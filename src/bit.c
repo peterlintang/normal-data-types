@@ -144,7 +144,7 @@ int MODULE_FUN_NAME(Bit, count)(T set)
 	for (n = NBYTES(set->length); --n >= 0; )
 	{
 		c = set->bytes[n];
-		length += count[c * 0xF] + count[c >> 4];
+		length += count[c & 0xF] + count[c >> 4];
 	}
 
 	return length;
