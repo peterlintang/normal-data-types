@@ -23,6 +23,7 @@ SRC := ./ap.c			\
 		./mp.c			\
 		./seq.c			\
 		./str.c			\
+		./list2.c		\
 		./text.c	
 
 OBJS := ./ap.o			\
@@ -37,6 +38,7 @@ OBJS := ./ap.o			\
 		./mp.o			\
 		./seq.o			\
 		./str.o			\
+		./list2.o		\
 		./text.o	
 
 
