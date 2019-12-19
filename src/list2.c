@@ -18,7 +18,7 @@
 
 #define T List_T
 
-#define NODE List_Node_T
+#define NODE ListNode_T
 
 
 /*
