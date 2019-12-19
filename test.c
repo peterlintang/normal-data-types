@@ -46,6 +46,13 @@ static void test_list2(void)
 		fprintf(stdout, "i: %d, value: %d\n", i, (int)node->priv);
 	}
 
+	while (node = MODULE_FUN_NAME(List, head)(list))
+	{
+		fprintf(stdout, "value: %d\n", (int)node->priv);
+		MODULE_FUN_NAME(List, remove)(list, node);
+		MODULE_FUN_NAME(ListNode, free)(&node);
+	}
+
 	MODULE_FUN_NAME(List, free)(&list);
 
 }
