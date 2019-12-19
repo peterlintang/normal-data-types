@@ -13,7 +13,6 @@ LIBS:=$(LIBDATATYPE)
 
 SRC := ./ap.c			\
 		./arrayrep.c	\
-		./list.c		\
 		./ring.c		\
 		./set.c			\
 		./table.c		\
@@ -28,7 +27,6 @@ SRC := ./ap.c			\
 
 OBJS := ./ap.o			\
 		./arrayrep.o	\
-		./list.o		\
 		./ring.o		\
 		./set.o			\
 		./table.o		\
