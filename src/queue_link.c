@@ -20,10 +20,11 @@
 #include "queue_link.h"
 
 #define T Queue_T
+#define LIST List_T
 #define NODE ListNode_T
 
 struct T {
-	List_T head;
+	LIST head;
 };
 
 
