@@ -24,6 +24,7 @@ SRC := ./ap.c			\
 		./str.c			\
 		./list2.c		\
 		./queue_link.c		\
+		./stack_link.c		\
 		./text.c	
 
 OBJS := ./ap.o			\
@@ -39,6 +40,7 @@ OBJS := ./ap.o			\
 		./str.o			\
 		./list2.o		\
 		./queue_link.o		\
+		./stack_link.o		\
 		./text.o	
 
 

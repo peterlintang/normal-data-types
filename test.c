@@ -80,6 +80,31 @@ static void test_queue_link(void)
 	MODULE_FUN_NAME(Queue, free)(&q, 0);
 }
 
+#include "stack_link.h"
+static void test_stack_link(void)
+{
+	Stack_T s = NULL;
+	int i;
+	int *p = NULL;
+
+	s = MODULE_FUN_NAME(Stack, new)();
+	if (NULL == s)
+		return ;
+
+	for (i = 0; i < 30; i++)
+	{
+		MODULE_FUN_NAME(Stack, push)(s, (void *)i);
+	}
+
+	while (MODULE_FUN_NAME(Stack, isEmpty)(s) == 0)
+	{
+		MODULE_FUN_NAME(Stack, pop)(s, &p);
+		fprintf(stdout, "value: %d\n", (int)p);
+	}
+
+	MODULE_FUN_NAME(Stack, free)(&s, 0);
+}
+
 struct test_routine {
 	void (*call_back)(void);
 	char *name;
@@ -90,6 +115,7 @@ struct test_routine my_test_routines[] =
 		{test_bit, "bit"},
 		{test_list2, "list2"},
 		{test_queue_link, "queue_link"},
+		{test_stack_link, "stack_link"},
 		{NULL,NULL},
 };
 

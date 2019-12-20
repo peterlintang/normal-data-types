@@ -11,7 +11,7 @@ LIBDATATYPE:=libdatatype.a
 
 
 all: libs
-	$(GCC) -I$(INC) test.c ./src/$(LIBDATATYPE) 
+	$(GCC) -I$(INC) -g test.c ./src/$(LIBDATATYPE) 
 	echo "done all"
 libs:
 	make -C src all
