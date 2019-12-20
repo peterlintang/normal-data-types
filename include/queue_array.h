@@ -27,7 +27,7 @@ typedef struct T *T;
  * return value: return the pointer to queue
  * args: @length: user suggest length of queue
  */
-T MODULE_FUN_NAME(Queue, new)(int length);
+T MODULE_FUN_NAME(Queue, new)(int length, int size);
 
 /*
  * name: MODULE_FUN_NAME(Queue, free)

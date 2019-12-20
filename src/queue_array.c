@@ -17,7 +17,7 @@
 
 #include "array.h" // use array to implement queue
 
-#include "queue_link.h"
+#include "queue_array.h"
 
 #define T Queue_T
 #define ARRAY Array_T
@@ -36,12 +36,12 @@ struct T {
  * return value: return the pointer to queue
  * args: @length: user suggest length of queue
  */
-T MODULE_FUN_NAME(Queue, new)(int length)
+T MODULE_FUN_NAME(Queue, new)(int length, int size)
 {
 	T q = (T)calloc(1, sizeof(*q));
 	if (q)
 	{
-		q->head = MODULE_FUN_NAME(Array, new)(length, sizeof(void *));
+		q->head = MODULE_FUN_NAME(Array, new)(length, size);
 		if (NULL == q->head)
 		{
 			free(q);
