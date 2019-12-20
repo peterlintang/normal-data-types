@@ -20,6 +20,7 @@
 #include "queue_link.h"
 
 #define T Queue_T
+#define NODE ListNode_T
 
 struct T {
 	List_T head;
@@ -114,7 +115,7 @@ int MODULE_FUN_NAME(Queue, get)(T q, void **x)
 	NODE node = NULL;
 
 	assert(q);
-	assert(x && *x);
+	assert(x);
 
 	node = MODULE_FUN_NAME(List, head)(q->head);
 	if (NULL == node)
@@ -136,6 +137,8 @@ int MODULE_FUN_NAME(Queue, get)(T q, void **x)
  */
 int MODULE_FUN_NAME(Queue, isEmpty)(T q)
 {
+	assert(q);
+
 	return MODULE_FUN_NAME(List, isEmpty)(q->head);
 }
 
