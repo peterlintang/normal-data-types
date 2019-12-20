@@ -42,6 +42,7 @@ void MODULE_FUN_NAME(Queue, free)(T *q, int withdata);
 /*
  * name: MODULE_FUN_NAME(Queue, put)
  * description: put @x at the end of queue
+ * 			TODO chuan zhi copy
  * return value: 0: put success
  * 				-1: no mem
  * args: @q pointer to queue
