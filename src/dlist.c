@@ -1,6 +1,6 @@
 /*************************************
  *
- * filename:	list2.c
+ * filename:	dlist.c
  * description:	implement the new list operations
  * author:
  * date:		2019-12-19
@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "list2.h"
+#include "dlist.h"
 
 #define T List_T
 

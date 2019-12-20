@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "list2.h" // use double link to implement queue
+#include "dlist.h" // use double link to implement queue
 
 #include "queue_link.h"
 

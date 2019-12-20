@@ -18,8 +18,8 @@ static void test_bit(void)
 
 }
 
-#include "list2.h"
-static void test_list2(void)
+#include "dlist.h"
+static void test_dlist(void)
 {
 	List_T list = NULL;
 	ListNode_T node = NULL;
@@ -113,7 +113,7 @@ struct test_routine {
 struct test_routine my_test_routines[] = 
 {
 		{test_bit, "bit"},
-		{test_list2, "list2"},
+		{test_dlist, "dlist"},
 		{test_queue_link, "queue_link"},
 		{test_stack_link, "stack_link"},
 		{NULL,NULL},

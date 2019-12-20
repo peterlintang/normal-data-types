@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "list2.h"
+#include "dlist.h"
 
 #include "stack_link.h"
 
