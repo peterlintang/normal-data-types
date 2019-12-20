@@ -60,6 +60,7 @@ static void test_dlist(void)
 
 }
 
+#if 0
 #include "queue_link.h"
 static void test_queue_link(void)
 {
@@ -84,6 +85,7 @@ static void test_queue_link(void)
 
 	MODULE_FUN_NAME(Queue, free)(&q, 0);
 }
+#endif
 
 #include "stack_link.h"
 static void test_stack_link(void)
@@ -123,29 +125,30 @@ static void test_queue_array(void)
 	int i;
 	int *p = NULL;
 
-	q = MODULE_FUN_NAME(Queue, new)(100);
+	q = MODULE_FUN_NAME(Queue, new)(300, sizeof(struct aa));
 	if (NULL == q)
 		return ;
 
-	for (i = 0; i < 20; i++)
+	for (i = 0; i < 200; i++)
 	{
-		struct aa *tmp = (struct aa *)calloc(1, sizeof(*tmp));
-		tmp->a = i;
-		strcpy(tmp->b, "hello");
+		struct aa tmp; 
+		tmp.a = i;
+		strcpy(tmp.b, "hello");
 		MODULE_FUN_NAME(Queue, put)(q, &tmp);
-		fprintf(stdout, "tmp: %p\n", tmp);
 	}
 
 	for (i = 0; i < 20; i++)
 	{
 		struct aa *tmp = NULL;
 		MODULE_FUN_NAME(Queue, get)(q, &tmp);
-		fprintf(stdout, "first get: value: %d, %p\n", tmp->a, tmp);
+		fprintf(stdout, "first get: value: %d, %s\n", tmp->a, tmp->b);
 	}
 
-	for (i = 0; i < 100; i++)
+	for (i = 0; i < 200; i++)
 	{
-		struct aa *tmp = NULL;
+		struct aa tmp; 
+		tmp.a = i;
+		strcpy(tmp.b, "world");
 		MODULE_FUN_NAME(Queue, put)(q, &tmp);
 	}
 
@@ -153,10 +156,10 @@ static void test_queue_array(void)
 	{
 		struct aa *tmp = NULL;
 		MODULE_FUN_NAME(Queue, get)(q, &tmp);
-//		fprintf(stdout, "second get: value: %d\n", tmp->a);
+		fprintf(stdout, "second get: value: %d, %s\n", tmp->a, tmp->b);
 	}
 
-	MODULE_FUN_NAME(Queue, free)(&q, 1);
+	MODULE_FUN_NAME(Queue, free)(&q, 0);
 }
 
 struct test_routine {
