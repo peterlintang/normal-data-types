@@ -130,11 +130,12 @@ int MODULE_FUN_NAME(Array, size)(T array)
 /*
  * name: MODULE_FUN_NAME(Array, resize)
  * description: resize @array to new elements' length to @length
- * return value: return void
+ * return value: 0: success
+ * 				-1: no mem
  * args: @array: pointer to array
  * 		 @length: new length of @array
  */
-void MODULE_FUN_NAME(Array, resize)(T array, int length)
+int MODULE_FUN_NAME(Array, resize)(T array, int length)
 {
 	assert(array);
 	assert(length >= 0);
@@ -149,6 +150,7 @@ void MODULE_FUN_NAME(Array, resize)(T array, int length)
 		if (NULL == array->array)
 		{
 			// TODO
+			return -1;
 		}
 	}
 	else
@@ -157,6 +159,7 @@ void MODULE_FUN_NAME(Array, resize)(T array, int length)
 	}
 
 	array->length = length;
+	return 0;
 }
 
 

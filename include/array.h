@@ -78,11 +78,12 @@ void *MODULE_FUN_NAME(Array, put)
 /*
  * name: MODULE_FUN_NAME(Array, resize)
  * description: resize @array to new elements' length to @length
- * return value: return void
+ * return value: 0: success
+ * 				-1: no mem
  * args: @array: pointer to array
  * 		 @length: new length of @array
  */
-void MODULE_FUN_NAME(Array, resize)
+int MODULE_FUN_NAME(Array, resize)
 		(T array, int length);
 
 /*
