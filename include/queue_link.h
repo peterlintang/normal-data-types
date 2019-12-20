@@ -1,7 +1,7 @@
 /*************************************
  *
  * filename:	queue_link.h
- * description:	use the double directions link
+ * description:	use the double directions link list
  * 		to implement the queue data struture
  * author:
  * date:		2019-12-20
