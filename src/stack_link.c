@@ -37,7 +37,7 @@ struct T {
 T MODULE_FUN_NAME(Stack, new)(void)
 {
 	T s = (T)calloc(1, sizeof(*s));
-	if (NULL == s)
+	if (s)
 	{
 		s->stack = MODULE_FUN_NAME(List, new)();
 		if (NULL == s->stack)
@@ -66,11 +66,13 @@ void MODULE_FUN_NAME(Stack, free)(T *s, int withdata)
 	assert(*s);
 	assert(1 == withdata || 0 == withdata);
 
-	while (MODULE_FUN_NAME(Stack, pop)(s, &p) == 0)
+	while (MODULE_FUN_NAME(Stack, pop)(*s, &p) == 0)
 	{
 		if (withdata)
 			free(p);
 	}
+
+	*s = NULL;
 }
 
 /*
