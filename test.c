@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <sys/time.h>
+
+
+
 #include "bit.h"
 static void test_bit(void)
 {
@@ -66,7 +70,7 @@ static void test_queue_link(void)
 	if (NULL == q)
 		return ;
 
-	for (i = 0; i < 30; i++)
+	for (i = 0; i < 300000; i++)
 	{
 		MODULE_FUN_NAME(Queue, put)(q, (void *)i);
 	}
@@ -91,7 +95,7 @@ static void test_stack_link(void)
 	if (NULL == s)
 		return ;
 
-	for (i = 0; i < 30; i++)
+	for (i = 0; i < 300000; i++)
 	{
 		MODULE_FUN_NAME(Stack, push)(s, (void *)i);
 	}
@@ -123,11 +127,19 @@ int main(int argc, char *argv[])
 {
 	int ret = 0;
 	int i;
+	struct timeval time1;
+	struct timeval time2;
 
 	for (i = 0; my_test_routines[i].call_back != NULL; i++)
 	{
 		fprintf(stdout, "%d testing : %s\n", i, my_test_routines[i].name);
+		gettimeofday(&time1, NULL);
 		my_test_routines[i].call_back();
+		gettimeofday(&time2, NULL);
+	fprintf(stdout, "%d testing : %s, elapse: %ld seconds, %ld useconds\n", 
+				i, my_test_routines[i].name,
+				time2.tv_sec - time1.tv_sec,
+				time2.tv_usec - time1.tv_usec);
 	}
 
 	return ret;
