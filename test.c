@@ -19,6 +19,7 @@ static void test_bit(void)
 	fprintf(stdout, "set bit: %d\n", MODULE_FUN_NAME(Bit, count)(set));
 	MODULE_FUN_NAME(Bit, put)(set, 20, 1);
 	fprintf(stdout, "set bit: %d\n", MODULE_FUN_NAME(Bit, count)(set));
+	MODULE_FUN_NAME(Bit, free)(&set);
 
 }
 
