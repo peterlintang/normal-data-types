@@ -3,9 +3,6 @@
 #include <stdlib.h>
 
 #include "bit.h"
-#include "list2.h"
-
-
 static void test_bit(void)
 {
 	Bit_T set = NULL;
@@ -21,6 +18,7 @@ static void test_bit(void)
 
 }
 
+#include "list2.h"
 static void test_list2(void)
 {
 	List_T list = NULL;
@@ -57,15 +55,42 @@ static void test_list2(void)
 
 }
 
+#include "queue_link.h"
+static void test_queue_link(void)
+{
+	Queue_T q = NULL;
+	int i;
+	int *p = NULL;
+
+	q = MODULE_FUN_NAME(Queue, new)();
+	if (NULL == q)
+		return ;
+
+	for (i = 0; i < 30; i++)
+	{
+		MODULE_FUN_NAME(Queue, put)(q, (void *)i);
+	}
+
+	while (MODULE_FUN_NAME(Queue, isEmpty)(q) == 0)
+	{
+		MODULE_FUN_NAME(Queue, get)(q, &p);
+		fprintf(stdout, "value: %d\n", (int)p);
+	}
+
+	MODULE_FUN_NAME(Queue, free)(&q, 0);
+}
+
 struct test_routine {
 	void (*call_back)(void);
+	char *name;
 };
 
 struct test_routine my_test_routines[] = 
 {
-		test_bit,
-		test_list2,
-		NULL,
+		{test_bit, "bit"},
+		{test_list2, "list2"},
+		{test_queue_link, "queue_link"},
+		{NULL,NULL},
 };
 
 int main(int argc, char *argv[])
@@ -75,6 +100,7 @@ int main(int argc, char *argv[])
 
 	for (i = 0; my_test_routines[i].call_back != NULL; i++)
 	{
+		fprintf(stdout, "%d testing : %s\n", i, my_test_routines[i].name);
 		my_test_routines[i].call_back();
 	}
 
