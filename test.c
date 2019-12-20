@@ -16,9 +16,9 @@ static void test_bit(void)
 		return ;
 	}
 	MODULE_FUN_NAME(Bit, set)(set, 5, 10);
-	fprintf(stdout, "set bit: %d\n", MODULE_FUN_NAME(Bit, count)(set));
+//	fprintf(stdout, "set bit: %d\n", MODULE_FUN_NAME(Bit, count)(set));
 	MODULE_FUN_NAME(Bit, put)(set, 20, 1);
-	fprintf(stdout, "set bit: %d\n", MODULE_FUN_NAME(Bit, count)(set));
+//	fprintf(stdout, "set bit: %d\n", MODULE_FUN_NAME(Bit, count)(set));
 	MODULE_FUN_NAME(Bit, free)(&set);
 
 }
@@ -46,12 +46,12 @@ static void test_dlist(void)
 			i > 0;
 			i--, node = MODULE_FUN_NAME(List, next)(node))
 	{
-		fprintf(stdout, "i: %d, value: %d\n", i, (int)node->priv);
+//		fprintf(stdout, "i: %d, value: %d\n", i, (int)node->priv);
 	}
 
 	while (node = MODULE_FUN_NAME(List, head)(list))
 	{
-		fprintf(stdout, "value: %d\n", (int)node->priv);
+//		fprintf(stdout, "value: %d\n", (int)node->priv);
 		MODULE_FUN_NAME(List, remove)(list, node);
 		MODULE_FUN_NAME(ListNode, free)(&node);
 	}
@@ -67,7 +67,7 @@ static void test_queue_link(void)
 	int i;
 	int *p = NULL;
 
-	q = MODULE_FUN_NAME(Queue, new)();
+	q = MODULE_FUN_NAME(Queue, new)(10);
 	if (NULL == q)
 		return ;
 
@@ -79,7 +79,7 @@ static void test_queue_link(void)
 	while (MODULE_FUN_NAME(Queue, isEmpty)(q) == 0)
 	{
 		MODULE_FUN_NAME(Queue, get)(q, &p);
-		fprintf(stdout, "value: %d\n", (int)p);
+//		fprintf(stdout, "value: %d\n", (int)p);
 	}
 
 	MODULE_FUN_NAME(Queue, free)(&q, 0);
@@ -104,10 +104,59 @@ static void test_stack_link(void)
 	while (MODULE_FUN_NAME(Stack, isEmpty)(s) == 0)
 	{
 		MODULE_FUN_NAME(Stack, pop)(s, &p);
-		fprintf(stdout, "value: %d\n", (int)p);
+//		fprintf(stdout, "value: %d\n", (int)p);
 	}
 
 	MODULE_FUN_NAME(Stack, free)(&s, 0);
+}
+
+#include "queue_array.h"
+static void test_queue_array(void)
+{
+	struct aa {
+		int a;
+		char b[11];
+	};
+
+
+	Queue_T q = NULL;
+	int i;
+	int *p = NULL;
+
+	q = MODULE_FUN_NAME(Queue, new)(100);
+	if (NULL == q)
+		return ;
+
+	for (i = 0; i < 20; i++)
+	{
+		struct aa *tmp = (struct aa *)calloc(1, sizeof(*tmp));
+		tmp->a = i;
+		strcpy(tmp->b, "hello");
+		MODULE_FUN_NAME(Queue, put)(q, &tmp);
+		fprintf(stdout, "tmp: %p\n", tmp);
+	}
+
+	for (i = 0; i < 20; i++)
+	{
+		struct aa *tmp = NULL;
+		MODULE_FUN_NAME(Queue, get)(q, &tmp);
+		fprintf(stdout, "first get: value: %d, %p\n", tmp->a, tmp);
+	}
+
+	for (i = 0; i < 100; i++)
+	{
+		struct aa *tmp = NULL;
+		MODULE_FUN_NAME(Queue, put)(q, &tmp);
+	}
+
+	while (MODULE_FUN_NAME(Queue, isEmpty)(q) == 0)
+	{
+		struct aa *tmp = NULL;
+		MODULE_FUN_NAME(Queue, get)(q, &tmp);
+//		fprintf(stdout, "second get: value: %d\n", tmp->a);
+	}
+
+	MODULE_FUN_NAME(Queue, free)(&q, 1);
 }
 
 struct test_routine {
@@ -119,8 +168,9 @@ struct test_routine my_test_routines[] =
 {
 		{test_bit, "bit"},
 		{test_dlist, "dlist"},
-		{test_queue_link, "queue_link"},
+//		{test_queue_link, "queue_link"},
 		{test_stack_link, "stack_link"},
+		{test_queue_array, "queue_array"},
 		{NULL,NULL},
 };
 
