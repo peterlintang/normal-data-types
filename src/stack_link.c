@@ -72,6 +72,7 @@ void MODULE_FUN_NAME(Stack, free)(T *s, int withdata)
 			free(p);
 	}
 
+	MODULE_FUN_NAME(List, free)(&(*s)->stack);
 	*s = NULL;
 }
 

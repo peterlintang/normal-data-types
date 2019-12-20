@@ -77,6 +77,8 @@ void MODULE_FUN_NAME(Queue, free)(T *q, int withdata)
 			free(node->priv);
 		MODULE_FUN_NAME(ListNode, free)(&node);
 	}
+
+	MODULE_FUN_NAME(List, free)(&(*q)->head);
 }
 
 /*
