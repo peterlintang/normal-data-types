@@ -34,7 +34,7 @@ struct T {
  */
 NODE MODULE_FUN_NAME(ListNode, new)(void *x)
 {
-	assert(x);
+//	assert(x);
 
 	NODE node = (NODE)calloc(1, sizeof(*node));
 	if (node)

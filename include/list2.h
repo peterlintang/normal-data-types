@@ -24,7 +24,7 @@ typedef struct NODE *NODE;
 struct NODE {
 	NODE prev;
 	NODE next;
-	void *priv;
+	void *priv; // user's data
 };
 
 
