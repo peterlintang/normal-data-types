@@ -27,10 +27,6 @@ struct NODE {
 	void *priv;
 };
 
-struct T {
-	NODE head;
-	int count;
-};
 
 /*
  * name: MODULE_FUN_NAME(ListNode, new)

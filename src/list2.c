@@ -20,6 +20,11 @@
 
 #define NODE ListNode_T
 
+struct T {
+	NODE head;
+	int count;
+};
+
 
 /*
  * name: MODULE_FUN_NAME(ListNode, new)
