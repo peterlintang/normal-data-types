@@ -116,7 +116,6 @@ int MODULE_FUN_NAME(Stack, pop)(T s, void **x)
 {
 	assert(s);
 	assert(x);
-	assert(*x);
 
 	if (MODULE_FUN_NAME(Stack, isEmpty)(s))
 		return -1;
