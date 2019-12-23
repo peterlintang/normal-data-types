@@ -56,25 +56,20 @@ T MODULE_FUN_NAME(Queue, new)(int length)
  * description: free the queue
  * return value: void
  * args: @q pointer to queue
- * 		@withdata: 1: means free user's data too
- *                  0: menas not free user's data
  */
-void MODULE_FUN_NAME(Queue, free)(T *q, int withdata)
+void MODULE_FUN_NAME(Queue, free)(T *q)
 {
 	NODE node = NULL;
 
 	assert(q);
 	assert(*q);
 	assert((*q)->head);
-	assert(1 == withdata || 0 == withdata);
 
 	for (node = MODULE_FUN_NAME(List, head)((*q)->head); 
 			node;
 			node = MODULE_FUN_NAME(List, head)((*q)->head))
 	{
 		MODULE_FUN_NAME(List, remove)((*q)->head, node);
-		if (withdata)
-			free(node->priv);
 		MODULE_FUN_NAME(ListNode, free)(&node);
 	}
 
