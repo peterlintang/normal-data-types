@@ -18,6 +18,12 @@ struct T {
 };
 
 
+/*
+ * name: MODULE_FUN_NAME(Ring, new)
+ * description: create a new ring
+ * return value: return the pointer to ring
+ * args: void
+ */
 T MODULE_FUN_NAME(Ring, new)(void)
 {
 	T ring = NULL;
@@ -31,6 +37,12 @@ T MODULE_FUN_NAME(Ring, new)(void)
 	return ring;
 }
 
+/*
+ * name: MODULE_FUN_NAME(Ring, ring)
+ * description: create a new ring by args
+ * return value: return the pointer to ring
+ * args: @x: args
+ */
 T MODULE_FUN_NAME(Ring, ring)(void *x, ...)
 {
 	va_list ap;
@@ -51,6 +63,12 @@ T MODULE_FUN_NAME(Ring, ring)(void *x, ...)
 	return ring;
 }
 
+/*
+ * name: MODULE_FUN_NAME(Ring, free)
+ * description: free a allocated ring
+ * return value: return void
+ * args: @ring: pointer's pointer to ring
+ */
 void MODULE_FUN_NAME(Ring, free)(T *ring)
 {
 	struct node *p = NULL;
@@ -72,6 +90,12 @@ void MODULE_FUN_NAME(Ring, free)(T *ring)
 	*ring = NULL;
 }
 
+/*
+ * name: MODULE_FUN_NAME(Ring, length)
+ * description: return the length of ring
+ * return value: ring's length
+ * args: @ring: pointer to ring
+ */
 int MODULE_FUN_NAME(Ring, length)(T ring)
 {
 	assert(ring);
@@ -80,6 +104,13 @@ int MODULE_FUN_NAME(Ring, length)(T ring)
 }
 
 
+/*
+ * name: MODULE_FUN_NAME(Ring, get)
+ * description: get the @i element of ring
+ * return value: return the value of @i element
+ * args: @ring: pointer to ring
+ * 		 @i: index of element
+ */
 void *MODULE_FUN_NAME(Ring, get)(T ring, int i)
 {
 	int n = 0;
@@ -108,6 +139,14 @@ void *MODULE_FUN_NAME(Ring, get)(T ring, int i)
 	return q->value;
 }
 
+/*
+ * name: MODULE_FUN_NAME(Ring, put)
+ * description: put the @i element of ring to be @x
+ * return value: return the prev value of @i element
+ * args: @ring: pointer to ring
+ * 		 @i: index of element
+ * 		 @x: value to put
+ */
 void *MODULE_FUN_NAME(Ring, put)(T ring, int i, void *x)
 {
 	int n = 0;
@@ -140,6 +179,13 @@ void *MODULE_FUN_NAME(Ring, put)(T ring, int i, void *x)
 	return prev;
 }
 
+/*
+ * name: MODULE_FUN_NAME(Ring, addhi)
+ * description: put @x at the tail of ring
+ * return value: return the value of @x
+ * args: @ring: pointer to ring
+ * 		 @x: value to put
+ */
 void *MODULE_FUN_NAME(Ring, addhi)(T ring, void *x)
 {
 	struct node *p = NULL;
@@ -169,6 +215,13 @@ void *MODULE_FUN_NAME(Ring, addhi)(T ring, void *x)
 	}
 }
 
+/*
+ * name: MODULE_FUN_NAME(Ring, addlo)
+ * description: put @x at the head of ring
+ * return value: return the value of @x
+ * args: @ring: pointer to ring
+ * 		 @x: value to put
+ */
 void *MODULE_FUN_NAME(Ring, addlo)(T ring, void *x)
 {
 	assert(ring);
@@ -237,6 +290,13 @@ void *MODULE_FUN_NAME(Ring, add)(T ring, int pos, void *x)
 	}
 }
 
+/*
+ * name: MODULE_FUN_NAME(Ring, remove)
+ * description: remove @i element in ring
+ * return value: return the value of @i element
+ * args: @ring: pointer to ring
+ * 		 @i: index of element
+ */
 void *MODULE_FUN_NAME(Ring, remove)(T ring, int i)
 {
 	int n;
@@ -278,6 +338,12 @@ void *MODULE_FUN_NAME(Ring, remove)(T ring, int i)
 	return x;
 }
 
+/*
+ * name: MODULE_FUN_NAME(Ring, rmhi)
+ * description: remove tail element in ring
+ * return value: return the value of tail element
+ * args: @ring: pointer to ring
+ */
 void *MODULE_FUN_NAME(Ring, rmhi)(T ring)
 {
 	void *x = NULL;
@@ -300,6 +366,12 @@ void *MODULE_FUN_NAME(Ring, rmhi)(T ring)
 	return x;
 }
 
+/*
+ * name: MODULE_FUN_NAME(Ring, rmlo)
+ * description: remove head element in ring
+ * return value: return the value of head element
+ * args: @ring: pointer to ring
+ */
 void *MODULE_FUN_NAME(Ring, rmlo)(T ring)
 {
 	void *x = NULL;
