@@ -15,7 +15,7 @@
 
 #include "module.h"
 
-/*
+
 #define T List_T
 typedef struct T *T;
 
@@ -23,82 +23,105 @@ struct T {
 	T rest;
 	void *first;
 };
-*/
 
-struct List_T {
-	struct List_T *rest;
-	void *first;
-};
-
-/* 
- * interface: 
- * description:  
- * args: 
- * return value: 
- */
-struct List_T *MODULE_FUN_NAME(List, append)(
-			struct List_T *list, 
-			struct List_T *tail);
-//struct List_T *List_append(struct List_T *list, struct List_T *tail);
-
-/* 
- * interface: 
- * description: 
- * args:	
- * return value: 
- */
-struct List_T *MODULE_FUN_NAME(List, copy)(
-				struct List_T *list);
-//struct List_T *List_copy(struct List_T *list);
-
-/* 
- * interface: 
- * description: 
- * args: 
- * return value: 
- */
-struct List_T *MODULE_FUN_NAME(List, list)(void *x, ...);
-//struct List_T *List_list(void *x, ...);
-
-/* 
- * interface: 
- * description: 
- * args:	
- * return value: 
- */
-struct List_T *MODULE_FUN_NAME(List, pop)(
-				struct List_T *list, void **x);
-//struct List_T *List_pop(struct List_T *list, void **x);
-
-struct List_T *MODULE_FUN_NAME(List, push)(
-				struct List_T *list, void *x);
-//struct List_T *List_push(struct List_T *list, void *x);
-
-struct List_T *MODULE_FUN_NAME(List, reverse)(
-				struct List_T *list);
-//struct List_T *List_reverse(struct List_T *list);
-
-int MODULE_FUN_NAME(List, length)(
-				struct List_T *list);
-//int List_length(struct List_T *list);
-
-void MODULE_FUN_NAME(List, free)(
-				struct List_T **list);
-//struct List_T *List_free(struct List_T *list);
-
-void MODULE_FUN_NAME(List, map)(
-				struct List_T *list, 
-			void apply(void **x, void *cl), void *cl);
-//void *List_map(struct List_T *list, 
-//			void apply(void **x, void *cl), void *cl);
-
-void **MODULE_FUN_NAME(List, toArray)(
-				struct List_T *list, void *end);
-
-//void **List_toArray(struct List_T *list, void *end);
 
 /*
+ * name: MODULE_FUN_NAME(List, append)
+ * description: append @tail to @list
+ * return value: return a  new list
+ * args: @list: pointer to list
+ * 		 @tail: pointer to list
+ */
+T MODULE_FUN_NAME(List, append)(
+			T list, 
+			T tail);
+
+/*
+ * name: MODULE_FUN_NAME(List, copy)
+ * description: copy list @list
+ * return value: return a copied list
+ * args: @list: pointer to list
+ */
+T MODULE_FUN_NAME(List, copy)(
+				T list);
+
+/*
+ * name: MODULE_FUN_NAME(List, list)
+ * description: create a new list by args
+ * return value: return a new list
+ * args: @x: args
+ */
+T MODULE_FUN_NAME(List, list)(void *x, ...);
+
+/*
+ * name: MODULE_FUN_NAME(List, pop)
+ * description: pop list's head element from list
+ * return value: return a poped list
+ * args: @list: pointer to list
+ * 		 @x: pointer's pointer to store the poped elements
+ */
+T MODULE_FUN_NAME(List, pop)(
+				T list, void **x);
+
+/*
+ * name: MODULE_FUN_NAME(List, push)
+ * description: push @x to the head of list
+ * return value: return a pushed list
+ * args: @list: pointer to list
+ * 		 @x: value to push
+ */
+T MODULE_FUN_NAME(List, push)(
+				T list, void *x);
+
+/*
+ * name: MODULE_FUN_NAME(List, reverse)
+ * description: reverse the list
+ * return value: return a reversed list
+ * args: @list: pointer to list
+ */
+T MODULE_FUN_NAME(List, reverse)(
+				T list);
+
+/*
+ * name: MODULE_FUN_NAME(List, length)
+ * description: return the total elements in list
+ * return value: return the total elements in list
+ * args: @list: pointer to list
+ */
+int MODULE_FUN_NAME(List, length)(
+				T list);
+
+/*
+ * name: MODULE_FUN_NAME(List, free)
+ * description: free list
+ * return value: return void
+ * args: @list: pointer to list
+ */
+void MODULE_FUN_NAME(List, free)(
+				T *list);
+
+/*
+ * name: MODULE_FUN_NAME(List, map)
+ * description: for each elements in list, call @apply
+ * return value: return void
+ * args: @list: pointer to list
+ * 		 @apply: function to call
+ */
+void MODULE_FUN_NAME(List, map)(
+				T list, 
+			void apply(void **x, void *cl), void *cl);
+
+/*
+ * name: MODULE_FUN_NAME(List, toArray)
+ * description: put all elements in list to array
+ * return value: return array
+ * args: @list: pointer to list
+ * 		 @end: indicator of end of array
+ */
+void **MODULE_FUN_NAME(List, toArray)(
+				T list, void *end);
+
+
 #undef T
-*/
 
 #endif

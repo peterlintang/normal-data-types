@@ -17,11 +17,13 @@
 #include "module.h"
 #include "list.h"
 
-struct List_T *MODULE_FUN_NAME(List, append)
-		(struct List_T *list, struct List_T *tail)
-//struct List_T *List_append(struct List_T *list, struct List_T *tail)
+#define T List_T
+
+T MODULE_FUN_NAME(List, append)
+		(T list, T tail)
+//T List_append(T list, T tail)
 {
-	struct List_T **p = &list;
+	T *p = &list;
 
 	while (*p)
 	{
@@ -33,17 +35,17 @@ struct List_T *MODULE_FUN_NAME(List, append)
 	return list;
 }
 
-struct List_T *MODULE_FUN_NAME(List, copy)
-		(struct List_T *list)
-//struct List_T *List_copy(struct List_T *list)
+T MODULE_FUN_NAME(List, copy)
+		(T list)
+//T List_copy(T list)
 {
-	struct List_T *head = NULL;
-	struct List_T **p = NULL;
+	T head = NULL;
+	T *p = NULL;
 
 	p = &head;
 	for (; list; list = list->rest)
 	{
-		*p = (struct List_T *)calloc(1, sizeof(**p));
+		*p = (T )calloc(1, sizeof(**p));
 		(*p)->first = list->first;
 		p = &(*p)->rest;
 	}
@@ -52,20 +54,20 @@ struct List_T *MODULE_FUN_NAME(List, copy)
 	return head;
 }
 
-struct List_T *MODULE_FUN_NAME(List, list)
+T MODULE_FUN_NAME(List, list)
 		(void *x, ...)
-//struct List_T *List_list(void *x, ...)
+//T List_list(void *x, ...)
 {
 	va_list ap;
-	struct List_T *list = NULL;
-	struct List_T **p = NULL;	// a good example to use pointer's pointer
-	struct List_T *item = NULL;
+	T list = NULL;
+	T *p = NULL;	// a good example to use pointer's pointer
+	T item = NULL;
 
 	p = &list;
 	va_start(ap, x);
 	for (; x; x = va_arg(ap, void *))
 	{
-		*p = (struct List_T *)calloc(1, sizeof(**p));
+		*p = (T )calloc(1, sizeof(**p));
 		if (NULL == *p)
 		{
 			goto error;
@@ -91,11 +93,11 @@ error:
 	return NULL;
 }
 
-struct List_T *MODULE_FUN_NAME(List, pop)
-			(struct List_T *list, void **x)
-//struct List_T *List_pop(struct List_T *list, void **x)
+T MODULE_FUN_NAME(List, pop)
+			(T list, void **x)
+//T List_pop(T list, void **x)
 {
-	struct List_T *head = NULL;
+	T head = NULL;
 	
 	if (list)
 	{
@@ -111,16 +113,16 @@ struct List_T *MODULE_FUN_NAME(List, pop)
 	}
 }
 
-struct List_T *MODULE_FUN_NAME(List, push)
-			(struct List_T *list, void *x)
-//struct List_T *List_push(struct List_T *list, void *x)
+T MODULE_FUN_NAME(List, push)
+			(T list, void *x)
+//T List_push(T list, void *x)
 {
-	struct List_T *p = NULL;
+	T p = NULL;
 
 	assert(list);
 	assert(x);
 
-	p = (struct List_T *)calloc(1, sizeof(*p));
+	p = (T )calloc(1, sizeof(*p));
 	if (NULL != p)
 	{
 		p->first = x;
@@ -130,12 +132,12 @@ struct List_T *MODULE_FUN_NAME(List, push)
 	return p;
 }
 
-struct List_T *MODULE_FUN_NAME(List, reverse)
-	(struct List_T *list)
-//struct List_T *List_reverse(struct List_T *list)
+T MODULE_FUN_NAME(List, reverse)
+	(T list)
+//T List_reverse(T list)
 {
-	struct List_T *head = NULL;
-	struct List_T *next = NULL;
+	T head = NULL;
+	T next = NULL;
 
 	for (; list; list = next)
 	{
@@ -148,8 +150,8 @@ struct List_T *MODULE_FUN_NAME(List, reverse)
 }
 
 int MODULE_FUN_NAME(List, length)
-		(struct List_T *list)
-//int List_length(struct List_T *list)
+		(T list)
+//int List_length(T list)
 {
 	int n;
 
@@ -161,10 +163,10 @@ int MODULE_FUN_NAME(List, length)
 }
 
 void MODULE_FUN_NAME(List, free)
-		(struct List_T **list)
-//void List_free(struct List_T **list)
+		(T *list)
+//void List_free(T *list)
 {
-	struct List_T *next = NULL;
+	T next = NULL;
 
 	assert(list);
 
@@ -179,9 +181,9 @@ void MODULE_FUN_NAME(List, free)
 }
 
 void MODULE_FUN_NAME(List, map)
-			(struct List_T *list, 
+			(T list, 
 				void apply(void **x, void *cl), void *cl)
-//void *List_map(struct List_T *list, 
+//void *List_map(T list, 
 //			void apply(void **x, void *cl), void *cl)
 {
 	assert(apply);
@@ -193,8 +195,8 @@ void MODULE_FUN_NAME(List, map)
 }
 
 void **MODULE_FUN_NAME(List, toArray)
-		(struct List_T *list, void *end)
-//void **List_toArray(struct List_T *list, void *end)
+		(T list, void *end)
+//void **List_toArray(T list, void *end)
 {
 	int i;
 	int n;
