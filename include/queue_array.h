@@ -34,10 +34,8 @@ T MODULE_FUN_NAME(Queue, new)(int length, int size);
  * description: free the queue
  * return value: void
  * args: @q pointer to queue
- * 		@withdata: 1: means free user's data too
- * 					0: menas not free user's data
  */
-void MODULE_FUN_NAME(Queue, free)(T *q, int withdata);
+void MODULE_FUN_NAME(Queue, free)(T *q);
 
 /*
  * name: MODULE_FUN_NAME(Queue, put)
