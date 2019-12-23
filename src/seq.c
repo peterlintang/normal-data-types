@@ -34,6 +34,12 @@ static void expand(T seq)
 }
 
 // < functions 175 >
+/*
+ * name: MODULE_FUN_NAME(Seq, new)
+ * description: create a new seq
+ * return value: return pointer to seq
+ * args: @hint: suggested seq size, will expand auto
+ */
 T MODULE_FUN_NAME(Seq, new)(int hint)
 {
 	T seq = NULL;
@@ -56,6 +62,12 @@ T MODULE_FUN_NAME(Seq, new)(int hint)
 	return seq;
 }
 
+/*
+ * name: MODULE_FUN_NAME(Seq, seq)
+ * description: create a new seq with @x ... args
+ * return value: return pointer to seq
+ * args: @x: args
+ */
 T MODULE_FUN_NAME(Seq, seq)(void *x, ...)
 {
 	va_list ap;
@@ -75,6 +87,12 @@ T MODULE_FUN_NAME(Seq, seq)(void *x, ...)
 	return seq;
 }
 
+/*
+ * name: MODULE_FUN_NAME(Seq, free)
+ * description: free a seq
+ * return value: return void
+ * args: @seq: pointer's pointer to seq
+ */
 void MODULE_FUN_NAME(Seq, free)(T *seq)
 {
 	assert(seq && *seq);
@@ -90,6 +108,12 @@ void MODULE_FUN_NAME(Seq, free)(T *seq)
 	*seq = NULL;
 }
 
+/*
+ * name: MODULE_FUN_NAME(Seq, length)
+ * description: get the length of seq
+ * return value: return length of seq
+ * args: @seq: pointer to seq
+ */
 int MODULE_FUN_NAME(Seq, length)(T seq)
 {
 	assert(seq);
@@ -97,6 +121,13 @@ int MODULE_FUN_NAME(Seq, length)(T seq)
 	return seq->length;
 }
 
+/*
+ * name: MODULE_FUN_NAME(Seq, get)
+ * description: get the @i index element of seq
+ * return value: return @i element of seq
+ * args: @seq: pointer to seq
+ * 		 @i: index
+ */
 void *MODULE_FUN_NAME(Seq, get)(T seq, int i)
 {
 	assert(seq);
@@ -105,6 +136,14 @@ void *MODULE_FUN_NAME(Seq, get)(T seq, int i)
 	return ((void **)seq->array.array)[(seq->head + i) % seq->array.length];
 }
 
+/*
+ * name: MODULE_FUN_NAME(Seq, put)
+ * description: put the @i index element of seq to be @x
+ * return value: return @i element's prev value of seq
+ * args: @seq: pointer to seq
+ * 		 @i: index
+ * 		 @x: value to put
+ */
 void *MODULE_FUN_NAME(Seq, put)(T seq, int i, void *x)
 {
 	void *prev = NULL;
@@ -118,6 +157,12 @@ void *MODULE_FUN_NAME(Seq, put)(T seq, int i, void *x)
 	return prev;
 }
 
+/*
+ * name: MODULE_FUN_NAME(Seq, rmhi)
+ * description: remove the last element of seq 
+ * return value: return pointer to last element
+ * args: @seq: pointer to seq
+ */
 void *MODULE_FUN_NAME(Seq, rmhi)(T seq)
 {
 	int i = 0;
@@ -125,10 +170,16 @@ void *MODULE_FUN_NAME(Seq, rmhi)(T seq)
 	assert(seq);
 	assert(seq->length > 0);
 
-	i == --seq->length;
+	i = --seq->length;
 	return ((void **)seq->array.array)[(seq->head + i) % seq->array.length];
 }
 
+/*
+ * name: MODULE_FUN_NAME(Seq, rmlo)
+ * description: remove the first element of seq 
+ * return value: return pointer to first element
+ * args: @seq: pointer to seq
+ */
 void *MODULE_FUN_NAME(Seq, rmlo)(T seq)
 {
 	int i = 0;
@@ -144,6 +195,13 @@ void *MODULE_FUN_NAME(Seq, rmlo)(T seq)
 	return x;
 }
 
+/*
+ * name: MODULE_FUN_NAME(Seq, addhi)
+ * description: add @x at tail of seq 
+ * return value: return pointer to @x
+ * args: @seq: pointer to seq
+ * 		 @x: value to add
+ */
 void *MODULE_FUN_NAME(Seq, addhi)(T seq, void *x)
 {
 	int i = 0;
@@ -160,6 +218,13 @@ void *MODULE_FUN_NAME(Seq, addhi)(T seq, void *x)
 	return x;
 }
 
+/*
+ * name: MODULE_FUN_NAME(Seq, addlo)
+ * description: add @x at head of seq 
+ * return value: return pointer to @x
+ * args: @seq: pointer to seq
+ * 		 @x: value to add
+ */
 void *MODULE_FUN_NAME(Seq, addlo)(T seq, void *x)
 {
 	int i = 0;
