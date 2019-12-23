@@ -37,7 +37,7 @@ T MODULE_FUN_NAME(Stack, new)(void);
  * 		@withdata: 1: means free user's data too
  * 					0: menas not free user's data
  */
-void MODULE_FUN_NAME(Stack, free)(T *s, int withdata);
+void MODULE_FUN_NAME(Stack, free)(T *s);
 
 /*
  * name: MODULE_FUN_NAME(Stack, push)

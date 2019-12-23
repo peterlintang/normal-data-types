@@ -58,18 +58,15 @@ T MODULE_FUN_NAME(Stack, new)(void)
  * 		@withdata: 1: means free user's data too
  * 					0: menas not free user's data
  */
-void MODULE_FUN_NAME(Stack, free)(T *s, int withdata)
+void MODULE_FUN_NAME(Stack, free)(T *s)
 {
 	void *p = NULL;
 
 	assert(s);
 	assert(*s);
-	assert(1 == withdata || 0 == withdata);
 
 	while (MODULE_FUN_NAME(Stack, pop)(*s, &p) == 0)
 	{
-		if (withdata)
-			free(p);
 	}
 
 	MODULE_FUN_NAME(List, free)(&(*s)->stack);
