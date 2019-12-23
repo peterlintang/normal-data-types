@@ -25,9 +25,10 @@ typedef struct T *T;
  * name: MODULE_FUN_NAME(Stack, new)
  * description: create a new stack
  * return value: return the pointer to stack
- * args: void
+ * args: @length: total elements for array
+ *       @size: element's size for mem space
  */
-T MODULE_FUN_NAME(Stack, new)(void);
+T MODULE_FUN_NAME(Stack, new)(int length, int size);
 
 /*
  * name: MODULE_FUN_NAME(Stack, free)

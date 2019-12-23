@@ -122,7 +122,7 @@ int MODULE_FUN_NAME(Stack, pop)(T s, void **x)
 		return -1;
 	
 	s->num--;
-	MODULE_FUN_NAME(Array, get)(s->array, s->num, x);
+	*x = MODULE_FUN_NAME(Array, get)(s->array, s->num);
 	return 0;
 }
 
