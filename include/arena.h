@@ -13,7 +13,7 @@
 #ifndef IC_ARENA_H__
 #define IC_ARENA_H__
 
-#include "except.h"
+#include "module.h"
 
 #define T Arena_T
 typedef struct T *T;
