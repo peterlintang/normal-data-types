@@ -219,6 +219,8 @@ static void test_ap(void)
 
 	MODULE_FUN_NAME(AP, free)(&ap1);
 	MODULE_FUN_NAME(AP, free)(&ap2);
+	MODULE_FUN_NAME(AP, free)(&ap3);
+	MODULE_FUN_NAME(AP, free)(&ap4);
 }
 
 struct test_routine {
