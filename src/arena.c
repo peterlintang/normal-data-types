@@ -73,7 +73,7 @@ void MODULE_FUN_NAME(Arena, dispose)(T *ap)
 {
 	assert(ap && *ap);
 
-	Arena_free(*ap);
+	MODULE_FUN_NAME(Arena, free)(*ap);
 	free(*ap);
 	*ap = NULL;
 }
@@ -150,7 +150,7 @@ void *MODULE_FUN_NAME(Arena, calloc)(
 	assert(count > 0);
 	assert(nbytes > 0);
 
-	ptr = Arena_alloc(arena, count * nbytes, file, line);
+	ptr = MODULE_FUN_NAME(Arena, alloc)(arena, count * nbytes, file, line);
 	memset(ptr, '\0', count * nbytes);
 
 	return ptr;
