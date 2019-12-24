@@ -88,7 +88,9 @@ void MODULE_FUN_NAME(Arena, dispose)(T *ap)
  * 		 file: file name
  * 		 line: line number in file
  */
-void *MODULE_FUN_NAME(Arena, alloc)(T arena, long nbytes, const char *file, int line)
+void *MODULE_FUN_NAME(Arena, alloc)(
+		T arena, long nbytes, 
+		const char *file, int line)
 {
 	assert(arena);
 	assert(nbytes > 0);
@@ -139,8 +141,9 @@ void *MODULE_FUN_NAME(Arena, alloc)(T arena, long nbytes, const char *file, int 
  * 		 file: file name
  * 		 line: line number in file
  */
-void *MODULE_FUN_NAME(Arena, calloc)(T arena, long count, long nbytes, 
-				const char *file, int line)
+void *MODULE_FUN_NAME(Arena, calloc)(
+		T arena, long count, long nbytes, 
+		const char *file, int line)
 {
 	void *ptr = NULL;
 
