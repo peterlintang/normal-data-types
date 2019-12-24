@@ -580,7 +580,7 @@ char *MODULE_FUN_NAME(AP, tostr)(char *str, int size, int base, T x)
 
 	assert(x);
 	assert(base >= 2 && base <= 36);
-	assert(str == NULL && size > 1);
+	assert(str == NULL || size > 1);
 
 	if (NULL == str)
 	{
@@ -629,7 +629,7 @@ void MODULE_FUN_NAME(AP, fmt)
 	assert(x);
 
 	buf = MODULE_FUN_NAME(AP, tostr)(NULL, 0, 10, x);
-	Fmt_putd(buf, strlen(buf), put, cl, flags, width, precision);
+//	Fmt_putd(buf, strlen(buf), put, cl, flags, width, precision);
 	free(buf);
 }
 
