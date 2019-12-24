@@ -193,6 +193,34 @@ static void test_stack_array(void)
 }
 #endif
 
+#include "ap.h"
+static void test_ap(void)
+{
+	char tmp[40] = { 0 };
+	char *p = NULL;
+	AP_T ap1 = NULL;
+	AP_T ap2 = NULL;
+	AP_T ap3 = NULL;
+	AP_T ap4 = NULL;
+	ap1 = MODULE_FUN_NAME(AP, new)(20);
+	ap2 = MODULE_FUN_NAME(AP, new)(30);
+
+	ap3 = MODULE_FUN_NAME(AP, muli)(ap1, 100);
+	ap4 = MODULE_FUN_NAME(AP, addi)(ap2, 200);
+
+	p = MODULE_FUN_NAME(AP, tostr)(tmp, 30, 10, ap1);
+	fprintf(stdout, "ap1: value: %s\n", p);
+	p = MODULE_FUN_NAME(AP, tostr)(tmp, 30, 10, ap2);
+	fprintf(stdout, "ap2: value: %s\n", p);
+	p = MODULE_FUN_NAME(AP, tostr)(tmp, 30, 10, ap3);
+	fprintf(stdout, "ap3: value: %s\n", p);
+	p = MODULE_FUN_NAME(AP, tostr)(tmp, 30, 10, ap4);
+	fprintf(stdout, "ap4: value: %s\n", p);
+
+	MODULE_FUN_NAME(AP, free)(&ap1);
+	MODULE_FUN_NAME(AP, free)(&ap2);
+}
+
 struct test_routine {
 	void (*call_back)(void);
 	char *name;
@@ -206,6 +234,7 @@ struct test_routine my_test_routines[] =
 		{test_stack_link, "stack_link"},
 //		{test_queue_array, "queue_array"},
 //		{test_stack_array, "stack_array"},
+		{test_ap, "ap"},
 		{NULL,NULL},
 };
 
