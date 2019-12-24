@@ -223,6 +223,29 @@ static void test_ap(void)
 	MODULE_FUN_NAME(AP, free)(&ap4);
 }
 
+#include "arena.h"
+static void test_arena(void)
+{
+	Arena_T area = NULL;
+
+	area = MODULE_FUN_NAME(Arena, new)();
+	if (area)
+	{
+		int *p = NULL;
+		p = (int *)MODULE_FUN_NAME(Arena, calloc)(area, 10, sizeof(int),
+						__FILE__, __LINE__);
+		if (p)
+		{
+			for (int i = 0; i < 10; i++)
+				p[i] = i + 1000;
+			for (int i = 0; i < 10; i++)
+				fprintf(stdout, "i: %d\n", p[i]);
+		}
+		MODULE_FUN_NAME(Arena, free)(area);
+		MODULE_FUN_NAME(Arena, dispose)(&area);
+	}
+}
+
 struct test_routine {
 	void (*call_back)(void);
 	char *name;
@@ -237,6 +260,7 @@ struct test_routine my_test_routines[] =
 //		{test_queue_array, "queue_array"},
 //		{test_stack_array, "stack_array"},
 		{test_ap, "ap"},
+		{test_arena, "arena"},
 		{NULL,NULL},
 };
 
