@@ -41,7 +41,13 @@ static int nfree = 0;
 
 
 // <function 93>
-T Arena_new(void)
+/*
+ * name: MODULE_FUN_NAME(Arena, new)
+ * description: create a new arena
+ * return value: return the pointer arena
+ * args: void
+ */
+T MODULE_FUN_NAME(Arena, new)(void)
 {
 	T arena = NULL;
 
@@ -56,7 +62,14 @@ T Arena_new(void)
 	return arena;
 }
 
-void Arena_dispose(T *ap)
+/*
+ * name: MODULE_FUN_NAME(Arena, dispose)
+ * description: destroy an arena and free the memory 
+ * 		allocated for arena
+ * return value: return void
+ * args: ap: pointer's pointer to arena
+ */
+void MODULE_FUN_NAME(Arena, dispose)(T *ap)
 {
 	assert(ap && *ap);
 
@@ -65,7 +78,17 @@ void Arena_dispose(T *ap)
 	*ap = NULL;
 }
 
-void *Arena_alloc(T arena, long nbytes, const char *file, int line)
+/*
+ * name: MODULE_FUN_NAME(Arena, alloc)
+ * description: alloc mem from an arena
+ * return value: return the pointer to the
+ * 		mem allocated 
+ * args: arena: arena (mem managed arena)
+ * 		 nbytes: total number of bytes to be allocated
+ * 		 file: file name
+ * 		 line: line number in file
+ */
+void *MODULE_FUN_NAME(Arena, alloc)(T arena, long nbytes, const char *file, int line)
 {
 	assert(arena);
 	assert(nbytes > 0);
@@ -105,7 +128,18 @@ void *Arena_alloc(T arena, long nbytes, const char *file, int line)
 	return arena->avail - nbytes;
 }
 
-void *Arena_calloc(T arena, long count, long nbytes, 
+/*
+ * name: MODULE_FUN_NAME(Arena, calloc)
+ * description: alloc mem from an arena and init to zero
+ * return value: return the pointer to the
+ * 		mem allocated 
+ * args: arena: arena (mem managed arena)
+ * 		 count: number of elements to allocated
+ * 		 nbytes: element's size for mem
+ * 		 file: file name
+ * 		 line: line number in file
+ */
+void *MODULE_FUN_NAME(Arena, calloc)(T arena, long count, long nbytes, 
 				const char *file, int line)
 {
 	void *ptr = NULL;
@@ -119,7 +153,13 @@ void *Arena_calloc(T arena, long count, long nbytes,
 	return ptr;
 }
 
-void Arena_free(T arena)
+/*
+ * name: MODULE_FUN_NAME(Arena, free)
+ * description: free an arena
+ * return value: return void
+ * args: arena: arena to free
+ */
+void MODULE_FUN_NAME(Arena, free)(T arena)
 {
 	assert(arena);
 
