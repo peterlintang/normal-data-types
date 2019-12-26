@@ -11,6 +11,8 @@
  *************************************/
 
 #include <pthread.h>
+#include <assert.h>
+#include <stdlib.h>
 
 #include "queue_link.h"
 
@@ -23,7 +25,7 @@
 #define MUTEX_T 	pthread_mutex_t
 #define COND_T 		pthread_cond_t
 
-#define MUTEX_INIT(mutex)		pthread_mutex_init(mutex)
+#define MUTEX_INIT(mutex)		pthread_mutex_init(mutex, NULL)
 #define MUTEX_DESTROY(mutex)	pthread_mutex_destroy(mutex)
 #define MUTEX_LOCK(mutex)		pthread_mutex_lock(mutex)
 #define MUTEX_UNLOCK(mutex)		pthread_mutex_unlock(mutex)
@@ -39,7 +41,7 @@
 #define T 		ThreadPool_T
 
 #define TASK	Task_T
-typedef TASK *TASK;
+typedef struct TASK *TASK;
 
 struct TASK {
 	MODULE_FUN_NAME(ThreadPool, Cb_T) cb;
@@ -171,18 +173,23 @@ int MODULE_FUN_NAME(ThreadPool, destroy)(T p)
 
 	for (i = 0; i < p->size; i++)
 	{
+		flag = 0;
+
 		if (MODULE_FUN_NAME(ThreadPool, post)(
 						p, 
 						thread_exit_handler, 
 						&flag))
+		{
 			return -1;
+		}
 
 		while (0 == flag)
 			pthread_yield();
+
 	}
 
-	COND_DESTROY(p->cond);
-	MUTEX_DESTROY(p->mutex);
+	COND_DESTROY(&p->cond);
+	MUTEX_DESTROY(&p->mutex);
 
 	return 0;
 }
@@ -211,13 +218,13 @@ int MODULE_FUN_NAME(ThreadPool, post)(
 	task->cb = cb;
 	task->cl = cl;
 
-	MUTEX_LOCK(p->mutex);
+	MUTEX_LOCK(&p->mutex);
 
 	MODULE_FUN_NAME(Queue, put)(p->queue, task);
 
-	COND_SIGNAL(p->cond);
+	COND_SIGNAL(&p->cond);
 
-	MUTEX_UNLOCK(p->mutex);
+	MUTEX_UNLOCK(&p->mutex);
 
 	return 0;
 }
@@ -236,7 +243,7 @@ static void thread_exit_handler(void *p)
 	pthread_exit(NULL);
 }
 
-static void *thread_cycle(void *pirv)
+static void *thread_cycle(void *priv)
 {
 	void *cl = NULL;
 	MODULE_FUN_NAME(ThreadPool, Cb_T) cb = NULL;
@@ -247,15 +254,14 @@ static void *thread_cycle(void *pirv)
 
 	for ( ; ; )
 	{
-		MUTEX_LOCK(p->mutex);
+		MUTEX_LOCK(&p->mutex);
 try_again:
-		task = MODULE_FUN_NAME(Queue, get)(p->queue);
-		if (NULL == task)
+		if (MODULE_FUN_NAME(Queue, get)(p->queue, &task) != 0)
 		{
-			COND_WAIT(p->cond, p->mutex);
+			COND_WAIT(&p->cond, &p->mutex);
 			goto try_again;
 		}
-		MUTEX_UNLOCK(p->mutex);
+		MUTEX_UNLOCK(&p->mutex);
 
 		cl = task->cl;
 		cb = task->cb;
