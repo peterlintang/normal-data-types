@@ -37,6 +37,7 @@
 #define COND_BROADCAST(cond)		pthread_cond_broadcast(cond)
 
 /**********************************************************/
+/* defines */
 #define QUEUE	Queue_T
 #define T 		ThreadPool_T
 
@@ -59,7 +60,7 @@ struct T {
 };
 
 /*
- * 
+ * local routines
  */
 static void thread_exit_handler(void *p);
 static void *thread_cycle(void *pirv);
@@ -232,7 +233,7 @@ int MODULE_FUN_NAME(ThreadPool, post)(
 
 
 /*
- *
+ * local routines
  */
 static void thread_exit_handler(void *p)
 {
