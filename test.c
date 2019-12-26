@@ -246,6 +246,27 @@ static void test_arena(void)
 	}
 }
 
+#include "thread_pool.h"
+static void pool_test_cb(void *cl)
+{
+	fprintf(stdout, "hello world: %d\n", (int)cl);
+}
+static void test_threadPool(void)
+{
+	int ret = 0;
+	ThreadPool_T p = NULL;
+
+	p = MODULE_FUN_NAME(ThreadPool, new)(10);
+	ret = MODULE_FUN_NAME(ThreadPool, init)(p);
+	fprintf(stdout, "%s: init: %d\n", __func__, ret);
+	ret = MODULE_FUN_NAME(ThreadPool, post)(p, pool_test_cb, 3);
+	fprintf(stdout, "%s: post: %d\n", __func__, ret);
+	ret = MODULE_FUN_NAME(ThreadPool, destroy)(p);
+	fprintf(stdout, "%s: destroy: %d\n", __func__, ret);
+	MODULE_FUN_NAME(ThreadPool, free)(&p);
+
+}
+
 struct test_routine {
 	void (*call_back)(void);
 	char *name;
@@ -261,6 +282,7 @@ struct test_routine my_test_routines[] =
 //		{test_stack_array, "stack_array"},
 		{test_ap, "ap"},
 		{test_arena, "arena"},
+		{test_threadPool, "threadPool"},
 		{NULL,NULL},
 };
 
