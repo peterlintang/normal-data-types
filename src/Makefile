@@ -24,6 +24,7 @@ SRC := ./ap.c			\
 		./str.c			\
 		./dlist.c		\
 		./arena.c		\
+		./thread_pool.c		\
 		./queue_link.c		\
 		./stack_link.c		\
 		./text.c	
@@ -41,6 +42,7 @@ OBJS := ./ap.o			\
 		./str.o			\
 		./dlist.o		\
 		./arena.o		\
+		./thread_pool.o		\
 		./queue_link.o		\
 		./stack_link.o		\
 		./text.o	
