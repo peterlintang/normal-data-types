@@ -56,7 +56,7 @@ $(LIBDATATYPE):$(OBJS)
 	echo "done libs"
 
 %.o:%.c
-	$(GCC) -I$(INC) -c $< -o $@
+	$(GCC) -I$(INC) -g -c $< -o $@
 
 clean:
 	rm -rf $(OBJS)  $(LIBS)
