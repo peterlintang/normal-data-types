@@ -19,7 +19,7 @@
 #include "thread_pool.h"
 
 /* threads defines */
-#define THREADS_MAX	20
+#define THREADS_MAX	20000
 #define COND_ATTR_T	pthread_condattr_t
 #define ATTR_T		pthread_attr_t
 #define MUTEX_T 	pthread_mutex_t
@@ -76,6 +76,7 @@ T MODULE_FUN_NAME(ThreadPool, new)(int size)
 	T p = NULL;
 
 	assert(size > 0);
+	assert(size <= THREADS_MAX);
 
 	p = (T)calloc(1, sizeof(*p));
 	if (NULL == p)
