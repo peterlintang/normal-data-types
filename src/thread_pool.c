@@ -171,7 +171,7 @@ int MODULE_FUN_NAME(ThreadPool, init)(T p)
 int MODULE_FUN_NAME(ThreadPool, destroy)(T p)
 {
 	int i;
-	int flag = 0;
+	volatile int flag = 0;
 
 	assert(p);
 
@@ -188,7 +188,8 @@ int MODULE_FUN_NAME(ThreadPool, destroy)(T p)
 		}
 
 		while (0 == flag)
-			pthread_yield();
+			usleep(1);
+	//		pthread_yield(); 
 
 	}
 
@@ -212,6 +213,7 @@ int MODULE_FUN_NAME(ThreadPool, post)(
 		MODULE_FUN_NAME(ThreadPool, Cb_T) cb, 
 		void *cl)
 {
+	int ret = 0;
 	TASK task = NULL;
 
 	assert(p);
@@ -225,13 +227,18 @@ int MODULE_FUN_NAME(ThreadPool, post)(
 
 	MUTEX_LOCK(&p->mutex);
 
-	MODULE_FUN_NAME(Queue, put)(p->queue, task);
+	ret = MODULE_FUN_NAME(Queue, put)(p->queue, task);
+	if (0 != ret)
+	{
+		goto out;
+	}
 
 	COND_SIGNAL(&p->cond);
 
+out:
 	MUTEX_UNLOCK(&p->mutex);
 
-	return 0;
+	return ret;
 }
 
 
