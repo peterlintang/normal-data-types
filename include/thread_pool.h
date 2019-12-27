@@ -38,9 +38,28 @@ T MODULE_FUN_NAME(ThreadPool, new)(int size);
 void MODULE_FUN_NAME(ThreadPool, free)(T *p);
 
 /*
+ * name: MODULE_FUN_NAME(ThreadPool, init)
+ * description: init a thread pool, create threads for the pool
+ * return value: 0: success; 
+ * 				<0 : error;
+ * args: p: pointer to pool 
+ */
+int MODULE_FUN_NAME(ThreadPool, init)(T p);
+
+/*
+ * name: MODULE_FUN_NAME(ThreadPool, destroy)
+ * description: stop threads for the pool
+ * return value: 0: success;
+ * 				<0: error
+ * args: p: pointer to pool 
+ */
+int MODULE_FUN_NAME(ThreadPool, destroy)(T p);
+
+/*
  * name: MODULE_FUN_NAME(ThreadPool, post)
  * description: post a task to thread pool
- * return value: 
+ * return value: 0: success
+ * 				-1: no mem
  * args: @p: pointer to thread pool
  * 		 @cb: user's callback
  * 		 @cl: user's private data, will passed to cb
