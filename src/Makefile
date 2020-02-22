@@ -31,7 +31,8 @@ DATA_SRCS := ./ap.c			\
 		./text.c	
 
 COMMUNICATE_SRCS := ./udsock-server.c \
-		./udsock-client.c
+		./udsock-client.c	\
+		./thread-signal.c
 
 
 DATA_OBJS := ./ap.o			\
@@ -53,7 +54,8 @@ DATA_OBJS := ./ap.o			\
 		./text.o	
 
 COMMUNICATE_OBJS := ./udsock-server.o \
-		./udsock-client.o
+		./udsock-client.o	\
+		./thread-signal.o
 
 all: $(LIBS)
 
