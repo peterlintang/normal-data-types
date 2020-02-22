@@ -30,6 +30,8 @@ int MODULE_FUN_NAME(Thread, blockSignals)(sigset_t *newset, sigset_t *oldset)
 {
 	int	i;
 
+	assert(newset && oldset);
+
 	sigemptyset(newset);
 
 	for (i = 1; i < MAX_SIGNALS; i++)
@@ -48,6 +50,8 @@ int MODULE_FUN_NAME(Thread, blockSignals)(sigset_t *newset, sigset_t *oldset)
  */
 int MODULE_FUN_NAME(Thread, unblockSignals)(sigset_t *newset, sigset_t *oldset)
 {
+	assert(newset && oldset);
+
 	return pthread_sigmask(SIG_UNBLOCK, newset, oldset);
 }
 

@@ -40,9 +40,8 @@ T MODULE_FUN_NAME(UnixSockServer, create)(const char *pathname, int backlog)
 	struct sockaddr_un addr;
 	T us = NULL;
 
-	if (!pathname || backlog < 1) {
-		return NULL;
-	}
+	assert(pathname != NULL);
+	assert(backlog >= 1);
 	
 	if (!(us = calloc(1, sizeof(*us)))) {
 		return NULL;
@@ -79,6 +78,8 @@ void MODULE_FUN_NAME(UnixSockServer, destroy)(T *uspp)
 {
 	T us = NULL;
 
+	assert(uspp != NULL && (*uspp) != NULL);
+
 	if (uspp && (us = *uspp)) {
 		if (us->listen_sock != -1)
 			close(us->listen_sock);
@@ -100,9 +101,7 @@ CLIENT MODULE_FUN_NAME(UnixSockServer, accept)(T server)
 {
 	CLIENT client = NULL;
 
-	if (!server) {
-		return NULL;
-	}
+	assert(server != NULL);
 
 	if (!(client = MODULE_FUN_NAME(UnixSockClient, create)(server->path))) {
 		return NULL;
@@ -132,6 +131,9 @@ CLIENT MODULE_FUN_NAME(UnixSockServer, accept)(T server)
 int MODULE_FUN_NAME(UnixSockServer, send)(CLIENT client, 
 				char *buf, unsigned int len)
 {
+	assert(client != NULL);
+	assert(buf != NULL);
+
 	return MODULE_FUN_NAME(UnixSockClient, send)(client, buf, len);
 }
 
@@ -149,6 +151,9 @@ int MODULE_FUN_NAME(UnixSockServer, send)(CLIENT client,
 int MODULE_FUN_NAME(UnixSockServer, recv)(CLIENT client, 
 				char *buf, unsigned int len)
 {
+	assert(client != NULL);
+	assert(buf != NULL);
+
 	return MODULE_FUN_NAME(UnixSockClient, recv)(client, buf, len);
 }
 
