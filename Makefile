@@ -7,17 +7,17 @@ FLAGS:=-c
 
 AR:=ar
 
-LIBDATATYPE:=libdatatype.a
+LIBDATATYPE:=./src/libdatatype.a
 
 
 all: libs
-	$(GCC) -I$(INC) -g test.c ./src/$(LIBDATATYPE) -lpthread
+	$(GCC) -I$(INC) -g test.c $(LIBDATATYPE) -lpthread
 	echo "done all"
 libs:
-	make -C src all
+	make -C src/ all
 
 clean:
-	make -C src clean
+	make -C src/ clean
 	rm -rf a.out
 	echo "done clean"
 

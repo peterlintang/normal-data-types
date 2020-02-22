@@ -8,10 +8,11 @@ FLAGS:=-c
 AR:=ar
 
 LIBDATATYPE:=libdatatype.a
+LIBCOMMUNICATE:=libcommunicate.a
 
-LIBS:=$(LIBDATATYPE)
+LIBS:=$(LIBDATATYPE) $(LIBCOMMUNICATE)
 
-SRC := ./ap.c			\
+DATA_SRCS := ./ap.c			\
 		./arrayrep.c	\
 		./ring.c		\
 		./set.c			\
@@ -29,7 +30,11 @@ SRC := ./ap.c			\
 		./stack_link.c		\
 		./text.c	
 
-OBJS := ./ap.o			\
+COMMUNICATE_SRCS := ./udsock-server.c \
+		./udsock-client.c
+
+
+DATA_OBJS := ./ap.o			\
 		./arrayrep.o	\
 		./ring.o		\
 		./set.o			\
@@ -47,18 +52,21 @@ OBJS := ./ap.o			\
 		./stack_link.o		\
 		./text.o	
 
+COMMUNICATE_OBJS := ./udsock-server.o \
+		./udsock-client.o
 
 all: $(LIBS)
-	echo "done all"
 
-$(LIBDATATYPE):$(OBJS)
-	$(AR) -r $(LIBDATATYPE) $(OBJS)
-	echo "done libs"
+$(LIBDATATYPE):$(DATA_OBJS)
+	$(AR) -r $(LIBDATATYPE) $(DATA_OBJS)
+
+$(LIBCOMMUNICATE):$(COMMUNICATE_OBJS)
+	$(AR) -r $(LIBCOMMUNICATE) $(COMMUNICATE_OBJS)
 
 %.o:%.c
 	$(GCC) -I$(INC) -g -c $< -o $@
 
 clean:
-	rm -rf $(OBJS)  $(LIBS)
+	rm -rf $(DATA_OBJS) $(COMMUNICATE_OBJS) $(LIBS)
 
 
