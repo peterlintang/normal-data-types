@@ -12,9 +12,6 @@
 #ifndef CI_UDSOCK_SERVER_H__
 #define CI_UDSOCK_SERVER_H__
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 #include "module.h"
 #include "udsock-client.h"
