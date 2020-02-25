@@ -186,6 +186,7 @@ int MODULE_FUN_NAME(SharedMem, read)(T shm, char *buf, int len)
 {
 	void *ptr = NULL;
 	int read = 0;
+	int data_available = 0;
 
 	assert(shm != NULL);
 	assert(buf != NULL);
@@ -195,6 +196,47 @@ int MODULE_FUN_NAME(SharedMem, read)(T shm, char *buf, int len)
 
 	pthread_mutex_lock(&shm->lock);
 
+	/* version 2 */
+	data_available = DATA_AVAILABLE(shm);
+	read = len > data_available ? data_available : len;
+
+	if (shm->read_cur < shm->write_cur)
+	{
+		memcpy(buf, ptr + (sizeof(*shm) + shm->read_cur), read);
+		shm->read_cur += read;
+	}
+	else if (shm->read_cur > shm->write_cur)
+	{
+		if (shm->size - shm->read_cur >= read)
+		{
+			memcpy(buf, ptr + (sizeof(*shm) + shm->read_cur), read);
+			shm->read_cur = (shm->read_cur + read) % shm->size;
+		}
+		else if (shm->size - shm->read_cur < read)
+		{
+			memcpy(buf, ptr + (sizeof(*shm) + shm->read_cur), shm->size - shm->read_cur);
+
+			shm->read_cur = 0;
+			buf += shm->size - shm->read_cur;
+			read -= shm->size - shm->read_cur;
+
+			memcpy(buf, ptr + (sizeof(*shm) + shm->read_cur), read);
+			shm->read_cur += read;
+		}
+		/*
+		else if (shm->size - shm->read_cur == read)
+		{
+			memcpy(buf, ptr + (sizeof(*shm) + shm->read_cur), read);
+			shm->read_cur = (shm->read_cur + read) % shm->size;
+		}
+		*/
+	}
+	else if (shm->read_cur == shm->write_cur)
+	{
+			// no data
+	}
+
+#if 0 // version 1
 	if (IS_EMPTY(shm))
 		goto out;
 
@@ -202,6 +244,7 @@ int MODULE_FUN_NAME(SharedMem, read)(T shm, char *buf, int len)
 
 	memcpy(buf, ptr + (sizeof(*shm) + shm->read_cur), read);
 	shm->read_cur += read;
+#endif 
 
 out:
 	pthread_mutex_unlock(&shm->lock);
@@ -221,6 +264,7 @@ int MODULE_FUN_NAME(SharedMem, write)(T shm, char *buf, int len)
 {
 	void *ptr = NULL;
 	int written = 0;
+	int space_left = 0;
 
 	assert(shm != NULL);
 	assert(buf != NULL);
@@ -230,6 +274,62 @@ int MODULE_FUN_NAME(SharedMem, write)(T shm, char *buf, int len)
 
 	pthread_mutex_lock(&shm->lock);
 
+	/* version 2, to improve efficency */
+	space_left = SPACE_LEFT(shm);
+	written = len > space_left ? space_left : len;
+
+	if (shm->read_cur > shm->write_cur)
+	{
+		memcpy(ptr + (sizeof(*shm) + shm->write_cur), buf, written);
+		shm->write_cur += written;
+	}
+	else if (shm->read_cur <= shm->write_cur)
+	{
+		if (shm->size - shm->write_cur > written)
+		{
+			memcpy(ptr + (sizeof(*shm) + shm->write_cur), buf, written);
+			shm->write_cur += written;
+		}
+		else
+		{
+			memcpy(ptr + (sizeof(*shm) + shm->write_cur), buf, shm->size - shm->write_cur);
+
+			written -= (shm->size - shm->write_cur);
+			buf += shm->size - shm->write_cur;
+			shm->write_cur = 0;
+
+			if (0 != written) 
+			{
+				memcpy(ptr + (sizeof(*shm) + shm->write_cur), buf, written);
+				shm->write_cur += written;
+			}
+		}
+	}
+	/*
+	else if (shm->read_cur == shm->write_cur)
+	{
+		if (shm->size - shm->write_cur > written)
+		{
+			memcpy(ptr + (sizeof(*shm) + shm->write_cur), buf, written);
+			shm->write_cur += written;
+		}
+		else
+		{
+			memcpy(ptr + (sizeof(*shm) + shm->write_cur), buf, shm->size - shm->write_cur);
+
+			written -= (shm->size - shm->write_cur);
+			buf += shm->size - shm->write_cur;
+			shm->write_cur = 0;
+
+			if (0 == written) break;
+
+			memcpy(ptr + (sizeof(*shm) + shm->write_cur), buf, written);
+			shm->write_cur += written;
+		}
+	}
+	*/
+
+#if 0  // version 1
 	if (IS_FULL(shm))
 		goto out;
 
@@ -253,6 +353,7 @@ int MODULE_FUN_NAME(SharedMem, write)(T shm, char *buf, int len)
 
 	memcpy(ptr + (sizeof(*shm) + shm->write_cur), buf, written);
 	shm->write_cur += written;
+#endif
 
 out:
 	pthread_mutex_unlock(&shm->lock);
