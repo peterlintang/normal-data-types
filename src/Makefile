@@ -38,7 +38,8 @@ COMMUNICATE_SRCS := ./udsock-server.c \
 		./sem-sysv.c	\
 		./mq-process.c	\
 		./process-lock.c	\
-		./named-fifo.c
+		./named-fifo.c		\
+		./stree.c
 
 
 DATA_OBJS := ./ap.o			\
@@ -67,7 +68,8 @@ COMMUNICATE_OBJS := ./udsock-server.o \
 		./sem-sysv.o	\
 		./mq-process.o	\
 		./process-lock.o	\
-		./named-fifo.o
+		./named-fifo.o		\
+		./stree.o
 
 all: $(LIBS)
 
