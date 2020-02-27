@@ -35,7 +35,8 @@ COMMUNICATE_SRCS := ./udsock-server.c \
 		./thread-signal.c	\
 		./named-sem.c	\
 		./share-mem.c	\
-		./sem-sysv.c
+		./sem-sysv.c	\
+		./mq-process.c
 
 
 DATA_OBJS := ./ap.o			\
@@ -61,7 +62,8 @@ COMMUNICATE_OBJS := ./udsock-server.o \
 		./thread-signal.o	\
 		./named-sem.o	\
 		./share-mem.o	\
-		./sem-sysv.o
+		./sem-sysv.o	\
+		./mq-process.o
 
 all: $(LIBS)
 
