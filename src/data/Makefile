@@ -28,7 +28,8 @@ DATA_SRCS := ./ap.c			\
 		./queue_link.c		\
 		./stack_link.c		\
 		./text.c		\
-		./stree.c
+		./stree.c	\
+		./simple_tree.c
 
 
 DATA_OBJS := ./ap.o			\
@@ -48,7 +49,8 @@ DATA_OBJS := ./ap.o			\
 		./queue_link.o		\
 		./stack_link.o		\
 		./text.o			\
-		./stree.o
+		./stree.o	\
+		./simple_tree.o
 
 
 all: $(LIBS)
