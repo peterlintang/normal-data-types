@@ -17,6 +17,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <semaphore.h>
+#include <assert.h>
 
 #include "named-sem.h"
 
