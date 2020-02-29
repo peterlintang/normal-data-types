@@ -1,5 +1,5 @@
 
-INC:=./include
+INC:=-I./include -I./include/data
 
 GCC:=gcc
 
@@ -7,11 +7,11 @@ FLAGS:=-c
 
 AR:=ar
 
-LIBDATATYPE:=./src/libdatatype.a
+LIBDATATYPE:=./src/data/libdatatype.a
 
 
 all: libs
-	$(GCC) -I$(INC) -g test.c $(LIBDATATYPE) -lpthread
+	$(GCC) $(INC) -g test.c $(LIBDATATYPE) -lpthread
 	echo "done all"
 libs:
 	make -C src/ all
