@@ -1,0 +1,181 @@
+diff --git a/README.md b/README.md
+index 16abc62..c6f419f 100644
+--- a/README.md
++++ b/README.md
+@@ -1,2 +1,8 @@
+ # normal-data-types
+ implement the normal data structure types for private future program usage
++
++hash
++tree
++crc
++md5
++mem manager
+diff --git a/src/Makefile b/src/Makefile
+index a6884ce..4a27dca 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -25,7 +25,7 @@ SRC := ./ap.c			\
+ 		./dlist.c		\
+ 		./arena.c		\
+ 		./thread_pool.c		\
+-		./queue_link.c		\
++		./queue_array.c		\
+ 		./stack_link.c		\
+ 		./text.c	
+ 
+@@ -43,7 +43,7 @@ OBJS := ./ap.o			\
+ 		./dlist.o		\
+ 		./arena.o		\
+ 		./thread_pool.o		\
+-		./queue_link.o		\
++		./queue_array.o		\
+ 		./stack_link.o		\
+ 		./text.o	
+ 
+diff --git a/src/thread_pool.c b/src/thread_pool.c
+index 89e8cc2..3b12224 100644
+--- a/src/thread_pool.c
++++ b/src/thread_pool.c
+@@ -14,7 +14,7 @@
+ #include <assert.h>
+ #include <stdlib.h>
+ 
+-#include "queue_link.h"
++#include "queue_array.h"
+ 
+ #include "thread_pool.h"
+ 
+@@ -85,7 +85,7 @@ T MODULE_FUN_NAME(ThreadPool, new)(int size)
+ 	}
+ 
+ 	p->size = size;
+-	p->queue = MODULE_FUN_NAME(Queue, new)(0);
++	p->queue = MODULE_FUN_NAME(Queue, new)(200000, sizeof(struct TASK));
+ 	if (NULL == p->queue)
+ 	{
+ 		free(p);
+@@ -237,6 +237,7 @@ int MODULE_FUN_NAME(ThreadPool, post)(
+ 
+ out:
+ 	MUTEX_UNLOCK(&p->mutex);
++		free(task);	// must free the mem we allocated
+ 
+ 	return ret;
+ }
+@@ -277,7 +278,6 @@ try_again:
+ 
+ 		cl = task->cl;
+ 		cb = task->cb;
+-		free(task);	// must free the mem we allocated
+ 		task = NULL;
+ 
+ 		if (cb)
+diff --git a/test.c b/test.c
+index 39b0698..dea64ff 100644
+--- a/test.c
++++ b/test.c
+@@ -60,7 +60,7 @@ static void test_dlist(void)
+ 
+ }
+ 
+-#if 1
++#if 0
+ #include "queue_link.h"
+ static void test_queue_link(void)
+ {
+@@ -114,7 +114,7 @@ static void test_stack_link(void)
+ }
+ #endif
+ 
+-#if 0
++#if 1
+ #include "queue_array.h"
+ static void test_queue_array(void)
+ {
+@@ -162,7 +162,7 @@ static void test_queue_array(void)
+ //		fprintf(stdout, "second get: value: %d, %s\n", tmp->a, tmp->b);
+ 	}
+ 
+-	MODULE_FUN_NAME(Queue, free)(&q, 0);
++	MODULE_FUN_NAME(Queue, free)(&q);
+ }
+ #endif
+ 
+@@ -249,7 +249,29 @@ static void test_arena(void)
+ #include "thread_pool.h"
+ static void pool_test_cb(void *cl)
+ {
+-	fprintf(stdout, "%d: hello world: %d\n", pthread_self(), (int)cl);
++	int i;
++	int ret = 0;
++
++	ret = (int )cl;
++
++	for (i = 0; i < 1000; i++)
++		ret = ret * ret;
++
++	ret = i + ret;
++//	fprintf(stdout, "%d: hello world: %d\n", pthread_self(), (int)cl);
++}
++static void producer(void *cl)
++{
++	int i;
++	int ret = 0;
++	ThreadPool_T p = (ThreadPool_T )cl;
++
++	for (i = 0; i < 500000; i++)
++	{
++		ret = MODULE_FUN_NAME(ThreadPool, post)(p, pool_test_cb, i);
++		if (0 != ret)
++			fprintf(stdout, "%s: post: %d\n", __func__, ret);
++	}
+ }
+ static void test_threadPool(void)
+ {
+@@ -257,13 +279,22 @@ static void test_threadPool(void)
+ 	int ret = 0;
+ 	ThreadPool_T p = NULL;
+ 
+-	p = MODULE_FUN_NAME(ThreadPool, new)(10);
++	p = MODULE_FUN_NAME(ThreadPool, new)(100);
+ 	ret = MODULE_FUN_NAME(ThreadPool, init)(p);
+ 	fprintf(stdout, "%s: init: %d\n", __func__, ret);
+-	for (i = 0; i < 10000; i++)
++	
++	for (i = 0; i < 5; i++)
++	{
++		ret = MODULE_FUN_NAME(ThreadPool, post)(p, producer, p);
++		if (0 != ret)
++			fprintf(stdout, "%s: post: %d\n", __func__, ret);
++	}
++	
++	for (i = 0; i < 500000; i++)
+ 	{
+ 		ret = MODULE_FUN_NAME(ThreadPool, post)(p, pool_test_cb, i);
+-	//	fprintf(stdout, "%s: post: %d\n", __func__, ret);
++		if (0 != ret)
++			fprintf(stdout, "%s: post: %d\n", __func__, ret);
+ 	}
+ 	ret = MODULE_FUN_NAME(ThreadPool, destroy)(p);
+ 	fprintf(stdout, "%s: destroy: %d\n", __func__, ret);
+@@ -280,9 +311,9 @@ struct test_routine my_test_routines[] =
+ {
+ 		{test_bit, "bit"},
+ 		{test_dlist, "dlist"},
+-		{test_queue_link, "queue_link"},
++//		{test_queue_link, "queue_link"},
+ 		{test_stack_link, "stack_link"},
+-//		{test_queue_array, "queue_array"},
++		{test_queue_array, "queue_array"},
+ //		{test_stack_array, "stack_array"},
+ 		{test_ap, "ap"},
+ 		{test_arena, "arena"},
+@@ -308,6 +339,7 @@ int main(int argc, char *argv[])
+ 				time2.tv_sec - time1.tv_sec,
+ 				time2.tv_usec - time1.tv_usec);
+ 	}
++	fprintf(stdout, "sizeof(void *): %d\n", sizeof(void *));
+ 
+ 	return ret;
+ }
