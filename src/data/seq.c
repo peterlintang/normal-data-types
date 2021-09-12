@@ -55,7 +55,7 @@ T MODULE_FUN_NAME(Seq, new)(int hint)
 		}
 		MODULE_FUN_NAME(ArrayRep, init)
 				(&seq->array, hint, sizeof(void *), 
-					calloc(hint, sizeof(void *)));
+					calloc(1, hint * sizeof(void *)));
 		return seq;
 	}
 

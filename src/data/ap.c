@@ -255,8 +255,7 @@ T MODULE_FUN_NAME(AP, div)(T x, T y)
 	q = mk(x->ndigits);
 	r = mk(y->ndigits);
 	{
-		XP_T tmp = (XP_T)calloc(x->ndigits + y->ndigits + 2, 
-						sizeof(char));
+		XP_T tmp = (XP_T)calloc(1, (x->ndigits + y->ndigits + 2) * sizeof(char));
 		MODULE_FUN_NAME(XP, div)
 				(x->ndigits, q->digits, x->digits, 
 						y->ndigits, y->digits, r->digits, tmp);
@@ -292,8 +291,7 @@ T MODULE_FUN_NAME(AP, mod)(T x, T y)
 	q = mk(x->ndigits);
 	r = mk(y->ndigits);
 	{
-		XP_T tmp = (XP_T)calloc(x->ndigits + y->ndigits + 2, 
-						sizeof(char));
+		XP_T tmp = (XP_T)calloc(1, (x->ndigits + y->ndigits + 2) * sizeof(char));
 		MODULE_FUN_NAME(XP, div)
 				(x->ndigits, q->digits, x->digits, 
 						y->ndigits, y->digits, r->digits, tmp);
@@ -594,10 +592,10 @@ char *MODULE_FUN_NAME(AP, tostr)(char *str, int size, int base, T x)
 		if (x->sign == -1) 
 			size++;
 
-		str = (char *)calloc(size, sizeof(char));
+		str = (char *)calloc(1, size * sizeof(char));
 	}
 
-	q = (XP_T)calloc(x->ndigits, sizeof(unsigned char));
+	q = (XP_T)calloc(1, x->ndigits * sizeof(unsigned char));
 	memcpy(q, x->digits, x->ndigits);
 
 	if (x->sign == -1)

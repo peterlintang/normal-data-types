@@ -78,8 +78,7 @@ T MODULE_FUN_NAME(Bit, new)(int length)
 	{
 		if (length > 0)
 		{
-			set->words = (unsigned long *)calloc(NWORDS(length), 
-							sizeof(unsigned long));
+			set->words = (unsigned long *)calloc(1, NWORDS(length) * sizeof(unsigned long));
 		}
 		else
 		{

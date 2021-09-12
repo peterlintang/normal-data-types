@@ -27,7 +27,7 @@ char *MODULE_FUN_NAME(Str, sub)(const char *s, int i, int j)
 	char *p = NULL;
 
 	CONVERT(s, i, j);
-	p = str = (char *)calloc(j - i + 1, sizeof(char));
+	p = str = (char *)calloc(1, (j - i + 1) * sizeof(char));
 	while (i < j)
 	{
 		*p++ = s[i++];
@@ -45,7 +45,7 @@ char *MODULE_FUN_NAME(Str, dup)(const char *s, int i, int j, int n)
 
 	assert(n >= 0);
 	CONVERT(s, i, j);
-	p = str = (char *)calloc(n * (j - i) + 1, sizeof(char));
+	p = str = (char *)calloc(1, (n * (j - i) + 1) * sizeof(char));
 	if (j - i > 0)
 	{
 		while (n-- > 0)
@@ -66,7 +66,7 @@ char *MODULE_FUN_NAME(Str, reverse)(const char *s, int i, int j)
 	char *p = NULL;
 
 	CONVERT(s, i, j);
-	p = str = (char *)calloc(j - i + 1, sizeof(char));
+	p = str = (char *)calloc(1, (j - i + 1) * sizeof(char));
 	while (j > i)
 	{
 		*p++ = s[--j];
@@ -84,7 +84,7 @@ char *MODULE_FUN_NAME(Str, cat)(const char *s1, int i1, int j1,
 
 	CONVERT(s1, i1, j1);
 	CONVERT(s2, i2, j2);
-	p = str = (char *)calloc(j1 - i1 + j2 - i2 + 1, sizeof(char));
+	p = str = (char *)calloc(1, (j1 - i1 + j2 - i2 + 1) * sizeof(char));
 	while (i1 < j1)
 		*p++ = s1[i1++];
 	while (i2 < j2)
@@ -115,7 +115,7 @@ char *MODULE_FUN_NAME(Str, catv)(const char *s, ...)
 	}
 	va_end(ap);
 
-	p = str = (char *)calloc(len + 1, sizeof(char));
+	p = str = (char *)calloc(1, (len + 1) * sizeof(char));
 	s = save;
 	va_start(ap, s);
 	while (s)
@@ -165,7 +165,7 @@ char *MODULE_FUN_NAME(Str, map)(const char *s, int i, int j,
 		char *p = NULL;
 
 		CONVERT(s, i, j);
-		p = str = (char *)calloc(j - i + 1, sizeof(char));
+		p = str = (char *)calloc(1, (j - i + 1) * sizeof(char));
 		while (i < j)
 		{
 			*p++ = map[(unsigned char)s[i++]];

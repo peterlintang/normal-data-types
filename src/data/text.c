@@ -96,7 +96,7 @@ T MODULE_FUN_NAME(Text, put)(const char *str)
 	assert(str);
 
 	text.len = strlen(str);
-	text.str = memcpy(calloc(text.len, sizeof(char)), str, text.len);
+	text.str = memcpy(calloc(1, text.len * sizeof(char)), str, text.len);
 
 	return text;
 }
@@ -107,7 +107,7 @@ char *MODULE_FUN_NAME(Text, get)(char *str, int size, T s)
 
 	if (NULL == str)
 	{
-		str = (char *)calloc(s.len + 1, sizeof(char));
+		str = (char *)calloc(1, (s.len + 1) * sizeof(char));
 	}
 	else
 	{
@@ -142,12 +142,12 @@ T MODULE_FUN_NAME(Text, dup)(T s, int n)
 	if (isatend(s, text.len - s.len))
 	{
 		text.str = s.str;
-		p = (char *)calloc(text.len - s.len, sizeof(char));
+		p = (char *)calloc(1, (text.len - s.len) * sizeof(char));
 		n--;
 	}
 	else
 	{
-		text.str = p = (char *)calloc(text.len, sizeof(char));
+		text.str = p = (char *)calloc(1, text.len * sizeof(char));
 	}
 
 	for (; n-- > 0; p += s.len)
@@ -182,12 +182,12 @@ T MODULE_FUN_NAME(Text, cat)(T s1, T s2)
 //		char *p = NULL;
 
 		text.str = s1.str;
-		memcpy(calloc(s2.len, sizeof(char)), s2.str, s2.len); // ???  TODO
+		memcpy(calloc(1, s2.len * sizeof(char)), s2.str, s2.len); // ???  TODO
 	}
 	else
 	{
 		char *p = NULL;
-		text.str = p = (char *)calloc(s1.len + s2.len, sizeof(char));
+		text.str = p = (char *)calloc(1, (s1.len + s2.len) * sizeof(char));
 		memcpy(p, s1.str, s1.len);
 		memcpy(p + s1.len, s2.str, s2.len);
 	}
@@ -216,7 +216,7 @@ T MODULE_FUN_NAME(Text, reverse)(T s)
 		i = s.len;
 		text.len = s.len;
 
-		p = (char *)calloc(s.len, sizeof(char));
+		p = (char *)calloc(1, s.len * sizeof(char));
 		text.str = p;
 
 		while (--i >= 0)
@@ -267,7 +267,7 @@ T MODULE_FUN_NAME(Text, map)(T s, const T *from, const T *to)
 		char *p = NULL;
 
 		text.len = s.len;
-		text.str = p = (char *)calloc(s.len, sizeof(char));
+		text.str = p = (char *)calloc(1, s.len * sizeof(char));
 		for (i = 0; i < s.len; i++)
 		{
 			*p++ = map[s.str[i]];

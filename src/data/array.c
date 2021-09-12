@@ -28,7 +28,7 @@ T MODULE_FUN_NAME(Array, new)(int length, int size)
 		{
 			char *tmp = NULL;
 
-			tmp = (char *)calloc(length, size);
+			tmp = (char *)calloc(1, length * size);
 			if (tmp)
 			{
 				MODULE_FUN_NAME(ArrayRep, init)
@@ -142,7 +142,7 @@ int MODULE_FUN_NAME(Array, resize)(T array, int length)
 
 	if (0 == array->length)
 	{
-		array->array = (char *)calloc(length, array->size);
+		array->array = (char *)calloc(1, length * array->size);
 	}
 	else if (length > 0)
 	{

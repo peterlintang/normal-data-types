@@ -309,7 +309,7 @@ void **MODULE_FUN_NAME(Set, toArray)(T set, void *end)
 
 	assert(set);
 
-	array = (void **)calloc(set->length + 1 , sizeof(*array));
+	array = (void **)calloc(1, (set->length + 1) * sizeof(*array));
 	for (i = 0; i < set->size; i++)
 	{
 		for (p = set->buckets[i]; p; p = p->link)

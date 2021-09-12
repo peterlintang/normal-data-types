@@ -330,7 +330,7 @@ void **MODULE_FUN_NAME(T, toArray)(
 	int index = 0;
 
 	count = MODULE_FUN_NAME(List, count)(list);
-	array = (void **)calloc(count + 1, sizeof(void *));
+	array = (void **)calloc(1, (count + 1) * sizeof(void *));
 	if (array)
 	{
 		for (node = MODULE_FUN_NAME(List, head)(list); 

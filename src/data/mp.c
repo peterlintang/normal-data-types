@@ -120,7 +120,7 @@ int MODULE_FUN_NAME(MP, set)(int n)
 	}
 	else
 	{
-		tmp[0] = (T)calloc(3 * nbytes + 2 * nbytes + 2, sizeof(char));
+		tmp[0] = (T)calloc(1, (3 * nbytes + 2 * nbytes + 2) * sizeof(char));
 	}
 	tmp[1] = tmp[0] + 1 * nbytes;
 	tmp[2] = tmp[0] + 2 * nbytes;
@@ -130,7 +130,7 @@ int MODULE_FUN_NAME(MP, set)(int n)
 T MODULE_FUN_NAME(MP, new)(unsigned long u)
 {
 	return MODULE_FUN_NAME(MP, fromintu)
-			(calloc(nbytes, sizeof(char)), u);
+			(calloc(1, nbytes * sizeof(char)), u);
 }
 
 T MODULE_FUN_NAME(MP, fromintu)(T z, unsigned long u)
@@ -1092,7 +1092,7 @@ char *MODULE_FUN_NAME(MP, tostr)
 			;
 		size = nbits / k + 1 + 1;
 
-		str = calloc(size, sizeof(char));
+		str = calloc(1, size * sizeof(char));
 	}
 
 	memcpy(tmp[1], x, nbytes);
@@ -1149,7 +1149,7 @@ void MODULE_FUN_NAME(MP, fmt)(int code, va_list *app,
 		;
 	size = nbits / k + 1 + 1;
 
-	buf = calloc(size + 1, sizeof(char));
+	buf = calloc(1, (size + 1) * sizeof(char));
 
 	if (sx)
 	{

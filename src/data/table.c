@@ -67,8 +67,7 @@ T MODULE_FUN_NAME(Table, new)(int hint,
 	for (i = 1; primes[i] < hint; i++)
 		;
 
-	table = (T) calloc(sizeof(*table) + 
-			primes[i - 1] * sizeof(table->buckets[0]), sizeof(char));
+	table = (T) calloc(1, (sizeof(*table) + primes[i - 1] * sizeof(table->buckets[0])) * sizeof(char));
 
 	table->size = primes[i - 1];
 	table->cmp = cmp ? cmp : cmpatom;
@@ -280,7 +279,7 @@ void **MODULE_FUN_NAME(Table, toArray)(T table, void *end)
 
 	assert(table);
 
-	array = (void **)calloc(2 * table->length + 1 , sizeof(*array));
+	array = (void **)calloc(1, (2 * table->length + 1) * sizeof(*array));
 	for (i = 0; i < table->size; i++)
 	{
 		for (p = table->buckets[i]; p; p = p->link)
