@@ -1,4 +1,13 @@
 
+/*
+ *
+ *   文件名称：arena.c
+ *   实现功能：内存的分配与回收
+ *   作者：lxj
+ *   创建时间: 2021-09-26
+ *
+ */
+
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -9,7 +18,7 @@
 
 
 // <macro 98>
-#define THRESHOLD	10
+#define THRESHOLD	10	/* 空闲链表的阈值，当空闲链表中的块数少于其值时，用户free的内存放到空闲链表  */
 
 
 // <types 92>
@@ -36,8 +45,8 @@ union header {
 };
 
 // <data 96>
-static T freechunks = NULL;
-static int nfree = 0;
+static T freechunks = NULL;		/* 空闲内存链表 */
+static int nfree = 0;			/* 空闲内存链表中，空闲内存块的数量 */
 
 
 // <function 93>
@@ -66,6 +75,7 @@ T MODULE_FUN_NAME(Arena, new)(void)
  * name: MODULE_FUN_NAME(Arena, dispose)
  * description: destroy an arena and free the memory 
  * 		allocated for arena
+ * 	销毁new创建的arena，但是空闲链表中的内存块没有返回给系统
  * return value: return void
  * args: ap: pointer's pointer to arena
  */
@@ -81,6 +91,11 @@ void MODULE_FUN_NAME(Arena, dispose)(T *ap)
 /*
  * name: MODULE_FUN_NAME(Arena, alloc)
  * description: alloc mem from an arena
+ * 申请nbytes内存，首先判断当前在使用的内存块剩下的内存是否满足要求，
+ * 满足要求，则在当前内存块申请，
+ * 否则在空闲链表中搜索，如果找到的空闲块内存大小适合，
+ * 则分配给用户并把新的内存块当为当前分配内存的块；
+ * 否则，从系统申请一块内存，然后把用户需要的内存返回给用户,
  * return value: return the pointer to the
  * 		mem allocated 
  * args: arena: arena (mem managed arena)
@@ -159,6 +174,8 @@ void *MODULE_FUN_NAME(Arena, calloc)(
 /*
  * name: MODULE_FUN_NAME(Arena, free)
  * description: free an arena
+ * 释放申请的内存，如果空闲链表中的内存块数目少于阈值，
+ * 则将内存放到空闲链表中，否则，释放内存到系统；
  * return value: return void
  * args: arena: arena to free
  */
