@@ -9,17 +9,27 @@
 #include "bit.h"
 static void test_bit(void)
 {
+#define BIT_TEST_LEN	1024000000
 	Bit_T set = NULL;
-	set = MODULE_FUN_NAME(Bit, new)(36);
+	Bit_T set2 = NULL;
+	set = MODULE_FUN_NAME(Bit, new)(BIT_TEST_LEN);
+	set2 = MODULE_FUN_NAME(Bit, new)(BIT_TEST_LEN);
 	if (NULL == set)
 	{
 		return ;
 	}
-	MODULE_FUN_NAME(Bit, set)(set, 5, 10);
-//	fprintf(stdout, "set bit: %d\n", MODULE_FUN_NAME(Bit, count)(set));
-	MODULE_FUN_NAME(Bit, put)(set, 20, 1);
-//	fprintf(stdout, "set bit: %d\n", MODULE_FUN_NAME(Bit, count)(set));
+	MODULE_FUN_NAME(Bit, set)(set, 0, BIT_TEST_LEN - 1);
+	MODULE_FUN_NAME(Bit, set)(set2, 0, BIT_TEST_LEN - 1);
+	fprintf(stdout, "set bit: %d\n", MODULE_FUN_NAME(Bit, count)(set));
+//	MODULE_FUN_NAME(Bit, put)(set, 20, 0);
+//	MODULE_FUN_NAME(Bit, put)(set, 21, 0);
+	MODULE_FUN_NAME(Bit, clear)(set, 1, 10);
+	fprintf(stdout, "set bit eq: %d\n", MODULE_FUN_NAME(Bit, eq)(set, set2));
+	fprintf(stdout, "set bit leq: %d\n", MODULE_FUN_NAME(Bit, leq)(set, set2));
+	fprintf(stdout, "set bit: %d\n", MODULE_FUN_NAME(Bit, get)(set, 2));
+	fprintf(stdout, "set bit: %d\n", MODULE_FUN_NAME(Bit, count)(set));
 	MODULE_FUN_NAME(Bit, free)(&set);
+	MODULE_FUN_NAME(Bit, free)(&set2);
 
 }
 
@@ -226,22 +236,32 @@ static void test_ap(void)
 #include "arena.h"
 static void test_arena(void)
 {
+#define TEST_INT_NUM	1024
+#define TEST_TIMES		256
 	Arena_T area = NULL;
 
 	area = MODULE_FUN_NAME(Arena, new)();
 	if (area)
 	{
 		int *p = NULL;
-		p = (int *)MODULE_FUN_NAME(Arena, calloc)(area, 10, sizeof(int),
-						__FILE__, __LINE__);
-		if (p)
+		for (int k = 0; k < TEST_TIMES; k++)
 		{
-			for (int i = 0; i < 10; i++)
+		for (int j = 0; j < TEST_TIMES; j++)
+		{
+			p = (int *)MODULE_FUN_NAME(Arena, calloc)(area, TEST_INT_NUM, sizeof(int),
+						__FILE__, __LINE__);
+			if (p)
+			{
+			for (int i = 0; i < TEST_INT_NUM; i++)
 				p[i] = i + 1000;
-			for (int i = 0; i < 10; i++)
+			/*
+			for (int i = 0; i < TEST_INT_NUM; i++)
 				fprintf(stdout, "i: %d\n", p[i]);
+			*/
+			}
 		}
 		MODULE_FUN_NAME(Arena, free)(area);
+		}
 		MODULE_FUN_NAME(Arena, dispose)(&area);
 	}
 }
@@ -271,6 +291,59 @@ static void test_threadPool(void)
 
 }
 
+#include "array.h"
+
+static void test_array(void)
+{
+#define ARRAY_TEST_ITEMS	1024
+	Array_T array;
+	array = MODULE_FUN_NAME(Array, new)(ARRAY_TEST_ITEMS, sizeof(int));
+	if (array == NULL) return ;
+
+	
+	for (int i = 2; i < ARRAY_TEST_ITEMS; i++)
+	{
+		MODULE_FUN_NAME(Array, put)(array, i, &i);
+	}
+	
+
+	fprintf(stdout, "len: %d, size: %d\n", MODULE_FUN_NAME(Array, length)(array), MODULE_FUN_NAME(Array, size)(array));
+
+	for (int i = 0; i < ARRAY_TEST_ITEMS; i++)
+	{
+		*((int *)MODULE_FUN_NAME(Array, get)(array, i)) += 1000;
+//		fprintf(stdout, "%d: %d\n", i, *((int *)MODULE_FUN_NAME(Array, get)(array, i)));
+	}
+	MODULE_FUN_NAME(Array, free)(&array);
+
+	array = MODULE_FUN_NAME(Array, new)(ARRAY_TEST_ITEMS, sizeof(double));
+	for (int i = 2; i < ARRAY_TEST_ITEMS; i++)
+	{
+		MODULE_FUN_NAME(Array, put)(array, i, &i);
+	}
+	for (int i = 0; i < ARRAY_TEST_ITEMS; i++)
+	{
+		*((double *)MODULE_FUN_NAME(Array, get)(array, i)) = i + 1.0;
+		fprintf(stdout, "%d: %f\n", i, *((double *)MODULE_FUN_NAME(Array, get)(array, i)));
+	}
+	Array_T copy;
+	copy = MODULE_FUN_NAME(Array, copy)(array, 512);
+	fprintf(stdout, "len: %d, size: %d\n", MODULE_FUN_NAME(Array, length)(copy), MODULE_FUN_NAME(Array, size)(copy));
+	for (int i = 0; i < MODULE_FUN_NAME(Array, length)(copy); i++)
+	{
+		fprintf(stdout, "%d: %f\n", i, *((double *)MODULE_FUN_NAME(Array, get)(copy, i)));
+	}
+
+	MODULE_FUN_NAME(Array, resize)(copy, 500);
+	fprintf(stdout, "len: %d, size: %d\n", MODULE_FUN_NAME(Array, length)(copy), MODULE_FUN_NAME(Array, size)(copy));
+	for (int i = 0; i < MODULE_FUN_NAME(Array, length)(copy); i++)
+	{
+		fprintf(stdout, "%d: %f\n", i, *((double *)MODULE_FUN_NAME(Array, get)(copy, i)));
+	}
+}
+
+
+
 struct test_routine {
 	void (*call_back)(void);
 	char *name;
@@ -278,15 +351,16 @@ struct test_routine {
 
 struct test_routine my_test_routines[] = 
 {
-		{test_bit, "bit"},
-		{test_dlist, "dlist"},
-		{test_queue_link, "queue_link"},
-		{test_stack_link, "stack_link"},
+//		{test_bit, "bit"},
+//		{test_dlist, "dlist"},
+//		{test_queue_link, "queue_link"},
+//		{test_stack_link, "stack_link"},
 //		{test_queue_array, "queue_array"},
 //		{test_stack_array, "stack_array"},
-		{test_ap, "ap"},
-		{test_arena, "arena"},
-		{test_threadPool, "threadPool"},
+//		{test_ap, "ap"},
+//		{test_arena, "arena"},
+//		{test_threadPool, "threadPool"},
+		{test_array, "array"},
 		{NULL,NULL},
 };
 
