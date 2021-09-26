@@ -1,16 +1,21 @@
 
-#ifndef BIT_H
-#define BIT_H
 
-struct bit_t;
+#ifndef SIMPLE_BIT_INCLUDED
+#define SIMPLE_BIT_INCLUDED
+
+#include "module.h"
+
+#define T SBit_T	// simple bit type
+typedef struct T *T;
 
 
 
-struct bit_t *bit_create(unsigned int num);
-int bit_destroy(struct bit_t **bits);
-int bit_set(struct bit_t *bits, unsigned int index);
-int bit_clear(struct bit_t *bits, unsigned int index);
-int bit_get(struct bit_t *bits, unsigned int index);
+T MODULE_FUN_NAME(sbit, create)(unsigned int num);
+int MODULE_FUN_NAME(sbit, destroy)(T *sb);
+int MODULE_FUN_NAME(sbit, set)(T sb, unsigned int index);
+int MODULE_FUN_NAME(sbit, clear)(T sb, unsigned int index);
+int MODULE_FUN_NAME(sbit, get)(T sb, unsigned int index);
 
+#undef T
 
 #endif
