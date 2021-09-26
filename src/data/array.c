@@ -1,4 +1,11 @@
 
+/*
+ * 文件名称: array.c
+ * 功能描述: 实现一个数组结构， 复制值的形式
+ * 作者:lxj
+ * 创建时间: 2021-09-26
+ *
+ */
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -21,6 +28,9 @@ T MODULE_FUN_NAME(Array, new)(int length, int size)
 {
 	T array = NULL;
 
+	assert(length >= 0);
+	assert(size > 0);
+
 	array = (T)calloc(1, sizeof(*array));
 	if (array)
 	{
@@ -28,7 +38,7 @@ T MODULE_FUN_NAME(Array, new)(int length, int size)
 		{
 			char *tmp = NULL;
 
-			tmp = (char *)calloc(1, length * size);
+			tmp = (char *)calloc(length, size);
 			if (tmp)
 			{
 				MODULE_FUN_NAME(ArrayRep, init)
@@ -142,7 +152,7 @@ int MODULE_FUN_NAME(Array, resize)(T array, int length)
 
 	if (0 == array->length)
 	{
-		array->array = (char *)calloc(1, length * array->size);
+		array->array = (char *)calloc(length, array->size);
 	}
 	else if (length > 0)
 	{
