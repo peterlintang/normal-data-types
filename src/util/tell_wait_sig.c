@@ -54,7 +54,7 @@ void WAIT_PARENT(void)
 		err_sys("SIG_SETMASK error");
 }
 
-void WAIt_CHILD(void)
+void WAIT_CHILD(void)
 {
 	while (sigflag == 0)
 		sigsuspend(&zeromask);
