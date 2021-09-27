@@ -54,7 +54,7 @@ int MODULE_FUN_NAME(Set, length)(T set);
  * args: @set: pointer to set
  * 		@member: pointer to member
  */
-int MODULE_FUN_NAME(Set, member)
+int MODULE_FUN_NAME(Set, is_member)
 		(T set, const void *member);
 /*
  * name: MODULE_FUN_NAME(Set, put)

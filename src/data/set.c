@@ -124,7 +124,7 @@ T MODULE_FUN_NAME(Set, new)(int hint,
  * args: @set: pointer to set
  * 		@member: pointer to member
  */
-int MODULE_FUN_NAME(Set, member)(T set, const void *member)
+int MODULE_FUN_NAME(Set, is_member)(T set, const void *member)
 {
 	int i;
 	struct member *p = NULL;
