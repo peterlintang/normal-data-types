@@ -13,6 +13,7 @@
 #include <pthread.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "queue_link.h"
 
@@ -182,7 +183,7 @@ int MODULE_FUN_NAME(ThreadPool, destroy)(T p)
 		if (MODULE_FUN_NAME(ThreadPool, post)(
 						p, 
 						thread_exit_handler, 
-						&flag))
+						(void *)&flag))
 		{
 			return -1;
 		}
@@ -268,7 +269,7 @@ static void *thread_cycle(void *priv)
 	{
 		MUTEX_LOCK(&p->mutex);
 try_again:
-		if (MODULE_FUN_NAME(Queue, get)(p->queue, &task) != 0)
+		if (MODULE_FUN_NAME(Queue, get)(p->queue, (void *)&task) != 0)
 		{
 			COND_WAIT(&p->cond, &p->mutex);
 			goto try_again;
