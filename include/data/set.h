@@ -46,6 +46,7 @@ void MODULE_FUN_NAME(Set, free)(T *set);
  */
 int MODULE_FUN_NAME(Set, length)(T set);
 
+
 /*
  * name: MODULE_FUN_NAME(Set, member)
  * description: judge @member is in @set
@@ -54,7 +55,7 @@ int MODULE_FUN_NAME(Set, length)(T set);
  * args: @set: pointer to set
  * 		@member: pointer to member
  */
-int MODULE_FUN_NAME(Set, is_member)
+int MODULE_FUN_NAME(Set, member)
 		(T set, const void *member);
 /*
  * name: MODULE_FUN_NAME(Set, put)
@@ -78,16 +79,21 @@ int MODULE_FUN_NAME(Set, put)
 void *MODULE_FUN_NAME(Set, remove)
 		(T set, const void *member);
 
+void *MODULE_FUN_NAME(Set, first)(T set);
+void *MODULE_FUN_NAME(Set, next)(T set, void *member);
+/*   是否最后一个元素  */
+int MODULE_FUN_NAME(Set, end)(T set, void *member);
+
 /*
  * name: MODULE_FUN_NAME(Set, map)
  * description: for each member in @set, call @apply
  * return value: void
  * args: @set: pointer to set
- * 		@apply: function to call
+ * 		@apply: function to call 0 success, !0 failed will return immediately
  * 		@cl: private data to user
  */
 void MODULE_FUN_NAME(Set, map)(T set, 
-				void apply(const void *member, void *cl),
+				int apply(const void *member, void *cl),
 				void *cl);
 
 /*
@@ -134,6 +140,9 @@ T MODULE_FUN_NAME(Set, minus)(T s, T t);	// s - t
  * 		 @t: pointer to set @t
  */
 T MODULE_FUN_NAME(Set, diff)(T s, T t);	// s / t 
+
+
+
 
 #undef T
 
