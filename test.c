@@ -421,7 +421,7 @@ static void test_set(void)
 	MODULE_FUN_NAME(Set, map)(set3, apply, NULL);
 
 	fprintf(stdout, "minus\n");
-	set3 = MODULE_FUN_NAME(Set, minus)(set, NULL);
+	set3 = MODULE_FUN_NAME(Set, minus)(set, NULL);	// 内存没有释放
 	fprintf(stdout, "set:\n");
 	MODULE_FUN_NAME(Set, map)(set, apply, NULL);
 	fprintf(stdout, "set2:\n");
@@ -438,6 +438,15 @@ static void test_set(void)
 	fprintf(stdout, "set3:\n");
 	MODULE_FUN_NAME(Set, map)(set3, apply, NULL);
 
+	void **array = NULL;
+	array = MODULE_FUN_NAME(Set, toArray)(set, NULL);
+	for (int i = 0; array[i] != NULL; i++)
+	{
+		fprintf(stdout, "i: %d <--> value: %d\n", i, (int)array[i]);
+	
+	}
+
+	free(array);
 	MODULE_FUN_NAME(Set, free)(&set);
 	MODULE_FUN_NAME(Set, free)(&set2);
 	MODULE_FUN_NAME(Set, free)(&set3);
