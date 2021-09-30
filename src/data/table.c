@@ -143,7 +143,7 @@ void *MODULE_FUN_NAME(Table, put)
 	void *prev = NULL;
 
 	assert(table);
-	assert(key);
+//	assert(key);
 
 	i = (*table->hash)(key) % table->size;
 	for (p = table->buckets[i]; p ; p = p->link)
@@ -183,7 +183,7 @@ void *MODULE_FUN_NAME(Table, get)(T table, const void *key)
 	struct binding *p = NULL;
 
 	assert(table);
-	assert(key);
+//	assert(key);
 
 	i = (*table->hash)(key) % table->size;
 	for (p = table->buckets[i]; p ; p = p->link)
@@ -210,7 +210,7 @@ void *MODULE_FUN_NAME(Table, remove)(T table, const void *key)
 	void *value = NULL;
 
 	assert(table);
-	assert(key);
+//	assert(key);
 
 	table->timestamp++;
 
@@ -241,7 +241,7 @@ void *MODULE_FUN_NAME(Table, remove)(T table, const void *key)
  * 		 @cl: user's data
  */
 void MODULE_FUN_NAME(Table, map)(T table, 
-		void apply(const void *key, void **value, void *cl),
+		int apply(const void *key, void **value, void *cl),
 		void *cl)
 {
 	int i;
@@ -257,7 +257,10 @@ void MODULE_FUN_NAME(Table, map)(T table,
 	{
 		for (p = table->buckets[i]; p; p = p->link)
 		{
-			apply(p->key, &p->value, cl);
+			if (apply(p->key, &p->value, cl) != 0) 
+			{
+				return ;
+			}
 			assert(table->timestamp == stamp);
 		}
 	}
@@ -289,7 +292,7 @@ void **MODULE_FUN_NAME(Table, toArray)(T table, void *end)
 		}
 	}
 
-	array[i] = end;
+	array[j] = end;
 	return array;
 }
 

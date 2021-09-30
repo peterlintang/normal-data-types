@@ -84,7 +84,7 @@ void *MODULE_FUN_NAME(Table, remove)(T table, const void *key);
  * 		 @cl: user's data
  */
 void MODULE_FUN_NAME(Table, map)(T table, 
-		void apply(const void *key, void **value, void *cl),
+		int apply(const void *key, void **value, void *cl),
 		void *cl);
 /*
  * name: MODULE_FUN_NAME(Table, toArray)
