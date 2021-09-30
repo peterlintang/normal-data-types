@@ -59,7 +59,7 @@ static T copy(T t, int hint)
 			{
 				p->member = member;
 				p->link = set->buckets[j];
-				set->buckets[j] = p->link;
+				set->buckets[j] = p;
 				set->length++;
 			}
 			else
