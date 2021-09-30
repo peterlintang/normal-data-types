@@ -282,7 +282,7 @@ static void test_threadPool(void)
 	fprintf(stdout, "%s: init: %d\n", __func__, ret);
 	for (i = 0; i < 10000; i++)
 	{
-		ret = MODULE_FUN_NAME(ThreadPool, post)(p, pool_test_cb, i);
+		ret = MODULE_FUN_NAME(ThreadPool, post)(p, pool_test_cb, (void *)i);
 	//	fprintf(stdout, "%s: post: %d\n", __func__, ret);
 	}
 	ret = MODULE_FUN_NAME(ThreadPool, destroy)(p);
