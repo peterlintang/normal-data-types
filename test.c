@@ -343,6 +343,108 @@ static void test_array(void)
 }
 
 
+#include "set.h"
+
+static int apply(const void *member, void *cl)
+{
+	fprintf(stdout, "%d\n", (int)member);
+	return 0;
+}
+
+static void test_set(void)
+{
+#define SET_ITEM_LEN	10
+	Set_T set = NULL;
+	Set_T set2 = NULL;
+	Set_T set3 = NULL;
+
+	/* first */
+	fprintf(stdout, "\n\nfirst\n\n");
+	set = MODULE_FUN_NAME(Set, new)(SET_ITEM_LEN, NULL, NULL);
+	for (int i = 0; i < SET_ITEM_LEN; i++)
+	{
+		MODULE_FUN_NAME(Set, put)(set, (void *)(i + 1));
+	}
+
+	fprintf(stdout, "len: %d\n", MODULE_FUN_NAME(Set, length)(set));
+	fprintf(stdout, "1 is member: %d\n", MODULE_FUN_NAME(Set, member)(set, 1));
+	fprintf(stdout, "11 is member: %d\n", MODULE_FUN_NAME(Set, member)(set, 11));
+	MODULE_FUN_NAME(Set, map)(set, apply, NULL);
+
+	for (int i = 0; i < SET_ITEM_LEN; i++)
+	{
+		MODULE_FUN_NAME(Set, remove)(set, (void *)(i + 1));
+	}
+
+	fprintf(stdout, "len: %d\n", MODULE_FUN_NAME(Set, length)(set));
+	MODULE_FUN_NAME(Set, map)(set, apply, NULL);
+
+	/* second */
+	fprintf(stdout, "\n\nsecond\n\n");
+	for (int i = 0; i < SET_ITEM_LEN; i++)
+	{
+		MODULE_FUN_NAME(Set, put)(set, (void *)(i + 1));
+	}
+
+	void *p = NULL;
+	for (p = MODULE_FUN_NAME(Set, first)(set); p != NULL; p = MODULE_FUN_NAME(Set, next)(set, p))
+	{
+		fprintf(stdout, "i: %d\n", (int)p);
+		if (MODULE_FUN_NAME(Set, end)(set, p) == 1)
+			break;
+	}
+
+	/* third */
+	fprintf(stdout, "\n\nthird\n\n");
+	set2 = MODULE_FUN_NAME(Set, new)(SET_ITEM_LEN, NULL, NULL);
+	for (int i = 0; i < SET_ITEM_LEN - 1; i++)
+	{
+		MODULE_FUN_NAME(Set, put)(set2, (void *)(i + 5));
+	}
+
+	fprintf(stdout, "inter\n");
+	set3 = MODULE_FUN_NAME(Set, inter)(set, NULL);
+	fprintf(stdout, "set:\n");
+	MODULE_FUN_NAME(Set, map)(set, apply, NULL);
+	fprintf(stdout, "set2:\n");
+	MODULE_FUN_NAME(Set, map)(set2, apply, NULL);
+	fprintf(stdout, "set3:\n");
+	MODULE_FUN_NAME(Set, map)(set3, apply, NULL);
+
+	fprintf(stdout, "diff\n");
+	set3 = MODULE_FUN_NAME(Set, diff)(set, NULL);
+	fprintf(stdout, "set:\n");
+	MODULE_FUN_NAME(Set, map)(set, apply, NULL);
+	fprintf(stdout, "set2:\n");
+	MODULE_FUN_NAME(Set, map)(set2, apply, NULL);
+	fprintf(stdout, "set3:\n");
+	MODULE_FUN_NAME(Set, map)(set3, apply, NULL);
+
+	fprintf(stdout, "minus\n");
+	set3 = MODULE_FUN_NAME(Set, minus)(set, NULL);
+	fprintf(stdout, "set:\n");
+	MODULE_FUN_NAME(Set, map)(set, apply, NULL);
+	fprintf(stdout, "set2:\n");
+	MODULE_FUN_NAME(Set, map)(set2, apply, NULL);
+	fprintf(stdout, "set3:\n");
+	MODULE_FUN_NAME(Set, map)(set3, apply, NULL);
+
+	fprintf(stdout, "union\n");
+	set3 = MODULE_FUN_NAME(Set, union)(set, NULL);
+	fprintf(stdout, "set:\n");
+	MODULE_FUN_NAME(Set, map)(set, apply, NULL);
+	fprintf(stdout, "set2:\n");
+	MODULE_FUN_NAME(Set, map)(set2, apply, NULL);
+	fprintf(stdout, "set3:\n");
+	MODULE_FUN_NAME(Set, map)(set3, apply, NULL);
+
+	MODULE_FUN_NAME(Set, free)(&set);
+	MODULE_FUN_NAME(Set, free)(&set2);
+	MODULE_FUN_NAME(Set, free)(&set3);
+
+}
+
+
 
 struct test_routine {
 	void (*call_back)(void);
@@ -360,7 +462,8 @@ struct test_routine my_test_routines[] =
 //		{test_ap, "ap"},
 //		{test_arena, "arena"},
 //		{test_threadPool, "threadPool"},
-		{test_array, "array"},
+//		{test_array, "array"},
+		{test_set, "array"},
 		{NULL,NULL},
 };
 
