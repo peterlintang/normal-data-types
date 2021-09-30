@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <pthread.h>
 #include <sys/time.h>
 
 
@@ -367,8 +368,8 @@ static void test_set(void)
 	}
 
 	fprintf(stdout, "len: %d\n", MODULE_FUN_NAME(Set, length)(set));
-	fprintf(stdout, "1 is member: %d\n", MODULE_FUN_NAME(Set, member)(set, 1));
-	fprintf(stdout, "11 is member: %d\n", MODULE_FUN_NAME(Set, member)(set, 11));
+	fprintf(stdout, "1 is member: %d\n", MODULE_FUN_NAME(Set, member)(set, (void *)1));
+	fprintf(stdout, "11 is member: %d\n", MODULE_FUN_NAME(Set, member)(set, (void *)11));
 	MODULE_FUN_NAME(Set, map)(set, apply, NULL);
 
 	for (int i = 0; i < SET_ITEM_LEN; i++)
@@ -455,6 +456,60 @@ static void test_set(void)
 
 
 
+#include "table.h"
+
+static int table_apply(const void *key, void **pvalue, void *priv)
+{
+	fprintf(stdout, "%d: %d\n", (int)key, (int)(*pvalue));
+	return 0;
+}
+
+static void test_table(void)
+{
+#define TABLE_ITEM_LEN	10
+
+	Table_T table = NULL;
+
+	table = MODULE_FUN_NAME(Table, new)(10, NULL, NULL);
+
+	fprintf(stdout, "first\n");
+	for (int i = 0; i < TABLE_ITEM_LEN; i++)
+	{
+		MODULE_FUN_NAME(Table, put)(table, (void *)(i), (void *)i);
+	}
+
+	for (int i = 0; i < TABLE_ITEM_LEN; i++)
+	{
+		fprintf(stdout, "%d: %d\n", MODULE_FUN_NAME(Table, get)(table, (void *)i));
+	}
+
+	fprintf(stdout, "second \n");
+	for (int i = 0; i < TABLE_ITEM_LEN - 5; i++)
+	{
+		fprintf(stdout, "remove %d item\n", i);
+		MODULE_FUN_NAME(Table, remove)(table, (void *)i);
+		MODULE_FUN_NAME(Table, map)(table, table_apply, NULL);
+	}
+
+
+	fprintf(stdout, "third\n");
+	void **array = NULL;
+	void *key = NULL;
+	void *value = NULL;
+	array = MODULE_FUN_NAME(Table, toArray)(table, (void *)111);
+	for (int i = 0; i < MODULE_FUN_NAME(Table, length)(table) * 2; i += 2)
+	{
+		key = array[i];
+		value = array[i + 1];
+		fprintf(stdout, "key: %d, value: %d\n", (int)key, (int)value);
+	}
+	fprintf(stdout, "end: %d\n", (int)array[MODULE_FUN_NAME(Table, length)(table) * 2]);
+	fprintf(stdout, "table len: %d\n", MODULE_FUN_NAME(Table, length)(table));
+
+	MODULE_FUN_NAME(Table, free)(&table);
+}
+
+
 struct test_routine {
 	void (*call_back)(void);
 	char *name;
@@ -472,7 +527,8 @@ struct test_routine my_test_routines[] =
 //		{test_arena, "arena"},
 //		{test_threadPool, "threadPool"},
 //		{test_array, "array"},
-		{test_set, "array"},
+//		{test_set, "set"},
+		{test_table, "table"},
 		{NULL,NULL},
 };
 
