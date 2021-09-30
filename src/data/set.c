@@ -281,7 +281,7 @@ void *MODULE_FUN_NAME(Set, first)(T set)
 		return NULL;
 	}
 
-	for (int i = 0; i < len; i++)
+	for (int i = 0; i < set->size; i++)
 	{
 		p = set->buckets[i];
 		if (p != NULL)
@@ -297,30 +297,37 @@ void *MODULE_FUN_NAME(Set, first)(T set)
  */
 void *MODULE_FUN_NAME(Set, next)(T set, void *member)
 {
+	int i = 0;
 	int len = 0;
 	struct member *p = NULL;
 
 	assert(set);
 	assert(member);
 
-	len = MODULE_FUN_NAME(Set, length)(set);
-	if (0 == len)
-	{
-		return NULL;
-	}
+	i = (*set->hash)(member) % set->size;
+	for (p = set->buckets[i]; p; p = p->link)
+		if ((*set->cmp)(member, p->member) == 0)
+			break;
 
-	for (int i = 0; i < len; i++)
+	p = p->link;
+
+	/*需在接下来的buckets中查找第一个元素*/
+	if (p == NULL)
 	{
-		for (p = set->buckets[i]; p; p = p->link)
+		for (i = i + 1; i < set->size; i++)
 		{
-			if (p->member == member)
+			p = set->buckets[i];
+			if (p != NULL)
 			{
-				return p->link;
+				return (void *)(p->member);
 			}
 		}
+		return NULL;
 	}
-
-	return NULL;
+	else
+	{
+		return (void *)p->member;
+	}
 }
 
 /*
