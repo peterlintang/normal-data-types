@@ -509,6 +509,70 @@ static void test_table(void)
 	MODULE_FUN_NAME(Table, free)(&table);
 }
 
+#include "seq.h"
+
+static void test_seq(void)
+{
+#define SEQ_ITEM_LEN	10
+	Seq_T seq = NULL;
+	Seq_T seq2 = NULL;
+	int len = 0;
+	void *prev = NULL;
+
+	fprintf(stdout, "first\n");
+	seq = MODULE_FUN_NAME(Seq, seq)("c", "c++", "html", "java", NULL);
+	seq2 = MODULE_FUN_NAME(Seq, new)(10);
+
+	len = MODULE_FUN_NAME(Seq, length)(seq);
+	fprintf(stdout, "len: %d\n", len);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Seq, get)(seq, i));
+	}
+
+	fprintf(stdout, "second\n");
+	prev = MODULE_FUN_NAME(Seq, put)(seq, 3, "shell");
+	len = MODULE_FUN_NAME(Seq, length)(seq);
+	fprintf(stdout, "len: %d, prev: %s\n", len, (char *)prev);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Seq, get)(seq, i));
+	}
+
+	fprintf(stdout, "third\n");
+	MODULE_FUN_NAME(Seq, addhi)(seq, "java");
+	MODULE_FUN_NAME(Seq, addlo)(seq, "icon");
+	len = MODULE_FUN_NAME(Seq, length)(seq);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Seq, get)(seq, i));
+	}
+
+	fprintf(stdout, "four\n");
+	MODULE_FUN_NAME(Seq, rmlo)(seq);
+	MODULE_FUN_NAME(Seq, rmhi)(seq);
+	len = MODULE_FUN_NAME(Seq, length)(seq);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Seq, get)(seq, i));
+	}
+
+	fprintf(stdout, "five\n");
+	for (int i = 0; i < SEQ_ITEM_LEN; i++)
+	{
+		MODULE_FUN_NAME(Seq, addhi)(seq2, (void *)i);
+		MODULE_FUN_NAME(Seq, addlo)(seq2, (void *)i);
+	}
+	len = MODULE_FUN_NAME(Seq, length)(seq2);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "i: %d, %d\n", i, (int)MODULE_FUN_NAME(Seq, get)(seq2, i));
+	}
+
+	MODULE_FUN_NAME(Seq, free)(&seq);
+	MODULE_FUN_NAME(Seq, free)(&seq2);
+}
+
 
 struct test_routine {
 	void (*call_back)(void);
@@ -528,7 +592,8 @@ struct test_routine my_test_routines[] =
 //		{test_threadPool, "threadPool"},
 //		{test_array, "array"},
 //		{test_set, "set"},
-		{test_table, "table"},
+//		{test_table, "table"},
+		{test_seq, "seq"},
 		{NULL,NULL},
 };
 
