@@ -2,6 +2,8 @@
  *
  * filename:	ring.h
  * description:	implement the ring operations
+ * 				环：n个从0-到n-1的值，值为指针；空环没有值，可通过索引访问；
+ * 				值可以添加到换的任何地方，环中任何值皆可删除；
  * author:
  * date:		2019-09-29
  * version:		0.0.1
@@ -130,7 +132,7 @@ void *MODULE_FUN_NAME(Ring, rmhi)(T ring);
  * use element of index n as head
  *
  **********************************/
-/* if n < 0, left rotate; if n > 0, right rotate */
+/* if n < 0, right rotate; if n > 0, left rotate */
 void MODULE_FUN_NAME(Ring, rotate)(T ring, int n); 
 
 
