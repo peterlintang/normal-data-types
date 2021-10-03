@@ -574,6 +574,88 @@ static void test_seq(void)
 }
 
 
+#include "ring.h"
+
+static void test_ring(void)
+{
+	Ring_T ring = NULL;
+	int len = 0;
+
+	fprintf(stdout, "first\n");
+	ring = MODULE_FUN_NAME(Ring, ring)("hello", "world", "c", "language");
+	len = MODULE_FUN_NAME(Ring, length)(ring);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+	}
+
+	fprintf(stdout, "second\n");
+	MODULE_FUN_NAME(Ring, put)(ring, 1, "ni");
+	len = MODULE_FUN_NAME(Ring, length)(ring);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+	}
+
+	fprintf(stdout, "third\n");
+	MODULE_FUN_NAME(Ring, addhi)(ring, "na");
+	MODULE_FUN_NAME(Ring, addlo)(ring, "ha");
+	len = MODULE_FUN_NAME(Ring, length)(ring);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+	}
+
+	fprintf(stdout, "third\n");
+	MODULE_FUN_NAME(Ring, rmhi)(ring);
+	len = MODULE_FUN_NAME(Ring, length)(ring);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+	}
+	MODULE_FUN_NAME(Ring, rmlo)(ring);
+	len = MODULE_FUN_NAME(Ring, length)(ring);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+	}
+
+	fprintf(stdout, "four\n");
+	MODULE_FUN_NAME(Ring, add)(ring, 3, "yahada");
+	MODULE_FUN_NAME(Ring, add)(ring, -5, "wone");
+	len = MODULE_FUN_NAME(Ring, length)(ring);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+	}
+
+	fprintf(stdout, "five\n");
+	MODULE_FUN_NAME(Ring, remove)(ring, 3);
+	len = MODULE_FUN_NAME(Ring, length)(ring);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+	}
+
+	fprintf(stdout, "six\n");
+	MODULE_FUN_NAME(Ring, rotate)(ring, 3);
+	len = MODULE_FUN_NAME(Ring, length)(ring);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+	}
+
+	fprintf(stdout, "six\n");
+	MODULE_FUN_NAME(Ring, rotate)(ring, -3);
+	len = MODULE_FUN_NAME(Ring, length)(ring);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+	}
+
+	MODULE_FUN_NAME(Ring, free)(&ring);
+}
+
 struct test_routine {
 	void (*call_back)(void);
 	char *name;
@@ -593,7 +675,8 @@ struct test_routine my_test_routines[] =
 //		{test_array, "array"},
 //		{test_set, "set"},
 //		{test_table, "table"},
-		{test_seq, "seq"},
+//		{test_seq, "seq"},
+		{test_ring, "ring"},
 		{NULL,NULL},
 };
 
