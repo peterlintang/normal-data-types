@@ -2,6 +2,9 @@
  *
  * filename:	seq.h
  * description:	implement the seq operations
+ * 序列，N个数值， 用0 - N-1整数索引;
+ * 可以在序列两端添加或删除元素；
+ *
  * author:
  * date:		2019-09-29
  * version:		0.0.1
@@ -108,3 +111,5 @@ void *MODULE_FUN_NAME(Seq, rmhi)(T seq);
 #undef T
 
 #endif
+
+

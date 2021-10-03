@@ -1,4 +1,9 @@
 
+/*
+ * 序列，N个数值， 用0 - N-1整数索引;
+ * 可以在序列两端添加或删除元素；
+ *
+ */
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
