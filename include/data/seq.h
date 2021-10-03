@@ -2,8 +2,8 @@
  *
  * filename:	seq.h
  * description:	implement the seq operations
- * 序列，N个数值， 用0 - N-1整数索引;
- * 可以在序列两端添加或删除元素；
+ * 序列，N个数值， 用0 - N-1整数索引;序列的值为指针；
+ * 可以在序列两端添加或删除元素；通过索引访问；
  *
  * author:
  * date:		2019-09-29
