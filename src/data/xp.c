@@ -124,6 +124,8 @@ int MODULE_FUN_NAME(XP, sum)(int n, T z, T x, int y)
 {
 	int i;
 
+	assert(y > 0 && y <= BASE);
+
 	for (i = 0; i < n; i++)
 	{
 		y += x[i];
@@ -138,6 +140,8 @@ int MODULE_FUN_NAME(XP, diff)(int n, T z, T x, int y)
 {
 	int i;
 	int d;
+
+	assert(y > 0 && y <= BASE);
 
 	for (i = 0; i < n; i++)
 	{
@@ -185,6 +189,7 @@ int MODULE_FUN_NAME(XP, mul)(T z, int n, T x, int m, T y)
 			z[i + j] = carry % BASE;
 			carry /= BASE;
 		}
+		carryout |= carry;
 	}
 
 	return carryout;
@@ -194,6 +199,8 @@ int MODULE_FUN_NAME(XP, product)(int n, T z, T x, int y)
 {
 	int i;
 	unsigned carry = 0;
+
+	assert(y < BASE);
 
 	for (i = 0; i < n; i++)
 	{
@@ -299,6 +306,8 @@ int MODULE_FUN_NAME(XP, quotient)(int n, T z, T x, int y)
 	int i;
 	unsigned carry = 0;
 
+	assert(y < BASE);
+
 	for (i = n - 1; i >= 0; i--)
 	{
 		carry = carry * BASE + x[i];
@@ -316,7 +325,7 @@ int MODULE_FUN_NAME(XP, cmp)(int n, T x, T y)
 	while (i > 0 && x[i] == y[i])
 		i--;
 
-	return x[i] - y[i];
+	return x[i] > y[i] ? 1 : (x[i] == y[i] ? 0 : -1);
 }
 
 void MODULE_FUN_NAME(XP, lshift)
