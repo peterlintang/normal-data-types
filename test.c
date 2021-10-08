@@ -673,7 +673,7 @@ static void test_str(void)
 
 static void test_xp(void)
 {
-#define XP_TEST_NUM	10240000
+#define XP_TEST_NUM	1024
 #define XP_LEN	16
 	int ret = 0;
 	int len = 0;
@@ -687,11 +687,21 @@ static void test_xp(void)
 	unsigned char sum_str[XP_LEN] = { 0 };
 	XP_T z = NULL;
 	unsigned char z_str[XP_LEN * 2] = { 0 };
+	XP_T q = NULL;
+	unsigned char q_str[XP_LEN] = { 0 };
+	XP_T r = NULL;
+	unsigned char r_str[XP_LEN] = { 0 };
+	XP_T tmp = NULL;
+	unsigned char tmp_str[XP_LEN * 2 + 2] = { 0 };
 
 	xp = xp_str;
 	xp2 = xp2_str;
 	sum = sum_str;
 	z = z_str;
+
+	q = q_str;
+	r = r_str;
+	tmp = tmp_str;
 
 	fprintf(stdout, "first\n");
 	for (int i = 0; i < XP_TEST_NUM; i++)
@@ -701,7 +711,7 @@ static void test_xp(void)
 			fprintf(stdout, "i: %d, toint: %lu\n", i, MODULE_FUN_NAME(XP, toint)(XP_LEN, xp));
 	}
 
-	fprintf(stdout, "second\n");
+	fprintf(stdout, "second add\n");
 	for (int i = 0; i < XP_TEST_NUM; i++)
 	{
 		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp, i);
@@ -714,7 +724,7 @@ static void test_xp(void)
 							MODULE_FUN_NAME(XP, toint)(XP_LEN, sum));
 	}
 
-	fprintf(stdout, "third\n");
+	fprintf(stdout, "third sub\n");
 	for (int i = 0; i < XP_TEST_NUM; i++)
 	{
 		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp, i);
@@ -727,20 +737,101 @@ static void test_xp(void)
 							MODULE_FUN_NAME(XP, toint)(XP_LEN, sum));
 	}
 
-	fprintf(stdout, "four\n");
+	fprintf(stdout, "four mul\n");
 	for (int i = 0; i < XP_TEST_NUM; i++)
 	{
 		memset(z, 0, XP_LEN * 2);
 		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp, i);
 		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp2, i + 1);
 		MODULE_FUN_NAME(XP, mul)(z, XP_LEN, xp2, XP_LEN, xp);
-		if (MODULE_FUN_NAME(XP, toint)(XP_LEN * 2, z) != (i) * (i + 1))
+		if (MODULE_FUN_NAME(XP, toint)(XP_LEN * 2, z) != ((unsigned long)i) * (unsigned long)(i + 1))
 			fprintf(stdout, "i: %d, toint: %lu, %lu, %lu\n", i, 
 							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp),
 							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp2),
 							MODULE_FUN_NAME(XP, toint)(XP_LEN * 2, z));
 	}
+
+	fprintf(stdout, "four div\n");
+	MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp, 9);
+	for (int i = 0; i < XP_TEST_NUM; i++)
+	{
+		memset(z, 0, XP_LEN * 2);
+		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp2, i);
+		MODULE_FUN_NAME(XP, div)(XP_LEN, q, xp2, XP_LEN, xp, r, tmp);
+		if (MODULE_FUN_NAME(XP, toint)(XP_LEN , q) != (i) / (9) 
+			|| MODULE_FUN_NAME(XP, toint)(XP_LEN, r) != i % 9)
+			fprintf(stdout, "i: %d, toint: %lu, %lu, %lu, %lu\n", i, 
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp),
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp2),
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, q),
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, r));
+	}
 	
+	fprintf(stdout, "five sum\n");
+	for (int j = 1; j < 256; j++)
+	for (int i = 0; i < XP_TEST_NUM; i++)
+	{
+		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp, i);
+		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp2, i + 1);
+		MODULE_FUN_NAME(XP, sum)(XP_LEN, sum, xp, j);
+		if (MODULE_FUN_NAME(XP, toint)(XP_LEN, sum) != i + j)
+			fprintf(stdout, "i: %d, toint: %lu, %lu, %lu\n", i, 
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp),
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp2),
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, sum));
+	}
+
+	fprintf(stdout, "six diff\n");
+	for (int j = 1; j < 256; j++)
+	{
+	for (int i = 0; i < XP_TEST_NUM; i++)
+	{
+		memset(sum, 0, XP_LEN);
+		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp, i + j);
+		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp2, i + 1);
+		MODULE_FUN_NAME(XP, diff)(XP_LEN, sum, xp, j);
+		if (MODULE_FUN_NAME(XP, toint)(XP_LEN, sum) != i)
+			fprintf(stdout, "i: %d, toint: %lu, %lu, %lu\n", i, 
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp),
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp2),
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, sum));
+	}
+	}
+
+	fprintf(stdout, "seven product\n");
+	for (int j = 1; j < 256; j++)
+	{
+	for (int i = 0; i < XP_TEST_NUM; i++)
+	{
+		memset(sum, 0, XP_LEN);
+		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp, i);
+		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp2, i + 1);
+		MODULE_FUN_NAME(XP, product)(XP_LEN, sum, xp, j);
+		if (MODULE_FUN_NAME(XP, toint)(XP_LEN, sum) != (unsigned long)i * (unsigned long)j)
+			fprintf(stdout, "i: %d, toint: %lu, %lu, %lu\n", i, 
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp),
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp2),
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, sum));
+	}
+	}
+
+	fprintf(stdout, "eight quotient\n");
+	for (int j = 1; j < 256; j++)
+	{
+	int ret = 0;
+	for (int i = 0; i < XP_TEST_NUM; i++)
+	{
+		memset(sum, 0, XP_LEN);
+		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp, i);
+		ret = MODULE_FUN_NAME(XP, quotient)(XP_LEN, sum, xp, j);
+		if (MODULE_FUN_NAME(XP, toint)(XP_LEN, sum) != i / j 
+			|| ret != i % j)
+			fprintf(stdout, "i: %d, j: %d, toint: %lu, %lu\n", i, j,
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp),
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, sum));
+	}
+	}
+
 }
 
 struct test_routine {
