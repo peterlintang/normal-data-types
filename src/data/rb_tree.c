@@ -429,6 +429,8 @@ T MODULE_FUN_NAME(RB_Tree, new)(int (*cmp)(void *, void *))
 {
 	T tree = NULL;
 
+	assert(cmp);
+
 	tree = (T)calloc(1, sizeof(*tree));
 	if (tree == NULL) 
 	{
