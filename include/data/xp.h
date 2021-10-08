@@ -2,7 +2,7 @@
  *
  * filename:	xp.h
  * description:	implement the xp operations
- * 				扩展精度算法
+ * 				扩展精度算法 无符号整数算法
  * author:
  * date:		2019-10-09
  * version:		0.0.1
