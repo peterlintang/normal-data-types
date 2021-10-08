@@ -1,5 +1,11 @@
 
 /*
+ * filename: 		rb_tree.h
+ * description:		实现红黑树数据结构
+ * date:			2021-10-08
+ * author:			lxj
+ */
+/*
  * for charpter 13
  */
 
@@ -7,47 +13,52 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "rb_tree.h"
 
-struct node {
-	struct node *left;
-	struct node *right;
-	struct node *parent;
-	int key;
+#define T RB_Tree
+#define NODE RB_Node
+
+struct NODE {
+	NODE left;
+	NODE right;
+	NODE parent;
+	void *priv;
 #define RED		0x1
 #define BLACK	0x2
 	int color;
 };
 
-struct rb_tree {
-	struct node *root;
-	struct node *nil;
+struct T {
+	NODE root;
+	NODE nil;
+	int (*cmp)(void *, void *);
 };
 
-static struct node *tree_search(struct rb_tree *T, 
-				struct node *x, int key)
+static NODE tree_search(T tree, 
+				NODE x, void *key)
 {
-	if (x == T->nil)
+	if (x == tree->nil)
 		return NULL;
-	if (x == NULL || x->key == key)
+	if (x == NULL || tree->cmp(x->priv, key) == 0)
 		return x;
-	if (x->key > key)
-		return tree_search(T, x->left, key);
+	if (tree->cmp(x->priv, key) > 0)
+		return tree_search(tree, x->left, key);
 	else
-		return tree_search(T, x->right, key);
+		return tree_search(tree, x->right, key);
 }
 
-struct node *rb_tree_search(struct rb_tree *T, int key)
+NODE MODULE_FUN_NAME(RB_Tree, search)(T tree, void *key)
 {
-	return tree_search(T, T->root, key);
+	return tree_search(tree, tree->root, key);
 }
 
-struct node *iterative_rb_tree_search(struct rb_tree *T, int key)
+NODE MODULE_FUN_NAME(RB_Tree, iterative_search)(T tree, void *key)
 {
-	struct node *x = T->root;
+	NODE x = tree->root;
 
-	while ((x != T->nil) && (x->key != key))
+	while ((x != tree->nil) && tree->cmp(x->priv, key) != 0)
 	{
-		if (x->key > key)
+		if (tree->cmp(x->priv, key) > 0)
 			x = x->left;
 		else
 			x = x->right;
@@ -56,58 +67,58 @@ struct node *iterative_rb_tree_search(struct rb_tree *T, int key)
 	return x;
 }
 
-static struct node *tree_minimum(struct rb_tree *T, struct node *x)
+static NODE tree_minimum(T tree, NODE x)
 {
-	if (x == T->nil)
+	if (x == tree->nil)
 	{
 		fprintf(stdout, "%s: nil: %p\n", __func__, x);
 		return x;
 	}
 
-	while (x->left != T->nil)
+	while (x->left != tree->nil)
 		x = x->left;
 
 	return x;
 }
 
-struct node *rb_tree_minimum(struct rb_tree *T)
+NODE MODULE_FUN_NAME(RB_Tree, minimum)(T tree)
 {
-	struct node *x = T->root;
+	NODE x = tree->root;
 
-	if (x == T->nil)
+	if (x == tree->nil)
 		return NULL;
 
-	return tree_minimum(T, x);
+	return tree_minimum(tree, x);
 }
 
-static struct node *tree_maximum(struct rb_tree *T, struct node *x)
+static NODE tree_maximum(T tree, NODE x)
 {
-	while (x->right != T->nil)
+	while (x->right != tree->nil)
 		x = x->right;
 
 	return x;
 }
 
-struct node *rb_tree_maximum(struct rb_tree *T)
+NODE MODULE_FUN_NAME(RB_Tree, maximum)(T tree)
 {
-	struct node *x = T->root;
+	NODE x = tree->root;
 
-	if (x == T->nil)
+	if (x == tree->nil)
 		return NULL;
 
-	return tree_maximum(T, x);
+	return tree_maximum(tree, x);
 }
 
-struct node *rb_tree_successor(struct rb_tree *T, struct node *x)
+NODE MODULE_FUN_NAME(RB_Tree, successor)(T tree, NODE x)
 {
-	struct node *y = NULL;
-	struct node *p = NULL;
+	NODE y = NULL;
+	NODE p = NULL;
 
-	if (x->right != T->nil)
-		return tree_minimum(T, x->right);
+	if (x->right != tree->nil)
+		return tree_minimum(tree, x->right);
 
 	y = x->parent;
-	while ((y != T->nil) && (x == y->right))
+	while ((y != tree->nil) && (x == y->right))
 	{
 		x = y;
 		y = y->parent;
@@ -116,16 +127,16 @@ struct node *rb_tree_successor(struct rb_tree *T, struct node *x)
 	return y;
 }
 
-struct node *rb_tree_predecessor(struct rb_tree *T, struct node *x)
+NODE MODULE_FUN_NAME(RB_Tree, predecessor)(T tree, NODE x)
 {
-	struct node *y = NULL;
-	struct node *p = NULL;
+	NODE y = NULL;
+	NODE p = NULL;
 
-	if (x->left != T->nil)
-		return tree_maximum(T, x->left);
+	if (x->left != tree->nil)
+		return tree_maximum(tree, x->left);
 
 	y = x->parent;
-	while ((y != T->nil) && (x == y->left))
+	while ((y != tree->nil) && (x == y->left))
 	{
 		x = y;
 		y = y->parent;
@@ -134,22 +145,22 @@ struct node *rb_tree_predecessor(struct rb_tree *T, struct node *x)
 	return y;
 }
 
-static void left_rotate(struct rb_tree *T, struct node *x)
+static void left_rotate(T tree, NODE x)
 {
-	struct node *y = NULL;
+	NODE y = NULL;
 
-	assert(x != T->nil);
-	assert(x->right != T->nil);
+	assert(x != tree->nil);
+	assert(x->right != tree->nil);
 
 	y = x->right;
 
 	x->right = y->left;
-	if (y->left != T->nil)
+	if (y->left != tree->nil)
 		y->left->parent = x;
 
 	y->parent = x->parent;
-	if (x->parent == T->nil)
-		T->root = y;
+	if (x->parent == tree->nil)
+		tree->root = y;
 	else if (x == x->parent->left)
 		x->parent->left = y;
 	else
@@ -162,22 +173,22 @@ static void left_rotate(struct rb_tree *T, struct node *x)
 /*
  * 13.2-1 answer
  */
-static void right_rotate(struct rb_tree *T, struct node *y)
+static void right_rotate(T tree, NODE y)
 {
-	struct node *x = NULL;
+	NODE x = NULL;
 
-	assert(y != T->nil);
-	assert(y->left != T->nil);
+	assert(y != tree->nil);
+	assert(y->left != tree->nil);
 
 	x = y->left;
 
 	y->left = x->right;
-	if (x->right != T->nil)
+	if (x->right != tree->nil)
 		x->right->parent = y;
 
 	x->parent = y->parent;
-	if (y->parent == T->nil)
-		T->root = x;
+	if (y->parent == tree->nil)
+		tree->root = x;
 	else if (y == y->parent->left)
 		y->parent->left = x;
 	else
@@ -187,9 +198,9 @@ static void right_rotate(struct rb_tree *T, struct node *y)
 	x->right = y;
 }
 
-static void rb_insert_fixup(struct rb_tree *T, struct node *z)
+static void rb_insert_fixup(T tree, NODE z)
 {
-	struct node *y = NULL;
+	NODE y = NULL;
 
 	while (z->parent->color == RED)
 	{
@@ -208,11 +219,11 @@ static void rb_insert_fixup(struct rb_tree *T, struct node *z)
 				if (z == z->parent->right)
 				{
 					z = z->parent;
-					left_rotate(T, z);
+					left_rotate(tree, z);
 				}
 				z->parent->color = BLACK;
 				z->parent->parent->color = RED;
-				right_rotate(T, z->parent->parent);
+				right_rotate(tree, z->parent->parent);
 			}
 		}
 		else
@@ -230,58 +241,58 @@ static void rb_insert_fixup(struct rb_tree *T, struct node *z)
 				if (z == z->parent->left)
 				{
 					z = z->parent;
-					right_rotate(T, z);// ?
+					right_rotate(tree, z);// ?
 				}
 				z->parent->color = BLACK;
 				z->parent->parent->color = RED;
-				left_rotate(T, z->parent->parent);//?
+				left_rotate(tree, z->parent->parent);//?
 			}
 		}
 	}
 
-	T->root->color = BLACK;
+	tree->root->color = BLACK;
 }
 
-struct node *rb_insert(struct rb_tree *T, struct node *node)
+NODE MODULE_FUN_NAME(RB_Tree, insert)(T tree, NODE node)
 {
-	struct node *y = NULL;
-	struct node *x = NULL;
+	NODE y = NULL;
+	NODE x = NULL;
 
-	y = T->nil;
-	x = T->root;
+	y = tree->nil;
+	x = tree->root;
 
-	while (x != T->nil)
+	while (x != tree->nil)
 	{
 		y = x;
-		if (x->key > node->key)
+		if (tree->cmp(x->priv, node->priv) > 0)
 			x = x->left;
 		else
 			x = x->right;
 	}
 
 	node->parent = y;
-	if (y == T->nil)
-		T->root = node;
-	else if (node->key < y->key)
+	if (y == tree->nil)
+		tree->root = node;
+	else if (tree->cmp(node->priv, y->priv) < 0)
 		y->left = node;
 	else
 		y->right = node;
 
-	node->left = T->nil;
-	node->right = T->nil;
+	node->left = tree->nil;
+	node->right = tree->nil;
 	node->color = RED;
 
-	rb_insert_fixup(T, node);
+	rb_insert_fixup(tree, node);
 
 	return node;
 }
 
-static void rb_transplant(struct rb_tree *T, 
-				struct node *u, struct node *v)
+static void rb_transplant(T tree, 
+				NODE u, NODE v)
 {
-	if (u->parent == T->nil)
+	if (u->parent == tree->nil)
 	{
-		T->root = v;
+		tree->root = v;
 	}
 	else if (u == u->parent->left)
 	{
@@ -295,10 +306,10 @@ static void rb_transplant(struct rb_tree *T,
 	v->parent = u->parent;
 }
 
-static void	rb_delete_fixup(struct rb_tree *T, struct node *x)
+static void	rb_delete_fixup(T tree, NODE x)
 {
-	struct node *w = NULL;
-	while ((x != T->root) && (x->color == BLACK))
+	NODE w = NULL;
+	while ((x != tree->root) && (x->color == BLACK))
 	{
 		if (x == x->parent->left)
 		{
@@ -307,7 +318,7 @@ static void	rb_delete_fixup(struct rb_tree *T, struct node *x)
 			{
 				w->color = BLACK;
 				x->parent->color = RED;
-				left_rotate(T, x->parent);
+				left_rotate(tree, x->parent);
 				w = x->parent->right;
 			}
 			if ((w->left->color == BLACK) && (w->right->color == BLACK))
@@ -319,14 +330,14 @@ static void	rb_delete_fixup(struct rb_tree *T, struct node *x)
 			{
 				w->left->color = BLACK;
 				w->color = RED;
-				right_rotate(T, w);
+				right_rotate(tree, w);
 				w = x->parent->right;
 			}
 			w->color = x->parent->color;
 			x->parent->color = BLACK;
 			w->right->color = BLACK;
-			left_rotate(T, x->parent);
-			x = T->root;
+			left_rotate(tree, x->parent);
+			x = tree->root;
 		}
 		else
 		{
@@ -335,7 +346,7 @@ static void	rb_delete_fixup(struct rb_tree *T, struct node *x)
 			{
 				w->color = BLACK;
 				x->parent->color = RED;
-				right_rotate(T, x->parent);
+				right_rotate(tree, x->parent);
 				w = x->parent->left;
 			}
 			if ((w->right->color == BLACK) && (w->left->color == BLACK))
@@ -347,44 +358,44 @@ static void	rb_delete_fixup(struct rb_tree *T, struct node *x)
 			{
 				w->right->color = BLACK;
 				w->color = RED;
-				left_rotate(T, w);
+				left_rotate(tree, w);
 				w = x->parent->left;
 			}
 			w->color = x->parent->color;
 			x->parent->color = BLACK;
 			w->left->color = BLACK;
-			right_rotate(T, x->parent);
-			x = T->root;
+			right_rotate(tree, x->parent);
+			x = tree->root;
 		}
 	}
 
 	x->color = BLACK;
 }
 
-struct node *rb_delete(struct rb_tree *T, struct node *z)
+NODE MODULE_FUN_NAME(RB_Tree, delete)(T tree, NODE z)
 {
 	int y_origin_color = RED;
-	struct node *y = NULL;
-	struct node *x = NULL;
+	NODE y = NULL;
+	NODE x = NULL;
 
 	y = z;
 	y_origin_color = y->color;
 
-	if (z->left == T->nil)
+	if (z->left == tree->nil)
 	{
 //		fprintf(stdout, "1 %s: y:%d\n", __func__, y->key);
 		x = z->right;
-		rb_transplant(T, z, z->right);
+		rb_transplant(tree, z, z->right);
 	}
-	else if (z->right == T->nil)
+	else if (z->right == tree->nil)
 	{
 //		fprintf(stdout, "2 %s: y:%d\n", __func__, y->key);
 		x = z->left;
-		rb_transplant(T, z, z->left);
+		rb_transplant(tree, z, z->left);
 	}
 	else
 	{
-		y = tree_minimum(T, z->right);
+		y = tree_minimum(tree, z->right);
 		y_origin_color = y->color;
 //		fprintf(stdout, "3 %s: y:%d\n", __func__, y->key);
 
@@ -395,11 +406,11 @@ struct node *rb_delete(struct rb_tree *T, struct node *z)
 		}
 		else
 		{
-			rb_transplant(T, y, y->right);
+			rb_transplant(tree, y, y->right);
 			y->right = z->right;
 			y->right->parent = y;
 		}
-		rb_transplant(T, z, y);
+		rb_transplant(tree, z, y);
 		y->left = z->left;
 		y->left->parent = y;
 		y->color = z->color;
@@ -407,70 +418,75 @@ struct node *rb_delete(struct rb_tree *T, struct node *z)
 
 	if (y_origin_color == BLACK)
 	{
-		rb_delete_fixup(T, x);
+		rb_delete_fixup(tree, x);
 	}
 
 	return z;
 }
 
 
-struct rb_tree *rb_tree_root(void)
+T MODULE_FUN_NAME(RB_Tree, new)(int (*cmp)(void *, void *))
 {
-	struct rb_tree *T = NULL;
+	T tree = NULL;
 
-	T = (struct rb_tree *)calloc(1, sizeof(*T));
-	if (T == NULL) 
+	tree = (T)calloc(1, sizeof(*tree));
+	if (tree == NULL) 
 	{
 		return NULL;
 	}
 
-	T->root = T->nil = (struct node *)calloc(1, sizeof(struct node));
-	if (T->nil == NULL) 
+	tree->root = tree->nil = (NODE )calloc(1, sizeof(struct NODE));
+	if (tree->nil == NULL) 
 	{
-		free(T);
+		free(tree);
 		return NULL;
 	}
-	T->nil->color = BLACK;
+	tree->nil->color = BLACK;
+	tree->cmp = cmp;
 
-	return T;
+	return tree;
+}
+
+void MODULE_FUN_NAME(RB_Tree, free)(T *tree)
+{
 }
 
 
 
-void inorder_tree_walk(struct node *x, struct node *nil)
+void MODULE_FUN_NAME(RB_Tree, inorder_walk)(T tree, NODE x, NODE nil)
 {
 //	fprintf(stdout, "%s: x: %p, nil: %p\n", __func__, x, nil);
 	if (x != nil)
 	{
-		inorder_tree_walk(x->left, nil);
-		fprintf(stdout, "key: %4d, color: %s \n", 
-						x->key, x->color == RED ? "RED" : "BLACK");
-		inorder_tree_walk(x->right, nil);
+		MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, x->left, nil);
+		fprintf(stdout, "priv: %p, color: %s \n", 
+						x->priv, x->color == RED ? "RED" : "BLACK");
+		MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, x->right, nil);
 	}
 }
 
-void preorder_tree_walk(struct node *x, struct node *nil)
+void MODULE_FUN_NAME(RB_Tree, preorder_walk)(T tree, NODE x, NODE nil)
 {
 //	fprintf(stdout, "%s: x: %p, nil: %p\n", __func__, x, nil);
 	if (x != nil)
 	{
-		fprintf(stdout, "key: %4d, color: %s \n", 
-						x->key, x->color == RED ? "RED" : "BLACK");
-		preorder_tree_walk(x->left, nil);
-		preorder_tree_walk(x->right, nil);
+		fprintf(stdout, "priv: %p, color: %s \n", 
+						x->priv, x->color == RED ? "RED" : "BLACK");
+		MODULE_FUN_NAME(RB_Tree, preorder_walk)(tree, x->left, nil);
+		MODULE_FUN_NAME(RB_Tree, preorder_walk)(tree, x->right, nil);
 	}
 }
 
 
-void postorder_tree_walk(struct node *x, struct node *nil)
+void MODULE_FUN_NAME(RB_Tree, postorder_walk)(T tree, NODE x, NODE nil)
 {
 //	fprintf(stdout, "%s: x: %p, nil: %p\n", __func__, x, nil);
 	if (x != nil)
 	{
-		postorder_tree_walk(x->left, nil);
-		postorder_tree_walk(x->right, nil);
-		fprintf(stdout, "key: %4d, color: %s \n", 
-						x->key, x->color == RED ? "RED" : "BLACK");
+		MODULE_FUN_NAME(RB_Tree, postorder_walk)(tree, x->left, nil);
+		MODULE_FUN_NAME(RB_Tree, postorder_walk)(tree, x->right, nil);
+		fprintf(stdout, "priv: %p, color: %s \n", 
+						x->priv, x->color == RED ? "RED" : "BLACK");
 	}
 }
 
@@ -478,10 +494,18 @@ void postorder_tree_walk(struct node *x, struct node *nil)
 /*
  * test code
  */
+static int cmp(void *arg1, void *arg2)
+{
+	int num1 = (int )arg1;
+	int num2 = (int )arg2;
+
+	return arg1 - arg2 > 0 ? 1 : ((arg1 - arg2 == 0) ? 0 : -1 );
+}
+
 int main(int argc, char *argv[])
 {
-	struct rb_tree *T = NULL;
-	struct node *node = NULL;
+	T tree = NULL;
+	NODE node = NULL;
 	int num = 16;
 	int seed = 79;
 	int key = 18;
@@ -493,25 +517,25 @@ int main(int argc, char *argv[])
 		key = atoi(argv[3]);
 	}
 
-	T = rb_tree_root();
-	if (T == NULL)
+	tree = MODULE_FUN_NAME(RB_Tree, new)(cmp);
+	if (tree == NULL)
 	{
 		fprintf(stderr, "no mem\n");
 		exit(1);
 	}
-	fprintf(stdout, "T: %p, T->root: %p, T->nil: %p\n", 
-					T, T->root, T->nil);
+	fprintf(stdout, "tree: %p, tree->root: %p, tree->nil: %p\n", 
+					tree, tree->root, tree->nil);
 
 	srand(seed);
 
 	for (int i = 0; i < num; i++)
 	{
-		node = (struct node *)calloc(1, sizeof(*node));
+		node = (NODE)calloc(1, sizeof(*node));
 		if (node)
 		{
-			node->key = rand();
-			fprintf(stdout, "inserting key: %d\n", node->key);
-			rb_insert(T, node);
+			node->priv = (void *)rand();
+			fprintf(stdout, "inserting priv: %d\n", (int)node->priv);
+			MODULE_FUN_NAME(RB_Tree, insert)(tree, node);
 		}
 		else
 		{
@@ -521,68 +545,29 @@ int main(int argc, char *argv[])
 	}
 
 	fprintf(stdout, "in order wal:\n");
-	inorder_tree_walk(T->root, T->nil);
+	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, tree->nil);
 	fprintf(stdout, "pre order wal:\n");
-	preorder_tree_walk(T->root, T->nil);
+	MODULE_FUN_NAME(RB_Tree, preorder_walk)(tree, tree->root, tree->nil);
 	fprintf(stdout, "post order wal:\n");
-	postorder_tree_walk(T->root, T->nil);
-
-	/*
-	node = rb_tree_minimum(T);
-	fprintf(stdout, "minimum: %p->%d\n", node, node->key);
-	fprintf(stdout, "deleting minim node...\n");
-	rb_delete(T, node);
-	fprintf(stdout, "done\n");
-	node = rb_tree_minimum(T);
-	fprintf(stdout, "minimum: %p->%d\n", node, node->key);
-
-	fprintf(stdout, "in order wal:\n");
-	inorder_tree_walk(T->root, T->nil);
-	fprintf(stdout, "pre order wal:\n");
-	preorder_tree_walk(T->root, T->nil);
-	fprintf(stdout, "post order wal:\n");
-	postorder_tree_walk(T->root, T->nil);
-
-	node = rb_tree_maximum(T);
-	fprintf(stdout, "maximum: %p->%d\n", node, node->key);
-	fprintf(stdout, "deleting maxim node...\n");
-	rb_delete(T, node);
-	fprintf(stdout, "done\n");
-	node = rb_tree_maximum(T);
-	fprintf(stdout, "maximum: %p->%d\n", node, node->key);
-
-	fprintf(stdout, "in order wal:\n");
-	inorder_tree_walk(T->root, T->nil);
-	fprintf(stdout, "pre order wal:\n");
-	preorder_tree_walk(T->root, T->nil);
-	fprintf(stdout, "post order wal:\n");
-	postorder_tree_walk(T->root, T->nil);
-	*/
+	MODULE_FUN_NAME(RB_Tree, postorder_walk)(tree, tree->root, tree->nil);
 
 	fprintf(stdout, "\ndeleting %d...\n", key);
-	node = rb_tree_search(T, key);
+	node = MODULE_FUN_NAME(RB_Tree, search)(tree, (void *)key);
 	if (node)
-		rb_delete(T, node);
+		MODULE_FUN_NAME(RB_Tree, delete)(tree, node);
 	else
 	{
 		fprintf(stderr, "not found\n");
 	}
-//	rb_delete(T, T->root);
 	fprintf(stdout, "in order wal:\n");
-	inorder_tree_walk(T->root, T->nil);
+	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, tree->nil);
 	fprintf(stdout, "pre order wal:\n");
-	preorder_tree_walk(T->root, T->nil);
+	MODULE_FUN_NAME(RB_Tree, preorder_walk)(tree, tree->root, tree->nil);
 	fprintf(stdout, "post order wal:\n");
-	postorder_tree_walk(T->root, T->nil);
+	MODULE_FUN_NAME(RB_Tree, postorder_walk)(tree, tree->root, tree->nil);
 
 	return 0;
 }
-
-
-
-
-
-
 
 
 
