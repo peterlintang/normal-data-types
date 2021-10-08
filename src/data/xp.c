@@ -147,7 +147,7 @@ int MODULE_FUN_NAME(XP, diff)(int n, T z, T x, int y)
 	{
 		d = (x[i] + BASE) - y;
 		z[i] = d % BASE;
-		y = 1 - d % BASE;
+		y = 1 - d / BASE;
 	}
 
 	return y;

@@ -58,10 +58,13 @@ extern int MODULE_FUN_NAME(XP, mul)
  * q = x / y, r = x % y, q 和x有n位数，r 和 y有m位数，
  * 如果y == 0， 返回0，并保持q、r不变，否则返回1,
  * tmp 必须至少能够有n+m+2位数.
- * @n:		@z的长度，
- * @z:		保存结果
- * @x:		待处理的数据
- * @y:		待乘数	( y > 0 && y < 2^8 )
+ * @n:		@x的长度，
+ * @x:		被除数
+ * @m:		@y的长度，
+ * @y:		除数
+ * @q:		保存x/y的值
+ * @r:		保存x%y的值
+ * @tmp:	临时值？
  */
 extern int MODULE_FUN_NAME(XP, div)
 		(int n, T q, T x, int m, T y, T r, T tmp);
@@ -92,7 +95,7 @@ extern int MODULE_FUN_NAME(XP, diff)
  * @n:		@z的长度，
  * @z:		保存结果
  * @x:		待处理的数据
- * @y:		待乘数
+ * @y:		待乘数	( y < 2^8 )
  */
 extern int MODULE_FUN_NAME(XP, product)
 		(int n, T z, T x, int y);
@@ -102,7 +105,7 @@ extern int MODULE_FUN_NAME(XP, product)
  * @n:		@x的长度，
  * @z:		保存结果
  * @x:		待处理的数据
- * @y:		除数
+ * @y:		除数	( y < 2^8 )
  */
 extern int MODULE_FUN_NAME(XP, quotient)(int n, T z, T x, int y);
 
