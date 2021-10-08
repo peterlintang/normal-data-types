@@ -673,16 +673,16 @@ static void test_str(void)
 
 static void test_xp(void)
 {
-#define XP_TEST_NUM	1024
+#define XP_TEST_NUM	10240
 #define XP_LEN	16
 	int ret = 0;
 	int len = 0;
 	XP_T xp = NULL;
 	unsigned char xp_str[XP_LEN] = { 0 };
-	unsigned char str[XP_LEN] = { 0 };
+	unsigned char str[XP_LEN * 3] = { 0 };
 	XP_T xp2 = NULL;
 	unsigned char xp2_str[XP_LEN] = { 0 };
-	unsigned char str2[XP_LEN] = { 0 };
+	unsigned char str2[XP_LEN * 3] = { 0 };
 	XP_T sum = NULL;
 	unsigned char sum_str[XP_LEN] = { 0 };
 	XP_T z = NULL;
@@ -830,6 +830,60 @@ static void test_xp(void)
 							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp),
 							MODULE_FUN_NAME(XP, toint)(XP_LEN, sum));
 	}
+	}
+
+	fprintf(stdout, "nine cmp\n");
+	for (int i = 0; i < XP_TEST_NUM; i++)
+	{
+		memset(sum, 0, XP_LEN);
+		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp, i);
+		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp2, i);
+		if (MODULE_FUN_NAME(XP, cmp)(XP_LEN, xp, xp2) != 0)
+			fprintf(stdout, "i: %d, toint: %lu, %lu\n", i,
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp),
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp2));
+	}
+
+	fprintf(stdout, "ten neg\n");
+	for (int i = 0; i < XP_TEST_NUM; i++)
+	{
+		memset(sum, 0, XP_LEN);
+		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp, i);
+		MODULE_FUN_NAME(XP, neg)(XP_LEN, xp2, xp, 0);
+		MODULE_FUN_NAME(XP, neg)(XP_LEN, sum, xp2, 0);
+		if (MODULE_FUN_NAME(XP, cmp)(XP_LEN, xp, sum) != 0)
+			fprintf(stdout, "i: %d, toint: %lu, %lu, %lu\n", i,
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp),
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp2),
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, sum));
+	}
+
+	fprintf(stdout, "eleven lshift\n");
+	for (int i = 0; i < XP_TEST_NUM; i++)
+	{
+		memset(sum, 0, XP_LEN);
+		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp, i);
+		MODULE_FUN_NAME(XP, lshift)(XP_LEN, xp2, XP_LEN, xp, 2, 0);
+		if (MODULE_FUN_NAME(XP, toint)(XP_LEN, xp2) != i << 2)
+			fprintf(stdout, "i: %d, toint: %lu, %lu, %lu\n", i,
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp),
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, xp2),
+							MODULE_FUN_NAME(XP, toint)(XP_LEN, sum));
+	}
+
+	fprintf(stdout, "twelve rshift\n");
+	for (int i = 0; i < XP_TEST_NUM; i++)
+	{
+		memset(xp, 0, XP_LEN);
+		memset(xp2, 0, XP_LEN);
+		memset(str, 0, XP_LEN * 2);
+		memset(str2, 0, XP_LEN * 2);
+		MODULE_FUN_NAME(XP, fromint)(XP_LEN, xp, i);
+		MODULE_FUN_NAME(XP, rshift)(XP_LEN, xp2, XP_LEN, xp, 9, 1);
+//		if (MODULE_FUN_NAME(XP, toint)(XP_LEN, xp2) != i >> 9)
+			fprintf(stdout, "i: %d, tostr: %s, %s, \n", i,
+							MODULE_FUN_NAME(XP, tostr)(str, XP_LEN * 3, 16, XP_LEN, xp),
+							MODULE_FUN_NAME(XP, tostr)(str2, XP_LEN * 3, 16, XP_LEN, xp2));
 	}
 
 }
