@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <pthread.h>
 #include <sys/time.h>
@@ -527,7 +528,7 @@ static void test_seq(void)
 	fprintf(stdout, "len: %d\n", len);
 	for (int i = 0; i < len; i++)
 	{
-		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Seq, get)(seq, i));
+		fprintf(stdout, "i: %d, %s\n", i, (char *)MODULE_FUN_NAME(Seq, get)(seq, i));
 	}
 
 	fprintf(stdout, "second\n");
@@ -536,7 +537,7 @@ static void test_seq(void)
 	fprintf(stdout, "len: %d, prev: %s\n", len, (char *)prev);
 	for (int i = 0; i < len; i++)
 	{
-		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Seq, get)(seq, i));
+		fprintf(stdout, "i: %d, %s\n", i, (char *)MODULE_FUN_NAME(Seq, get)(seq, i));
 	}
 
 	fprintf(stdout, "third\n");
@@ -545,7 +546,7 @@ static void test_seq(void)
 	len = MODULE_FUN_NAME(Seq, length)(seq);
 	for (int i = 0; i < len; i++)
 	{
-		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Seq, get)(seq, i));
+		fprintf(stdout, "i: %d, %s\n", i, (char *)MODULE_FUN_NAME(Seq, get)(seq, i));
 	}
 
 	fprintf(stdout, "four\n");
@@ -554,7 +555,7 @@ static void test_seq(void)
 	len = MODULE_FUN_NAME(Seq, length)(seq);
 	for (int i = 0; i < len; i++)
 	{
-		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Seq, get)(seq, i));
+		fprintf(stdout, "i: %d, %s\n", i, (char *)MODULE_FUN_NAME(Seq, get)(seq, i));
 	}
 
 	fprintf(stdout, "five\n");
@@ -586,7 +587,7 @@ static void test_ring(void)
 	len = MODULE_FUN_NAME(Ring, length)(ring);
 	for (int i = 0; i < len; i++)
 	{
-		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+		fprintf(stdout, "i: %d, %s\n", i, (char *)MODULE_FUN_NAME(Ring, get)(ring, i));
 	}
 
 	fprintf(stdout, "second\n");
@@ -594,7 +595,7 @@ static void test_ring(void)
 	len = MODULE_FUN_NAME(Ring, length)(ring);
 	for (int i = 0; i < len; i++)
 	{
-		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+		fprintf(stdout, "i: %d, %s\n", i, (char *)MODULE_FUN_NAME(Ring, get)(ring, i));
 	}
 
 	fprintf(stdout, "third\n");
@@ -603,7 +604,7 @@ static void test_ring(void)
 	len = MODULE_FUN_NAME(Ring, length)(ring);
 	for (int i = 0; i < len; i++)
 	{
-		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+		fprintf(stdout, "i: %d, %s\n", i, (char *)MODULE_FUN_NAME(Ring, get)(ring, i));
 	}
 
 	fprintf(stdout, "third\n");
@@ -611,13 +612,13 @@ static void test_ring(void)
 	len = MODULE_FUN_NAME(Ring, length)(ring);
 	for (int i = 0; i < len; i++)
 	{
-		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+		fprintf(stdout, "i: %d, %s\n", i, (char *)MODULE_FUN_NAME(Ring, get)(ring, i));
 	}
 	MODULE_FUN_NAME(Ring, rmlo)(ring);
 	len = MODULE_FUN_NAME(Ring, length)(ring);
 	for (int i = 0; i < len; i++)
 	{
-		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+		fprintf(stdout, "i: %d, %s\n", i, (char *)MODULE_FUN_NAME(Ring, get)(ring, i));
 	}
 
 	fprintf(stdout, "four\n");
@@ -626,7 +627,7 @@ static void test_ring(void)
 	len = MODULE_FUN_NAME(Ring, length)(ring);
 	for (int i = 0; i < len; i++)
 	{
-		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+		fprintf(stdout, "i: %d, %s\n", i, (char *)MODULE_FUN_NAME(Ring, get)(ring, i));
 	}
 
 	fprintf(stdout, "five\n");
@@ -634,7 +635,7 @@ static void test_ring(void)
 	len = MODULE_FUN_NAME(Ring, length)(ring);
 	for (int i = 0; i < len; i++)
 	{
-		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+		fprintf(stdout, "i: %d, %s\n", i, (char *)MODULE_FUN_NAME(Ring, get)(ring, i));
 	}
 
 	fprintf(stdout, "six\n");
