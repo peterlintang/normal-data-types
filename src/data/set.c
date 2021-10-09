@@ -245,17 +245,20 @@ void MODULE_FUN_NAME(Set, free)(T *set)
 	int i;
 	struct member *p = NULL;
 	struct member *q = NULL;
+	int size = 0;
 
 	assert(set && *set);
 
-	if ((*set)->length > 0)
+	size = (*set)->size;
+	if (size > 0)
 	{
-		for (i = 0; i < (*set)->length; i++)
+		for (i = 0; i < size; i++)
 		{
 			for (p = (*set)->buckets[i]; p; p = q)
 			{
 				q = p->link;
 				free(p);
+				p = NULL;
 			}
 		}
 	}
@@ -403,7 +406,7 @@ void **MODULE_FUN_NAME(Set, toArray)(T set, void *end)
 	{
 		for (p = set->buckets[i]; p; p = p->link)
 		{
-			array[j++] = (void *)p->member;
+			array[j++] = (void *)(p->member);
 		}
 	}
 	array[j] = end;
