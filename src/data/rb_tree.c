@@ -18,22 +18,6 @@
 #define T RB_Tree
 #define NODE RB_Node
 
-struct NODE {
-	NODE left;
-	NODE right;
-	NODE parent;
-	void *priv;
-#define RED		0x1
-#define BLACK	0x2
-	int color;
-};
-
-struct T {
-	NODE root;
-	NODE nil;
-	int (*cmp)(void *, void *);
-};
-
 static NODE tree_search(T tree, 
 				NODE x, void *key)
 {
@@ -49,11 +33,15 @@ static NODE tree_search(T tree,
 
 NODE MODULE_FUN_NAME(RB_Tree, search)(T tree, void *key)
 {
+	assert(tree && key);
+
 	return tree_search(tree, tree->root, key);
 }
 
 NODE MODULE_FUN_NAME(RB_Tree, iterative_search)(T tree, void *key)
 {
+	assert(tree && key);
+
 	NODE x = tree->root;
 
 	while ((x != tree->nil) && tree->cmp(x->priv, key) != 0)
@@ -71,7 +59,7 @@ static NODE tree_minimum(T tree, NODE x)
 {
 	if (x == tree->nil)
 	{
-		fprintf(stdout, "%s: nil: %p\n", __func__, x);
+//		fprintf(stdout, "%s: nil: %p\n", __func__, x);
 		return x;
 	}
 
@@ -83,6 +71,8 @@ static NODE tree_minimum(T tree, NODE x)
 
 NODE MODULE_FUN_NAME(RB_Tree, minimum)(T tree)
 {
+	assert(tree);
+
 	NODE x = tree->root;
 
 	if (x == tree->nil)
@@ -101,6 +91,8 @@ static NODE tree_maximum(T tree, NODE x)
 
 NODE MODULE_FUN_NAME(RB_Tree, maximum)(T tree)
 {
+	assert(tree);
+
 	NODE x = tree->root;
 
 	if (x == tree->nil)
@@ -113,6 +105,8 @@ NODE MODULE_FUN_NAME(RB_Tree, successor)(T tree, NODE x)
 {
 	NODE y = NULL;
 	NODE p = NULL;
+
+	assert(tree && x);
 
 	if (x->right != tree->nil)
 		return tree_minimum(tree, x->right);
@@ -131,6 +125,8 @@ NODE MODULE_FUN_NAME(RB_Tree, predecessor)(T tree, NODE x)
 {
 	NODE y = NULL;
 	NODE p = NULL;
+
+	assert(tree && x);
 
 	if (x->left != tree->nil)
 		return tree_maximum(tree, x->left);
@@ -258,6 +254,8 @@ NODE MODULE_FUN_NAME(RB_Tree, insert)(T tree, NODE node)
 	NODE y = NULL;
 	NODE x = NULL;
 
+	assert(tree && node);
+
 	y = tree->nil;
 	x = tree->root;
 
@@ -378,6 +376,8 @@ NODE MODULE_FUN_NAME(RB_Tree, delete)(T tree, NODE z)
 	NODE y = NULL;
 	NODE x = NULL;
 
+	assert(tree && z);
+
 	y = z;
 	y_origin_color = y->color;
 
@@ -451,44 +451,63 @@ T MODULE_FUN_NAME(RB_Tree, new)(int (*cmp)(void *, void *))
 
 void MODULE_FUN_NAME(RB_Tree, free)(T *tree)
 {
+	assert(tree && *tree);
 }
 
 
 
-void MODULE_FUN_NAME(RB_Tree, inorder_walk)(T tree, NODE x, NODE nil)
+void MODULE_FUN_NAME(RB_Tree, inorder_walk)(T tree, NODE x, int (*map)(void *, void *), void *arg)
 {
-//	fprintf(stdout, "%s: x: %p, nil: %p\n", __func__, x, nil);
-	if (x != nil)
+	assert(tree && x);
+
+	if (x != tree->nil)
 	{
-		MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, x->left, nil);
-		fprintf(stdout, "priv: %p, color: %s \n", 
-						x->priv, x->color == RED ? "RED" : "BLACK");
-		MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, x->right, nil);
+		MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, x->left, map, arg);
+		if (map)
+		{
+			if (map(x->priv, arg) != 0) 
+				return ;
+		}
+//		fprintf(stdout, "priv: %p, color: %s \n", 
+//						x->priv, x->color == RED ? "RED" : "BLACK");
+		MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, x->right, map, arg);
 	}
 }
 
-void MODULE_FUN_NAME(RB_Tree, preorder_walk)(T tree, NODE x, NODE nil)
+void MODULE_FUN_NAME(RB_Tree, preorder_walk)(T tree, NODE x, int (*map)(void *, void *), void *arg)
 {
-//	fprintf(stdout, "%s: x: %p, nil: %p\n", __func__, x, nil);
-	if (x != nil)
+	assert(tree && x);
+
+	if (x != tree->nil)
 	{
-		fprintf(stdout, "priv: %p, color: %s \n", 
-						x->priv, x->color == RED ? "RED" : "BLACK");
-		MODULE_FUN_NAME(RB_Tree, preorder_walk)(tree, x->left, nil);
-		MODULE_FUN_NAME(RB_Tree, preorder_walk)(tree, x->right, nil);
+		if (map) 
+		{
+			if (map(x->priv, arg) != 0)
+				return ;
+		}
+//		fprintf(stdout, "priv: %p, color: %s \n", 
+//						x->priv, x->color == RED ? "RED" : "BLACK");
+		MODULE_FUN_NAME(RB_Tree, preorder_walk)(tree, x->left, map, arg);
+		MODULE_FUN_NAME(RB_Tree, preorder_walk)(tree, x->right, map, arg);
 	}
 }
 
 
-void MODULE_FUN_NAME(RB_Tree, postorder_walk)(T tree, NODE x, NODE nil)
+void MODULE_FUN_NAME(RB_Tree, postorder_walk)(T tree, NODE x, int (*map)(void *, void *), void *arg)
 {
-//	fprintf(stdout, "%s: x: %p, nil: %p\n", __func__, x, nil);
-	if (x != nil)
+	assert(tree && x);
+
+	if (x != tree->nil)
 	{
-		MODULE_FUN_NAME(RB_Tree, postorder_walk)(tree, x->left, nil);
-		MODULE_FUN_NAME(RB_Tree, postorder_walk)(tree, x->right, nil);
-		fprintf(stdout, "priv: %p, color: %s \n", 
-						x->priv, x->color == RED ? "RED" : "BLACK");
+		MODULE_FUN_NAME(RB_Tree, postorder_walk)(tree, x->left, map, arg);
+		MODULE_FUN_NAME(RB_Tree, postorder_walk)(tree, x->right, map, arg);
+		if (map) 
+		{
+			if (map(x->priv, arg) != 0) 
+				return ;
+		}
+//		fprintf(stdout, "priv: %p, color: %s \n", 
+//						x->priv, x->color == RED ? "RED" : "BLACK");
 	}
 }
 
@@ -502,6 +521,12 @@ static int cmp(void *arg1, void *arg2)
 	int num2 = (int )arg2;
 
 	return arg1 - arg2 > 0 ? 1 : ((arg1 - arg2 == 0) ? 0 : -1 );
+}
+
+static int myprint(void *priv, void *arg)
+{
+	fprintf(stdout, "%d\n", (int)priv);
+	return 0;
 }
 
 int main(int argc, char *argv[])
@@ -535,7 +560,7 @@ int main(int argc, char *argv[])
 		node = (NODE)calloc(1, sizeof(*node));
 		if (node)
 		{
-			node->priv = (void *)rand();
+			node->priv = (void *)(rand() % 100);
 			fprintf(stdout, "inserting priv: %d\n", (int)node->priv);
 			MODULE_FUN_NAME(RB_Tree, insert)(tree, node);
 		}
@@ -547,11 +572,11 @@ int main(int argc, char *argv[])
 	}
 
 	fprintf(stdout, "in order wal:\n");
-	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, tree->nil);
+	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, myprint, NULL);
 	fprintf(stdout, "pre order wal:\n");
-	MODULE_FUN_NAME(RB_Tree, preorder_walk)(tree, tree->root, tree->nil);
+	MODULE_FUN_NAME(RB_Tree, preorder_walk)(tree, tree->root, myprint, NULL);
 	fprintf(stdout, "post order wal:\n");
-	MODULE_FUN_NAME(RB_Tree, postorder_walk)(tree, tree->root, tree->nil);
+	MODULE_FUN_NAME(RB_Tree, postorder_walk)(tree, tree->root, myprint, NULL);
 
 	fprintf(stdout, "\ndeleting %d...\n", key);
 	node = MODULE_FUN_NAME(RB_Tree, search)(tree, (void *)key);
@@ -562,11 +587,11 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "not found\n");
 	}
 	fprintf(stdout, "in order wal:\n");
-	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, tree->nil);
+	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, myprint, NULL);
 	fprintf(stdout, "pre order wal:\n");
-	MODULE_FUN_NAME(RB_Tree, preorder_walk)(tree, tree->root, tree->nil);
+	MODULE_FUN_NAME(RB_Tree, preorder_walk)(tree, tree->root, myprint, NULL);
 	fprintf(stdout, "post order wal:\n");
-	MODULE_FUN_NAME(RB_Tree, postorder_walk)(tree, tree->root, tree->nil);
+	MODULE_FUN_NAME(RB_Tree, postorder_walk)(tree, tree->root, myprint, NULL);
 
 	return 0;
 }
