@@ -349,13 +349,13 @@ static void test_array(void)
 
 static int apply(const void *member, void *cl)
 {
-	fprintf(stdout, "%d\n", (int)member);
+//	fprintf(stdout, "%d\n", (int)member);
 	return 0;
 }
 
 static void test_set(void)
 {
-#define SET_ITEM_LEN	10
+#define SET_ITEM_LEN	10240000
 	Set_T set = NULL;
 	Set_T set2 = NULL;
 	Set_T set3 = NULL;
@@ -388,13 +388,15 @@ static void test_set(void)
 		MODULE_FUN_NAME(Set, put)(set, (void *)(i + 1));
 	}
 
+	/*
 	void *p = NULL;
 	for (p = MODULE_FUN_NAME(Set, first)(set); p != NULL; p = MODULE_FUN_NAME(Set, next)(set, p))
 	{
-		fprintf(stdout, "i: %d\n", (int)p);
+//		fprintf(stdout, "i: %d\n", (int)p);
 		if (MODULE_FUN_NAME(Set, end)(set, p) == 1)
 			break;
 	}
+	*/
 
 	/* third */
 	fprintf(stdout, "\n\nthird\n\n");
@@ -444,14 +446,16 @@ static void test_set(void)
 	array = MODULE_FUN_NAME(Set, toArray)(set, NULL);
 	for (int i = 0; array[i] != NULL; i++)
 	{
-		fprintf(stdout, "i: %d <--> value: %d\n", i, (int)array[i]);
+//		fprintf(stdout, "i: %d <--> value: %d\n", i, (int)(array[i]));
 	
 	}
 
 	free(array);
+	
 	MODULE_FUN_NAME(Set, free)(&set);
 	MODULE_FUN_NAME(Set, free)(&set2);
 	MODULE_FUN_NAME(Set, free)(&set3);
+	
 
 }
 
@@ -1106,6 +1110,164 @@ static void test_ap2(void)
 
 }
 
+#include "rb_tree.h"
+
+static int rb_cmp(void *arg1, void *arg2)
+{
+	unsigned long num1 = (unsigned long )arg1;
+	unsigned long num2 = (unsigned long )arg2;
+
+	if (num1 > num2)
+	{
+		return 1;
+	}
+	else if (num1 == num2)
+	{
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+int rb_print(void *priv, void *arg)
+{
+	fprintf(stdout, "%d\n", (int)priv);
+	return 0;
+}
+
+static void test_rb(void)
+{
+#define RB_ITEM_LEN	1024000
+	RB_Tree tree = NULL;
+	RB_Node node = NULL;
+
+	tree = MODULE_FUN_NAME(RB_Tree, new)(rb_cmp);
+
+	for (int i = 0; i < RB_ITEM_LEN; i++)
+	{
+		node = (RB_Node)calloc(1, sizeof(*node));
+		node->priv = (void *)((i) % RB_ITEM_LEN + 1);
+		MODULE_FUN_NAME(RB_Tree, insert)(tree, node);
+	}
+//	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
+	node = MODULE_FUN_NAME(RB_Tree, minimum)(tree);
+	node = MODULE_FUN_NAME(RB_Tree, maximum)(tree);
+
+//	MODULE_FUN_NAME(RB_Tree, free)(&tree);
+}
+
+#include "fib-heap.h"
+
+static int fib_cmp(void *arg1, void *arg2)
+{
+	unsigned long num1 = (unsigned long )arg1;
+	unsigned long num2 = (unsigned long )arg2;
+//	fprintf(stdout, "cmp: %d, %d, %p, %p\n", num1, num2, arg1, arg2);
+
+	if (num1 > num2)
+	{
+		return 1;
+	}
+	else if (num1 < num2)
+	{
+		return -1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+static void test_fib(void)
+{
+#define FIB_ITEM_LEN	102400
+#define FIB_INFINITE	0
+	FibHeap_T h1 = NULL;
+	FibHeap_T h2 = NULL;
+	FibHeap_T h3 = NULL;
+	FibHeap_Node node = NULL;
+
+	h1 = MODULE_FUN_NAME(FibHeap, new)(fib_cmp, FIB_INFINITE);
+
+	
+	fprintf(stdout, "first\n");
+	for (int i = 0; i < FIB_ITEM_LEN; i++)
+	{
+		node = MODULE_FUN_NAME(FibHeap, NodeCreate)((void *)(i + 1));
+		if (node == NULL)
+		{
+			fprintf(stdout, "error no mem:\n");
+			return ;
+		}
+		MODULE_FUN_NAME(FibHeap, insert)(h1, node);
+	}
+
+	for (int i = 0; i < FIB_ITEM_LEN; i++)
+	{
+		node = MODULE_FUN_NAME(FibHeap, extractMin)(h1);
+//		fprintf(stdout, "i: %d, value: %d\n", i, (int)(MODULE_FUN_NAME(FibHeap, NodePriv)(node)));
+		MODULE_FUN_NAME(FibHeap, NodeFree)(&node);
+	}
+	
+
+	fprintf(stdout, "second\n");
+	h2 = MODULE_FUN_NAME(FibHeap, new)(fib_cmp, FIB_INFINITE);
+	
+	for (int i = 0; i < FIB_ITEM_LEN; i++)
+	{
+		node = MODULE_FUN_NAME(FibHeap, NodeCreate)((void *)(i + 1));
+		if (node == NULL)
+		{
+			fprintf(stdout, "error no mem:\n");
+			return ;
+		}
+		MODULE_FUN_NAME(FibHeap, insert)(h2, node);
+	}
+
+	for (int i = 0; i < FIB_ITEM_LEN; i++)
+	{
+		node = MODULE_FUN_NAME(FibHeap, minmum)(h2);
+//		fprintf(stdout, "i: %d, value: %d\n", i, (int)(MODULE_FUN_NAME(FibHeap, NodePriv)(node)));
+		MODULE_FUN_NAME(FibHeap, delete)(h2, node);
+		MODULE_FUN_NAME(FibHeap, NodeFree)(&node);
+	}
+	
+
+	fprintf(stdout, "third\n");
+	for (int i = 0; i < FIB_ITEM_LEN; i += 2)
+	{
+		node = MODULE_FUN_NAME(FibHeap, NodeCreate)((void *)(i + 1));
+		MODULE_FUN_NAME(FibHeap, insert)(h1, node);
+		node = MODULE_FUN_NAME(FibHeap, NodeCreate)((void *)(i + 2));
+		MODULE_FUN_NAME(FibHeap, insert)(h2, node);
+	}
+	/*
+	fprintf(stdout, "h1:\n");
+	MODULE_FUN_NAME(FibHeap, print)(h1);
+	fprintf(stdout, "h2:\n");
+	MODULE_FUN_NAME(FibHeap, print)(h2);
+	*/
+
+	h3 = MODULE_FUN_NAME(FibHeap, union)(&h1, &h2);
+	fprintf(stdout, "h3:\n");
+	MODULE_FUN_NAME(FibHeap, print)(h3);
+	for (int i = 0; i < FIB_ITEM_LEN; i++)
+	{
+	//	node = MODULE_FUN_NAME(FibHeap, minmum)(h3);
+		node = MODULE_FUN_NAME(FibHeap, extractMin)(h3);
+		fprintf(stdout, "i: %d, value: %d\n", i, (int)(MODULE_FUN_NAME(FibHeap, NodePriv)(node)));
+//	MODULE_FUN_NAME(FibHeap, print)(h3);
+//		MODULE_FUN_NAME(FibHeap, delete)(h3, node);
+		MODULE_FUN_NAME(FibHeap, NodeFree)(&node);
+	}
+	MODULE_FUN_NAME(FibHeap, print)(h3);
+
+//	MODULE_FUN_NAME(FibHeap, free)(&h1);
+
+}
+
 struct test_routine {
 	void (*call_back)(void);
 	char *name;
@@ -1128,8 +1290,10 @@ struct test_routine my_test_routines[] =
 //		{test_seq, "seq"},
 //		{test_ring, "ring"},
 //		{test_str, "string"},
-		{test_xp, "xp"},
-		{test_ap2, "ap2"},
+//		{test_xp, "xp"},
+//		{test_ap2, "ap2"},
+//		{test_rb, "rb_tree"},	// has bugs in interfaces
+		{test_fib, "fib"},
 		{NULL,NULL},
 };
 
