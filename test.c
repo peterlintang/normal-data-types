@@ -38,6 +38,7 @@ static void test_bit(void)
 #include "dlist.h"
 static void test_dlist(void)
 {
+#define DLIST_ITEM_LEN	10240000
 	List_T list = NULL;
 	ListNode_T node = NULL;
 
@@ -47,7 +48,7 @@ static void test_dlist(void)
 	if (NULL == list)
 		return ;
 
-	for (i = 0; i < 20; i++)
+	for (i = 0; i < DLIST_ITEM_LEN; i++)
 	{
 		node = MODULE_FUN_NAME(ListNode, new)((void *)(i + 1));
 		MODULE_FUN_NAME(List, insert)(list, node);
@@ -58,12 +59,12 @@ static void test_dlist(void)
 			i > 0;
 			i--, node = MODULE_FUN_NAME(List, next)(node))
 	{
-//		fprintf(stdout, "i: %d, value: %d\n", i, (int)node->priv);
+		fprintf(stdout, "i: %d, value: %d\n", i, (int)node->priv);
 	}
 
 	while (node = MODULE_FUN_NAME(List, head)(list))
 	{
-//		fprintf(stdout, "value: %d\n", (int)node->priv);
+		fprintf(stdout, "value: %d\n", (int)node->priv);
 		MODULE_FUN_NAME(List, remove)(list, node);
 		MODULE_FUN_NAME(ListNode, free)(&node);
 	}
@@ -76,6 +77,7 @@ static void test_dlist(void)
 #include "queue_link.h"
 static void test_queue_link(void)
 {
+#define QUUEE_LINK_ITEM_LEN	10240000
 	Queue_T q = NULL;
 	int i;
 	int *p = NULL;
@@ -84,7 +86,7 @@ static void test_queue_link(void)
 	if (NULL == q)
 		return ;
 
-	for (i = 0; i < 300000; i++)
+	for (i = 0; i < QUUEE_LINK_ITEM_LEN; i++)
 	{
 		MODULE_FUN_NAME(Queue, put)(q, (void *)i);
 	}
@@ -92,7 +94,7 @@ static void test_queue_link(void)
 	while (MODULE_FUN_NAME(Queue, isEmpty)(q) == 0)
 	{
 		MODULE_FUN_NAME(Queue, get)(q, (void **)&p);
-//		fprintf(stdout, "value: %d\n", (int)p);
+		fprintf(stdout, "value: %d\n", (int)p);
 	}
 
 	MODULE_FUN_NAME(Queue, free)(&q);
@@ -103,6 +105,7 @@ static void test_queue_link(void)
 #include "stack_link.h"
 static void test_stack_link(void)
 {
+#define STACK_LINK_ITEM_LEN	1024000
 	Stack_T s = NULL;
 	int i;
 	int *p = NULL;
@@ -111,7 +114,7 @@ static void test_stack_link(void)
 	if (NULL == s)
 		return ;
 
-	for (i = 0; i < 300000; i++)
+	for (i = 0; i < STACK_LINK_ITEM_LEN; i++)
 	{
 		MODULE_FUN_NAME(Stack, push)(s, (void *)i);
 	}
@@ -119,7 +122,7 @@ static void test_stack_link(void)
 	while (MODULE_FUN_NAME(Stack, isEmpty)(s) == 0)
 	{
 		MODULE_FUN_NAME(Stack, pop)(s, (void **)&p);
-//		fprintf(stdout, "value: %d\n", (int)p);
+		fprintf(stdout, "value: %d\n", (int)p);
 	}
 
 	MODULE_FUN_NAME(Stack, free)(&s);
@@ -256,10 +259,10 @@ static void test_arena(void)
 			{
 			for (int i = 0; i < TEST_INT_NUM; i++)
 				p[i] = i + 1000;
-			/*
+			
 			for (int i = 0; i < TEST_INT_NUM; i++)
 				fprintf(stdout, "i: %d\n", p[i]);
-			*/
+			
 			}
 		}
 		MODULE_FUN_NAME(Arena, free)(area);
@@ -275,6 +278,7 @@ static void pool_test_cb(void *cl)
 }
 static void test_threadPool(void)
 {
+#define THREADPOOL_ITEM_LEN	10240000
 	int i;
 	int ret = 0;
 	ThreadPool_T p = NULL;
@@ -282,7 +286,7 @@ static void test_threadPool(void)
 	p = MODULE_FUN_NAME(ThreadPool, new)(10);
 	ret = MODULE_FUN_NAME(ThreadPool, init)(p);
 	fprintf(stdout, "%s: init: %d\n", __func__, ret);
-	for (i = 0; i < 10000; i++)
+	for (i = 0; i < THREADPOOL_ITEM_LEN; i++)
 	{
 		ret = MODULE_FUN_NAME(ThreadPool, post)(p, pool_test_cb, (void *)i);
 	//	fprintf(stdout, "%s: post: %d\n", __func__, ret);
@@ -297,7 +301,7 @@ static void test_threadPool(void)
 
 static void test_array(void)
 {
-#define ARRAY_TEST_ITEMS	1024
+#define ARRAY_TEST_ITEMS	10240000
 	Array_T array;
 	array = MODULE_FUN_NAME(Array, new)(ARRAY_TEST_ITEMS, sizeof(int));
 	if (array == NULL) return ;
@@ -349,7 +353,7 @@ static void test_array(void)
 
 static int apply(const void *member, void *cl)
 {
-//	fprintf(stdout, "%d\n", (int)member);
+	fprintf(stdout, "%d\n", (int)member);
 	return 0;
 }
 
@@ -388,7 +392,7 @@ static void test_set(void)
 		MODULE_FUN_NAME(Set, put)(set, (void *)(i + 1));
 	}
 
-	/*
+	
 	void *p = NULL;
 	for (p = MODULE_FUN_NAME(Set, first)(set); p != NULL; p = MODULE_FUN_NAME(Set, next)(set, p))
 	{
@@ -396,7 +400,7 @@ static void test_set(void)
 		if (MODULE_FUN_NAME(Set, end)(set, p) == 1)
 			break;
 	}
-	*/
+	
 
 	/* third */
 	fprintf(stdout, "\n\nthird\n\n");
@@ -446,7 +450,7 @@ static void test_set(void)
 	array = MODULE_FUN_NAME(Set, toArray)(set, NULL);
 	for (int i = 0; array[i] != NULL; i++)
 	{
-//		fprintf(stdout, "i: %d <--> value: %d\n", i, (int)(array[i]));
+		fprintf(stdout, "i: %d <--> value: %d\n", i, (int)(array[i]));
 	
 	}
 
@@ -471,7 +475,7 @@ static int table_apply(const void *key, void **pvalue, void *priv)
 
 static void test_table(void)
 {
-#define TABLE_ITEM_LEN	10
+#define TABLE_ITEM_LEN	10240000
 
 	Table_T table = NULL;
 
@@ -493,7 +497,7 @@ static void test_table(void)
 	{
 		fprintf(stdout, "remove %d item\n", i);
 		MODULE_FUN_NAME(Table, remove)(table, (void *)i);
-		MODULE_FUN_NAME(Table, map)(table, table_apply, NULL);
+//		MODULE_FUN_NAME(Table, map)(table, table_apply, NULL);
 	}
 
 
@@ -518,7 +522,7 @@ static void test_table(void)
 
 static void test_seq(void)
 {
-#define SEQ_ITEM_LEN	10
+#define SEQ_ITEM_LEN	10240000
 	Seq_T seq = NULL;
 	Seq_T seq2 = NULL;
 	int len = 0;
@@ -583,15 +587,18 @@ static void test_seq(void)
 
 static void test_ring(void)
 {
+#define RING_ITEM_LEN	1024000
 	Ring_T ring = NULL;
 	int len = 0;
 
+
+#if 0
 	fprintf(stdout, "first\n");
 	ring = MODULE_FUN_NAME(Ring, ring)("hello", "world", "c", "language");
 	len = MODULE_FUN_NAME(Ring, length)(ring);
 	for (int i = 0; i < len; i++)
 	{
-		fprintf(stdout, "i: %d, %s\n", i, (char *)MODULE_FUN_NAME(Ring, get)(ring, i));
+		fprintf(stdout, "i: %d, len: %d, %s\n", i, len, (char *)(MODULE_FUN_NAME(Ring, get)(ring, i)));
 	}
 
 	fprintf(stdout, "second\n");
@@ -647,16 +654,33 @@ static void test_ring(void)
 	len = MODULE_FUN_NAME(Ring, length)(ring);
 	for (int i = 0; i < len; i++)
 	{
-		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+		fprintf(stdout, "i: %d, %s\n", i, (char *)MODULE_FUN_NAME(Ring, get)(ring, i));
 	}
 
-	fprintf(stdout, "six\n");
+	fprintf(stdout, "seven\n");
 	MODULE_FUN_NAME(Ring, rotate)(ring, -3);
 	len = MODULE_FUN_NAME(Ring, length)(ring);
 	for (int i = 0; i < len; i++)
 	{
-		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+//		fprintf(stdout, "i: %d, %s\n", i, MODULE_FUN_NAME(Ring, get)(ring, i));
+		MODULE_FUN_NAME(Ring, rmhi)(ring);
 	}
+#endif
+
+	
+	
+	ring = MODULE_FUN_NAME(Ring, new)();
+	for (int i = 0; i < RING_ITEM_LEN; i++)	
+	{
+		MODULE_FUN_NAME(Ring, addhi)(ring, (void *)(i + 1));
+	}
+	len = MODULE_FUN_NAME(Ring, length)(ring);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "i: %d, %d\n", i, (int)MODULE_FUN_NAME(Ring, get)(ring, i));
+	}
+	
+	
 
 	MODULE_FUN_NAME(Ring, free)(&ring);
 }
@@ -678,7 +702,7 @@ static void test_str(void)
 
 static void test_xp(void)
 {
-#define XP_TEST_NUM	10240
+#define XP_TEST_NUM	102400
 #define XP_LEN	16
 	int ret = 0;
 	int len = 0;
@@ -895,7 +919,7 @@ static void test_xp(void)
 
 static void test_ap2(void)
 {
-#define XP_TEST_NUM	10240
+#define XP_TEST_NUM	1024000
 #define XP_LEN	16
 	int ret = 0;
 	int len = 0;
@@ -1139,7 +1163,7 @@ int rb_print(void *priv, void *arg)
 
 static void test_rb(void)
 {
-#define RB_ITEM_LEN	1024000
+#define RB_ITEM_LEN	10
 	RB_Tree tree = NULL;
 	RB_Node node = NULL;
 
@@ -1150,6 +1174,15 @@ static void test_rb(void)
 		node = (RB_Node)calloc(1, sizeof(*node));
 		node->priv = (void *)((i) % RB_ITEM_LEN + 1);
 		MODULE_FUN_NAME(RB_Tree, insert)(tree, node);
+	}
+
+	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
+	for (int i = 0; i < RB_ITEM_LEN; i++)
+	{
+		node = MODULE_FUN_NAME(RB_Tree, search)(tree, (void *)(i + 1));
+		fprintf(stdout, "i: %d, value: %d\n", i, (int)(node->priv));
+		MODULE_FUN_NAME(RB_Tree, delete)(tree, node);
+	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
 	}
 //	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
 	node = MODULE_FUN_NAME(RB_Tree, minimum)(tree);
@@ -1182,7 +1215,7 @@ static int fib_cmp(void *arg1, void *arg2)
 
 static void test_fib(void)
 {
-#define FIB_ITEM_LEN	102400
+#define FIB_ITEM_LEN	1024000
 #define FIB_INFINITE	0
 	FibHeap_T h1 = NULL;
 	FibHeap_T h2 = NULL;
@@ -1207,7 +1240,7 @@ static void test_fib(void)
 	for (int i = 0; i < FIB_ITEM_LEN; i++)
 	{
 		node = MODULE_FUN_NAME(FibHeap, extractMin)(h1);
-//		fprintf(stdout, "i: %d, value: %d\n", i, (int)(MODULE_FUN_NAME(FibHeap, NodePriv)(node)));
+		fprintf(stdout, "i: %d, value: %d\n", i, (int)(MODULE_FUN_NAME(FibHeap, NodePriv)(node)));
 		MODULE_FUN_NAME(FibHeap, NodeFree)(&node);
 	}
 	
@@ -1229,7 +1262,7 @@ static void test_fib(void)
 	for (int i = 0; i < FIB_ITEM_LEN; i++)
 	{
 		node = MODULE_FUN_NAME(FibHeap, minmum)(h2);
-//		fprintf(stdout, "i: %d, value: %d\n", i, (int)(MODULE_FUN_NAME(FibHeap, NodePriv)(node)));
+		fprintf(stdout, "i: %d, value: %d\n", i, (int)(MODULE_FUN_NAME(FibHeap, NodePriv)(node)));
 		MODULE_FUN_NAME(FibHeap, delete)(h2, node);
 		MODULE_FUN_NAME(FibHeap, NodeFree)(&node);
 	}
@@ -1275,25 +1308,25 @@ struct test_routine {
 
 struct test_routine my_test_routines[] = 
 {
-//		{test_bit, "bit"},
-//		{test_dlist, "dlist"},
-//		{test_queue_link, "queue_link"},
-//		{test_stack_link, "stack_link"},
+//		{test_bit, "bit"},					// ko
+//		{test_dlist, "dlist"},				// ko
+//		{test_queue_link, "queue_link"},	// ko
+//		{test_stack_link, "stack_link"},	// ko
 //		{test_queue_array, "queue_array"},
 //		{test_stack_array, "stack_array"},
-//		{test_ap, "ap"},
-//		{test_arena, "arena"},
-//		{test_threadPool, "threadPool"},
-//		{test_array, "array"},
-//		{test_set, "set"},
-//		{test_table, "table"},
-//		{test_seq, "seq"},
+//		{test_ap, "ap"},					// kko
+//		{test_arena, "arena"},				// ko
+//		{test_threadPool, "threadPool"},	// ko
+//		{test_array, "array"},				// ko
+//		{test_set, "set"},					// ko
+//		{test_table, "table"},				// ko
+//		{test_seq, "seq"},					// ko
 //		{test_ring, "ring"},
 //		{test_str, "string"},
-//		{test_xp, "xp"},
-//		{test_ap2, "ap2"},
-//		{test_rb, "rb_tree"},	// has bugs in interfaces
-		{test_fib, "fib"},
+//		{test_xp, "xp"},					// ko
+//		{test_ap2, "ap2"},					// ko
+		{test_rb, "rb_tree"},	// has bugs in interfaces
+//		{test_fib, "fib"},					// ko
 		{NULL,NULL},
 };
 
