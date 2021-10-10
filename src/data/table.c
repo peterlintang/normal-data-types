@@ -67,12 +67,23 @@ T MODULE_FUN_NAME(Table, new)(int hint,
 	for (i = 1; primes[i] < hint; i++)
 		;
 
-	table = (T) calloc(1, (sizeof(*table) + primes[i - 1] * sizeof(table->buckets[0])) * sizeof(char));
+	table = (T) calloc(1, sizeof(*table));
+	if (table == NULL)
+	{
+		return NULL;
+	}
+
+	table->buckets = (struct binding **) calloc(1, (primes[i - 1] * sizeof(table->buckets[0])) * sizeof(char));
+	if (table->buckets == NULL)
+	{
+		free(table);
+		return NULL;
+	}
 
 	table->size = primes[i - 1];
 	table->cmp = cmp ? cmp : cmpatom;
 	table->hash = hash ? hash : hashatom;
-	table->buckets = (struct binding **)(table + 1);
+//	table->buckets = (struct binding **)(table + 1);
 	for (i = 0; i < table->size; i++)
 	{
 		table->buckets[i] = NULL;

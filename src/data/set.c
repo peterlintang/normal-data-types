@@ -99,14 +99,24 @@ T MODULE_FUN_NAME(Set, new)(int hint,
 	for (i = 1; primes[i] < hint; i++) 
 		;
 
-	set = (T)calloc(1, sizeof(*set) + 
-					primes[i - 1] * sizeof(set->buckets[0]));
+	set = (T)calloc(1, sizeof(*set));
+	if (set == NULL)
+	{
+		return NULL;
+	}
+	set->buckets = (struct member **)calloc(1, (primes[i - 1] * sizeof(set->buckets[0])));
+	if (set->buckets == NULL)
+	{
+		free(set);
+		return NULL;
+	}
+
 	if (set)
 	{
 		set->size = primes[i - 1];
 		set->cmp = cmp ? cmp : cmpatom;
 		set->hash = hash ? hash : hashatom;
-		set->buckets = (struct member **)(set + 1);
+//		set->buckets = (struct member **)(set + 1);
 		for (i = 0; i < set->size; i++)
 			set->buckets[i] = NULL;
 		set->length = 0;
