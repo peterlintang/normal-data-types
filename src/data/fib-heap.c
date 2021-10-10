@@ -29,6 +29,8 @@ struct T {
 	void *infinite;
 };
 
+static void print_info(NODE node);
+
 static int default_cmp(void *arg1, void *arg2)
 {
 	unsigned long key1 = (unsigned long)arg1;
@@ -96,15 +98,24 @@ static void fib_heap_link(T h, NODE y, NODE x)
 	NODE child = NULL;
 
 	/* remove y from the root list */
+	/*
 	y->left->right = y->right;
 	y->right->left = y->left;
 	y->left = NULL;
 	y->right = NULL;
+	*/
 
 	/* add y to the child list of x */
 	child = x->child;
 	if (child)
 	{
+		/*
+		y->left = child;
+		y->right = child->right;
+		child->right->left = y;
+		child->right = y;
+		*/
+
 		child->left->right = y;
 		y->left = child->left;
 		y->right = child;
@@ -124,7 +135,7 @@ static void fib_heap_link(T h, NODE y, NODE x)
 
 static void consolidate(T h)
 {
-#define D	(h->n)	// how to make it
+#define D	(h->n + 1)	// how to make it
 	NODE A[D];
 	NODE x = NULL;
 	NODE y = NULL;
@@ -133,19 +144,34 @@ static void consolidate(T h)
 	int d = 0;
 
 	assert(h->min);
+//			fprintf(stdout, "started: %d\n", D);
 
 	for (int i = 0; i < D; i++)
 		A[i] = NULL;
 
-	for (w = h->min; ; )
+	for (w = h->min; w != NULL; )
 	{
 		x = w;
-		x->flag = TRUE;
-		w = w->right;
 		d = x->degree;
+
+		x->flag = TRUE;
+		if (w == w->right)
+		{
+			w = NULL;
+		}
+		else
+		{
+			w->left->right = w->right;
+			w->right->left = w->left;
+			w = w->right;
+		}
+		x->left = NULL;
+		x->right = NULL;
 
 		while (A[d] != NULL)
 		{
+//fprintf(stdout, "%s: w->right: %p, h->min: %p\n",
+//			__func__, w->right, h->min);
 			y = A[d];
 			if (h->cmp(x->priv, y->priv) > 0)
 			{
@@ -155,23 +181,35 @@ static void consolidate(T h)
 			}
 			y->flag = FALSE;
 			fib_heap_link(h, y, x);
+//			fprintf(stdout, "d: %d, A[d]: %p\n", d, A[d]);
 			A[d] = NULL;
+//			fprintf(stdout, "d: %d, A[d]: %p\n", d, A[d]);
 			d += 1;
+//		fprintf(stdout, "%s node %p, right: %p, left: %p, p: %p, priv: %d\n", 
+//						__func__, x, x->right, x->left, x->p, (int)x->priv);
+//		fprintf(stdout, "%s node %p, right: %p, left: %p, p: %p, priv: %d\n", 
+//						__func__, y, y->right, y->left, y->p, (int)y->priv);
 		}
 
+//fprintf(stdout, "%s: w->right: %p, h->min: %p\n",
+//			__func__, w->right, h->min);
+//		fprintf(stdout, "out: d: %d, A[d]: %p\n", d, A[d]);
 		A[d] = x;
+//		fprintf(stdout, "out: d: %d, A[d]: %p, x: %p\n", d, A[d], x);
 
-		if (TRUE == w->flag)
+//		if (TRUE == w->flag)
 		{
 //fprintf(stdout, "%s: w->right: %p, h->min: %p\n",
 //			__func__, w->right, h->min);
-			break;
+//			break;
 		}
 	}
+//				fprintf(stdout, "finished\n");
 
 	h->min = NULL;
 	for (int i = 0; i < D; i++)
 	{
+//			fprintf(stdout, "i: %d, A[i]: %p\n", i, A[i]);
 		if (A[i])
 		{
 			A[i]->flag = FALSE;
@@ -194,6 +232,12 @@ static void consolidate(T h)
 }
 
 /*************************************************************/
+void *MODULE_FUN_NAME(FibHeap, NodePriv)(NODE node)
+{
+	assert(node);
+
+	return node->priv;
+}
 
 NODE MODULE_FUN_NAME(FibHeap, NodeCreate)(void *priv)
 {
@@ -300,6 +344,21 @@ NODE MODULE_FUN_NAME(FibHeap, minmum)(T h)
 	return h->min;
 }
 
+static void print_info(NODE node)
+{
+	NODE start = NULL;
+	fprintf(stdout, "%s: %p\n", __func__, node);
+	for (start = node; start != NULL; start = start->right)
+	{
+		fprintf(stdout, "node %p, right: %p, left: %p, p: %p, priv: %d\n", 
+						start, start->right, start->left, start->p, (int)start->priv);
+		if (start->right == node)
+		{
+			break;
+		}
+	}
+}
+
 NODE MODULE_FUN_NAME(FibHeap, extractMin)(T h)
 {
 	assert(h);
@@ -313,7 +372,21 @@ NODE MODULE_FUN_NAME(FibHeap, extractMin)(T h)
 		while (z->child != NULL)
 		{
 			x = z->child;
+#if 0
+			fprintf(stdout, "x: %p, z: %p\n", x, z);
+			fprintf(stdout, "x right: %p, left: %p, p: %p\n", x->right, x->left, x->p);
+			NODE node = NULL;
+			NODE min = x;
+	for (node = min; ; node = node->right)
+	{
+	fprintf(stdout, "node: %p, key: %d, child: %p, left: %p, right: %p, p: %p\n", 
+					node, (int)node->priv, node->child,
+					node->left, node->right, node->p);
+		if (node->right == min)
+			break;
+	}
 
+#endif
 			/* remove x from child list of z */
 			if (x == x->right)
 			{
@@ -325,6 +398,8 @@ NODE MODULE_FUN_NAME(FibHeap, extractMin)(T h)
 
 				x->left->right = x->right;
 				x->right->left = x->left;
+				x->left = NULL;
+				x->right = NULL;
 			}
 
 			/* add x to root list of h */
@@ -334,6 +409,8 @@ NODE MODULE_FUN_NAME(FibHeap, extractMin)(T h)
 			z->left = x;
 			x->p = NULL;
 		}
+//		MODULE_FUN_NAME(FibHeap, print)(h);
+//		print_info(h->min);
 
 		/* remove z from the root list of h */
 		z->left->right = z->right;
@@ -341,16 +418,24 @@ NODE MODULE_FUN_NAME(FibHeap, extractMin)(T h)
 
 		if (z == z->right)
 		{
+//				fprintf(stdout, "last item\n");
+			h->min = NULL;
 			z->left = NULL;
 			z->right = NULL;
-			h->min = NULL;
 		}
 		else
 		{
 			h->min = z->right;
+//				fprintf(stdout, "before consolidate\n");
+//		MODULE_FUN_NAME(FibHeap, print)(h);
+//		print_info(h->min);
 			consolidate(h);
-			h->n -= 1;
+//				fprintf(stdout, "after consolidate\n");
+//		MODULE_FUN_NAME(FibHeap, print)(h);
+//		print_info(h->min);
+		//	fprintf(stdout, "hello\n");
 		}
+		h->n -= 1;
 	}
 
 	return z;
@@ -462,10 +547,11 @@ NODE MODULE_FUN_NAME(FibHeap, delete)(T h, NODE x)
 
 /********************************************************/
 
-void MODULE_FUN_NAME(FibHeap, print)(NODE min)
+void MODULE_FUN_NAME(FibHeap, print)(T h)
 {
 	static int level = 0;
 	NODE node = NULL;
+	NODE min = h->min;
 
 	if (NULL == min)
 	{
@@ -475,9 +561,9 @@ void MODULE_FUN_NAME(FibHeap, print)(NODE min)
 	fprintf(stdout, "level: %d\n", level++);
 	for (node = min; ; node = node->right)
 	{
-	fprintf(stdout, "node: %p, key: %d, child: %p, left: %p, right: %p\n", 
+	fprintf(stdout, "node: %p, key: %d, child: %p, left: %p, right: %p, parent: %p\n", 
 					node, (int)node->priv, node->child,
-					node->left, node->right);
+					node->left, node->right, node->p);
 		if (node->child) MODULE_FUN_NAME(FibHeap, print)(node->child);
 		if (node->right == min)
 			break;
@@ -485,6 +571,7 @@ void MODULE_FUN_NAME(FibHeap, print)(NODE min)
 }
 
 
+#if 0
 int main(int argc, char *argv[])
 {
 	int ret = 0;
@@ -543,6 +630,7 @@ int main(int argc, char *argv[])
 	return ret;
 }
 
+#endif
 
 
 

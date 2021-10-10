@@ -10,6 +10,8 @@
 typedef struct T *T;
 typedef struct NODE *NODE;
 
+void *MODULE_FUN_NAME(FibHeap, NodePriv)(NODE node);
+
 NODE MODULE_FUN_NAME(FibHeap, NodeCreate)(void *key);
 
 void MODULE_FUN_NAME(FibHeap, NodeFree)(NODE *pnode);
@@ -44,7 +46,7 @@ NODE MODULE_FUN_NAME(FibHeap, minmum)(T h);
  * @h不为空,取@h中的最小元素;并将元素从@h删除; 为空返回NULL
  * h:			fib堆	
  */
-NODE MODULE_FUN_NAME(FibHeap, extract_min)(T h);
+NODE MODULE_FUN_NAME(FibHeap, extractMin)(T h);
 
 /*
  * 合并h1与h2，并返回新的fibheap，失败返回NULL
@@ -59,7 +61,7 @@ T MODULE_FUN_NAME(FibHeap, union)(T *h1p, T *h2p);
  * x:			堆中元素
  * k:			新值指针
  */
-void *MODULE_FUN_NAME(FibHeap, decrease_key)(T h, NODE x, void *k);
+void *MODULE_FUN_NAME(FibHeap, decreaseKey)(T h, NODE x, void *k);
 
 /*
  * 删除fib堆@h中的元素@x，返回删除的x指针
@@ -69,7 +71,7 @@ void *MODULE_FUN_NAME(FibHeap, decrease_key)(T h, NODE x, void *k);
  */
 NODE MODULE_FUN_NAME(FibHeap, delete)(T h, NODE x);
 
-void MODULE_FUN_NAME(FibHeap, print)(NODE min);
+void MODULE_FUN_NAME(FibHeap, print)(T h);
 
 #undef T
 #undef NODE

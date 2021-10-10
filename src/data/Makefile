@@ -29,6 +29,8 @@ DATA_SRCS := ./ap.c			\
 		./stack_link.c		\
 		./text.c		\
 		./stree.c	\
+		./rb_tree.c	\
+		./fib-heap.c	\
 		./simple_tree.c
 
 
@@ -50,6 +52,8 @@ DATA_OBJS := ./ap.o			\
 		./stack_link.o		\
 		./text.o			\
 		./stree.o	\
+		./rb_tree.o	\
+		./fib-heap.o	\
 		./simple_tree.o
 
 
