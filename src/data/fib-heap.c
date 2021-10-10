@@ -18,7 +18,7 @@ struct NODE {
 	NODE child;
 	void *priv;
 	int mark;
-	int flag;
+//	int flag;
 	int degree;
 };
 
@@ -154,7 +154,7 @@ static void consolidate(T h)
 		x = w;
 		d = x->degree;
 
-		x->flag = TRUE;
+//		x->flag = TRUE;
 		if (w == w->right)
 		{
 			w = NULL;
@@ -179,7 +179,7 @@ static void consolidate(T h)
 				x = y;
 				y = tmp;
 			}
-			y->flag = FALSE;
+//			y->flag = FALSE;
 			fib_heap_link(h, y, x);
 //			fprintf(stdout, "d: %d, A[d]: %p\n", d, A[d]);
 			A[d] = NULL;
@@ -212,7 +212,7 @@ static void consolidate(T h)
 //			fprintf(stdout, "i: %d, A[i]: %p\n", i, A[i]);
 		if (A[i])
 		{
-			A[i]->flag = FALSE;
+//			A[i]->flag = FALSE;
 			if (h->min == NULL)
 			{
 				A[i]->left = A[i]->right = A[i];
