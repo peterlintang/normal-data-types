@@ -334,11 +334,14 @@ static void	rb_delete_fixup(struct rb_tree *T, struct node *x)
 				right_rotate(T, w);
 				w = x->parent->right;
 			}
+			else
+			{
 			w->color = x->parent->color;
 			x->parent->color = BLACK;
 			w->right->color = BLACK;
 			left_rotate(T, x->parent);
 			x = T->root;
+			}
 		}
 		else
 		{
@@ -362,11 +365,14 @@ static void	rb_delete_fixup(struct rb_tree *T, struct node *x)
 				left_rotate(T, w);
 				w = x->parent->left;
 			}
+			else
+			{
 			w->color = x->parent->color;
 			x->parent->color = BLACK;
 			w->left->color = BLACK;
 			right_rotate(T, x->parent);
 			x = T->root;
+			}
 		}
 	}
 
