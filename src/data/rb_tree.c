@@ -69,7 +69,7 @@ static NODE tree_minimum(T tree, NODE x)
 		count++;
 		x = x->left;
 	}
-	fprintf(stdout, "minimum: %d\n", count);
+//	fprintf(stdout, "minimum: %d\n", count);
 
 	return x;
 }
@@ -469,9 +469,24 @@ T MODULE_FUN_NAME(RB_Tree, new)(int (*cmp)(void *, void *))
 	return tree;
 }
 
-void MODULE_FUN_NAME(RB_Tree, free)(T *tree)
+void MODULE_FUN_NAME(RB_Tree, free)(T *treep)
 {
-	assert(tree && *tree);
+	T tree = NULL;
+	NODE node = NULL;
+
+	assert(treep && *treep);
+
+	tree = *treep;
+
+	while ((node = (tree->root)) != tree->nil)
+	{
+		fprintf(stdout, "delete node: %d\n", (int)node->priv);
+		MODULE_FUN_NAME(RB_Tree, delete)(tree, node);
+		free(node);
+		node = NULL;
+	}
+
+	*treep = NULL;
 }
 
 
