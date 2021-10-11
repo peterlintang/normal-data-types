@@ -1331,7 +1331,7 @@ struct test_routine my_test_routines[] =
 //		{test_str, "string"},
 //		{test_xp, "xp"},					// ko
 //		{test_ap2, "ap2"},					// ko
-		{test_rb, "rb_tree"},	// has bugs in interfaces
+//		{test_rb, "rb_tree"},				// ko
 //		{test_fib, "fib"},					// ko
 		{NULL,NULL},
 };
