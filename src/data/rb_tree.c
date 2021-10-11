@@ -57,6 +57,7 @@ NODE MODULE_FUN_NAME(RB_Tree, iterative_search)(T tree, void *key)
 
 static NODE tree_minimum(T tree, NODE x)
 {
+	int count = 0;
 	if (x == tree->nil)
 	{
 //		fprintf(stdout, "%s: nil: %p\n", __func__, x);
@@ -64,7 +65,11 @@ static NODE tree_minimum(T tree, NODE x)
 	}
 
 	while (x->left != tree->nil)
+	{
+		count++;
 		x = x->left;
+	}
+	fprintf(stdout, "minimum: %d\n", count);
 
 	return x;
 }
@@ -83,9 +88,14 @@ NODE MODULE_FUN_NAME(RB_Tree, minimum)(T tree)
 
 static NODE tree_maximum(T tree, NODE x)
 {
+	int count = 0;
 	while (x->right != tree->nil)
+	{
+		count++;
 		x = x->right;
+	}
 
+	fprintf(stdout, "maximum: %d\n", count);
 	return x;
 }
 
@@ -309,9 +319,13 @@ static void	rb_delete_fixup(T tree, NODE x)
 	NODE w = NULL;
 	while ((x != tree->root) && (x->color == BLACK))
 	{
+//			fprintf(stdout, "x: %p, parent: %p, left: %p, right: %p, color: %s\n", 
+//							x, x->parent, x->left, x->right, x->color == RED ? "red" : "black");
 		if (x == x->parent->left)
 		{
 			w = x->parent->right;
+		//	fprintf(stdout, "w: %p, parent: %p, left: %p, right: %p, color: %s\n", 
+	//						w, w->parent, w->left, w->right, w->color == RED ? "red" : "black");
 			if (w->color == RED)
 			{
 				w->color = BLACK;
@@ -331,11 +345,14 @@ static void	rb_delete_fixup(T tree, NODE x)
 				right_rotate(tree, w);
 				w = x->parent->right;
 			}
+			else
+			{
 			w->color = x->parent->color;
 			x->parent->color = BLACK;
 			w->right->color = BLACK;
 			left_rotate(tree, x->parent);
 			x = tree->root;
+			}
 		}
 		else
 		{
@@ -359,11 +376,14 @@ static void	rb_delete_fixup(T tree, NODE x)
 				left_rotate(tree, w);
 				w = x->parent->left;
 			}
+			else
+			{
 			w->color = x->parent->color;
 			x->parent->color = BLACK;
 			w->left->color = BLACK;
 			right_rotate(tree, x->parent);
 			x = tree->root;
+			}
 		}
 	}
 
@@ -465,7 +485,7 @@ void MODULE_FUN_NAME(RB_Tree, inorder_walk)(T tree, NODE x, int (*map)(void *, v
 		MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, x->left, map, arg);
 		if (map)
 		{
-			if (map(x->priv, arg) != 0) 
+			if (map(x, arg) != 0) 
 				return ;
 		}
 //		fprintf(stdout, "priv: %p, color: %s \n", 
@@ -512,6 +532,7 @@ void MODULE_FUN_NAME(RB_Tree, postorder_walk)(T tree, NODE x, int (*map)(void *,
 }
 
 
+#if 0
 /*
  * test code
  */
@@ -595,6 +616,7 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+#endif
 
 
 
