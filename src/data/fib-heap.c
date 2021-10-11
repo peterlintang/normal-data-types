@@ -546,27 +546,28 @@ NODE MODULE_FUN_NAME(FibHeap, delete)(T h, NODE x)
 }
 
 /********************************************************/
+static void fibHeap_print(NODE node)
+{
+	NODE x = NULL;
+
+	for (x = node; ; x = x->right)
+	{
+		fprintf(stdout, "node: %p, key: %d, child: %p, left: %p, right: %p, parent: %p\n", 
+					x, (int)x->priv, x->child,
+					x->left, x->right, x->p);
+		if (x->child) fibHeap_print(node->child);
+		if (x->right == node)
+			break;
+	}
+}
 
 void MODULE_FUN_NAME(FibHeap, print)(T h)
 {
-	static int level = 0;
-	NODE node = NULL;
-	NODE min = h->min;
+	assert(h);
 
-	if (NULL == min)
+	if (h->min)
 	{
-		return ;
-	}
-	
-	fprintf(stdout, "level: %d\n", level++);
-	for (node = min; ; node = node->right)
-	{
-	fprintf(stdout, "node: %p, key: %d, child: %p, left: %p, right: %p, parent: %p\n", 
-					node, (int)node->priv, node->child,
-					node->left, node->right, node->p);
-		if (node->child) MODULE_FUN_NAME(FibHeap, print)(node->child);
-		if (node->right == min)
-			break;
+		fibHeap_print(h->min);
 	}
 }
 
