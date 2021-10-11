@@ -1158,15 +1158,15 @@ static int rb_cmp(void *arg1, void *arg2)
 int rb_print(void *priv, void *arg)
 {
 	RB_Node node = (RB_Node)priv;
-	fprintf(stdout, "node: %p, %d, parent: %p, left: %p, right: %p, color: %s\n", 
-					node, (int)node->priv, node->parent, node->left, node->right, node->color == RED? "red" : "black");
+//	fprintf(stdout, "node: %p, %d, parent: %p, left: %p, right: %p, color: %s\n", 
+//					node, (int)node->priv, node->parent, node->left, node->right, node->color == RED? "red" : "black");
 //	fprintf(stdout, "%d\n", (int)priv);
 	return 0;
 }
 
 static void test_rb(void)
 {
-#define RB_ITEM_LEN	10240000
+#define RB_ITEM_LEN	102400000
 	RB_Tree tree = NULL;
 	RB_Node node = NULL;
 
@@ -1177,7 +1177,7 @@ static void test_rb(void)
 		node = (RB_Node)calloc(1, sizeof(*node));
 		node->priv = (void *)((i) % RB_ITEM_LEN + 1);
 		MODULE_FUN_NAME(RB_Tree, insert)(tree, node);
-		fprintf(stdout, "insert %d...\n", (i + 1));
+//		fprintf(stdout, "insert %d...\n", (i + 1));
 //		MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
 	}
 
@@ -1186,7 +1186,7 @@ static void test_rb(void)
 	for (int i = 0; i < RB_ITEM_LEN; i++)
 	{
 		node = MODULE_FUN_NAME(RB_Tree, search)(tree, (void *)(i + 1));
-		fprintf(stdout, "i: %d, value: %d\n", i, (int)(node->priv));
+//		fprintf(stdout, "i: %d, value: %d\n", i, (int)(node->priv));
 //		MODULE_FUN_NAME(RB_Tree, delete)(tree, node);
 //	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
 	}
