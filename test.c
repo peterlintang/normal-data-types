@@ -1425,7 +1425,7 @@ static void test_queue(void)
 
 static void test_stack(void)
 {
-#define STACK_ITEM_LEN	10240000
+#define STACK_ITEM_LEN	102400000
 	Stack_T s = NULL;
 	int ret = 0;
 	int *value = NULL;
