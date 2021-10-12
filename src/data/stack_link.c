@@ -20,8 +20,8 @@
 #include "stack_link.h"
 
 #define T StackL_T
-#define LIST List_T
-#define NODE ListNode_T
+#define LIST ListD_T
+#define NODE ListDNode_T
 
 struct T {
 	LIST stack;
@@ -39,7 +39,7 @@ T MODULE_FUN_NAME(StackL, new)(void)
 	T s = (T)calloc(1, sizeof(*s));
 	if (s)
 	{
-		s->stack = MODULE_FUN_NAME(List, new)();
+		s->stack = MODULE_FUN_NAME(ListD, new)();
 		if (NULL == s->stack)
 		{
 			free(s);
@@ -69,7 +69,7 @@ void MODULE_FUN_NAME(StackL, free)(T *s)
 	{
 	}
 
-	MODULE_FUN_NAME(List, free)(&(*s)->stack);
+	MODULE_FUN_NAME(ListD, free)(&(*s)->stack);
 	*s = NULL;
 }
 
@@ -87,11 +87,11 @@ int MODULE_FUN_NAME(StackL, push)(T s, void *x)
 
 	assert(s);
 
-	node = MODULE_FUN_NAME(ListNode, new)(x);
+	node = MODULE_FUN_NAME(ListDNode, new)(x);
 	if (NULL == node)
 		return -1;
 
-	MODULE_FUN_NAME(List, insert)(s->stack, node);
+	MODULE_FUN_NAME(ListD, insert)(s->stack, node);
 	return 0;
 }
 
@@ -110,13 +110,13 @@ int MODULE_FUN_NAME(StackL, pop)(T s, void **x)
 	assert(s);
 	assert(x);
 
-	node = MODULE_FUN_NAME(List, tail)(s->stack);
+	node = MODULE_FUN_NAME(ListD, tail)(s->stack);
 	if (NULL == node)
 		return -1;
 
-	MODULE_FUN_NAME(List, remove)(s->stack, node);
+	MODULE_FUN_NAME(ListD, remove)(s->stack, node);
 	*x = node->priv;
-	MODULE_FUN_NAME(ListNode, free)(&node);
+	MODULE_FUN_NAME(ListDNode, free)(&node);
 
 	return 0;
 }
@@ -132,7 +132,7 @@ int MODULE_FUN_NAME(StackL, isEmpty)(T s)
 {
 	assert(s);
 
-	return MODULE_FUN_NAME(List, isEmpty)(s->stack);
+	return MODULE_FUN_NAME(ListD, isEmpty)(s->stack);
 }
 
 

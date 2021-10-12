@@ -20,8 +20,8 @@
 #include "queue_link.h"
 
 #define T QueueL_T
-#define LIST List_T
-#define NODE ListNode_T
+#define LIST ListD_T
+#define NODE ListDNode_T
 
 struct T {
 	LIST head;
@@ -40,7 +40,7 @@ T MODULE_FUN_NAME(QueueL, new)(int length)
 	T q = (T)calloc(1, sizeof(*q));
 	if (q)
 	{
-		q->head = MODULE_FUN_NAME(List, new)();
+		q->head = MODULE_FUN_NAME(ListD, new)();
 		if (NULL == q->head)
 		{
 			free(q);
@@ -65,15 +65,15 @@ void MODULE_FUN_NAME(QueueL, free)(T *q)
 	assert(*q);
 	assert((*q)->head);
 
-	for (node = MODULE_FUN_NAME(List, head)((*q)->head); 
+	for (node = MODULE_FUN_NAME(ListD, head)((*q)->head); 
 			node;
-			node = MODULE_FUN_NAME(List, head)((*q)->head))
+			node = MODULE_FUN_NAME(ListD, head)((*q)->head))
 	{
-		MODULE_FUN_NAME(List, remove)((*q)->head, node);
-		MODULE_FUN_NAME(ListNode, free)(&node);
+		MODULE_FUN_NAME(ListD, remove)((*q)->head, node);
+		MODULE_FUN_NAME(ListDNode, free)(&node);
 	}
 
-	MODULE_FUN_NAME(List, free)(&(*q)->head);
+	MODULE_FUN_NAME(ListD, free)(&(*q)->head);
 }
 
 /*
@@ -90,13 +90,13 @@ int MODULE_FUN_NAME(QueueL, put)(T q, void *x)
 
 	assert(q);
 
-	node = MODULE_FUN_NAME(ListNode, new)(x);
+	node = MODULE_FUN_NAME(ListDNode, new)(x);
 	if (NULL == node)
 	{
 		return -1;
 	}
 
-	MODULE_FUN_NAME(List, insert)(q->head, node);
+	MODULE_FUN_NAME(ListD, insert)(q->head, node);
 	return 0;
 }
 
@@ -115,13 +115,13 @@ int MODULE_FUN_NAME(QueueL, get)(T q, void **x)
 	assert(q);
 	assert(x);
 
-	node = MODULE_FUN_NAME(List, head)(q->head);
+	node = MODULE_FUN_NAME(ListD, head)(q->head);
 	if (NULL == node)
 		return -1;
 
-	MODULE_FUN_NAME(List, remove)(q->head, node);
+	MODULE_FUN_NAME(ListD, remove)(q->head, node);
 	*x = node->priv;
-	MODULE_FUN_NAME(ListNode, free)(&node);
+	MODULE_FUN_NAME(ListDNode, free)(&node);
 
 	return 0;
 }
@@ -137,7 +137,7 @@ int MODULE_FUN_NAME(QueueL, isEmpty)(T q)
 {
 	assert(q);
 
-	return MODULE_FUN_NAME(List, isEmpty)(q->head);
+	return MODULE_FUN_NAME(ListD, isEmpty)(q->head);
 }
 
 
