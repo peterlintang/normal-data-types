@@ -155,14 +155,14 @@ static void test_queue_array(void)
 		tmp.a = i;
 		strcpy(tmp.b, "hello");
 		fprintf(stdout, "i: %d, \n", i);
-		MODULE_FUN_NAME(QueueA, put)(q, &tmp);
+		MODULE_FUN_NAME(QueueA, put)(q, (void *)&tmp);
 	}
 
 	fprintf(stdout, "gettiing \n");
 	for (i = 0; i < QUEUEA_ITEM_LEN; i++)
 	{
 		struct aa *tmp = NULL;
-		MODULE_FUN_NAME(QueueA, get)(q, &tmp);
+		MODULE_FUN_NAME(QueueA, get)(q, (void **)&tmp);
 		fprintf(stdout, "i: %d, \n", i);
 		if (tmp != NULL)
 			fprintf(stdout, "first get: value: %d, %s\n", tmp->a, tmp->b);
@@ -175,14 +175,14 @@ static void test_queue_array(void)
 		tmp.a = i;
 		strcpy(tmp.b, "world");
 		fprintf(stdout, "i: %d, \n", i);
-		MODULE_FUN_NAME(QueueA, put)(q, &tmp);
+		MODULE_FUN_NAME(QueueA, put)(q, (void *)&tmp);
 	}
 
 	fprintf(stdout, "gettiing \n");
 	while (MODULE_FUN_NAME(QueueA, isEmpty)(q) == 0)
 	{
 		struct aa *tmp = NULL;
-		MODULE_FUN_NAME(QueueA, get)(q, &tmp);
+		MODULE_FUN_NAME(QueueA, get)(q, (void **)&tmp);
 		if (tmp != NULL)
 		{
 			fprintf(stdout, "second get: value: %d, %s\n", tmp->a, tmp->b);
@@ -214,7 +214,7 @@ static void test_stack_array(void)
 
 	while (MODULE_FUN_NAME(StackA, isEmpty)(s) == 0)
 	{
-		MODULE_FUN_NAME(StackA, pop)(s, &p);
+		MODULE_FUN_NAME(StackA, pop)(s, (void **)&p);
 		fprintf(stdout, "value: %d\n", *p);
 	}
 
@@ -1354,7 +1354,7 @@ static void test_list(void)
 //	list = MODULE_FUN_NAME(List, list)(&num, 1, 2);
 	for (int i = 0; i < LIST_ITEM_LEN; i++)
 	{
-		list = MODULE_FUN_NAME(List, push)(list, (i + 1));
+		list = MODULE_FUN_NAME(List, push)(list, (void *)(i + 1));
 	}
 
 	len = MODULE_FUN_NAME(List, length)(list);
@@ -1371,7 +1371,7 @@ static void test_list(void)
 	fprintf(stdout, "pop...\n");
 	for (int i = 0; i < len; i++)
 	{
-		list = MODULE_FUN_NAME(List, pop)(list, &value);
+		list = MODULE_FUN_NAME(List, pop)(list, (void **)&value);
 //		fprintf(stdout, "i: %d, value: %d, list: %p\n", i, (int)value, list);
 	}
 
@@ -1450,7 +1450,7 @@ struct test_routine my_test_routines[] =
 //		{test_fib, "fib"},					// ko
 //		{test_os_rank, "os_rank"},					// ko
 //		{test_list, "list"},					// ko
-		{test_queue, "queue"},					// ko
+//		{test_queue, "queue"},					// ko
 		{NULL,NULL},
 };
 
