@@ -78,26 +78,26 @@ static void test_dlist(void)
 static void test_queue_link(void)
 {
 #define QUUEE_LINK_ITEM_LEN	10240000
-	Queue_T q = NULL;
+	QueueL_T q = NULL;
 	int i;
 	int *p = NULL;
 
-	q = MODULE_FUN_NAME(Queue, new)(10);
+	q = MODULE_FUN_NAME(QueueL, new)(10);
 	if (NULL == q)
 		return ;
 
 	for (i = 0; i < QUUEE_LINK_ITEM_LEN; i++)
 	{
-		MODULE_FUN_NAME(Queue, put)(q, (void *)i);
+		MODULE_FUN_NAME(QueueL, put)(q, (void *)i);
 	}
 
-	while (MODULE_FUN_NAME(Queue, isEmpty)(q) == 0)
+	while (MODULE_FUN_NAME(QueueL, isEmpty)(q) == 0)
 	{
-		MODULE_FUN_NAME(Queue, get)(q, (void **)&p);
+		MODULE_FUN_NAME(QueueL, get)(q, (void **)&p);
 		fprintf(stdout, "value: %d\n", (int)p);
 	}
 
-	MODULE_FUN_NAME(Queue, free)(&q);
+	MODULE_FUN_NAME(QueueL, free)(&q);
 }
 #endif
 
@@ -129,55 +129,68 @@ static void test_stack_link(void)
 }
 #endif
 
-#if 0
+#if 1
 #include "queue_array.h"
 static void test_queue_array(void)
 {
+#define QUEUEA_ITEM_LEN	10240000
 	struct aa {
 		int a;
 		char b[11];
 	};
 
 
-	Queue_T q = NULL;
+	QueueA_T q = NULL;
 	int i;
 	int *p = NULL;
 
-	q = MODULE_FUN_NAME(Queue, new)(30000, sizeof(struct aa));
+	q = MODULE_FUN_NAME(QueueA, new)(QUEUEA_ITEM_LEN + 1, sizeof(struct aa));
 	if (NULL == q)
 		return ;
 
-	for (i = 0; i < 20000; i++)
+	fprintf(stdout, "putiing \n");
+	for (i = 0; i < QUEUEA_ITEM_LEN; i++)
 	{
 		struct aa tmp; 
 		tmp.a = i;
 		strcpy(tmp.b, "hello");
-		MODULE_FUN_NAME(Queue, put)(q, &tmp);
+		fprintf(stdout, "i: %d, \n", i);
+		MODULE_FUN_NAME(QueueA, put)(q, &tmp);
 	}
 
-	for (i = 0; i < 2000; i++)
+	fprintf(stdout, "gettiing \n");
+	for (i = 0; i < QUEUEA_ITEM_LEN; i++)
 	{
 		struct aa *tmp = NULL;
-		MODULE_FUN_NAME(Queue, get)(q, &tmp);
-//		fprintf(stdout, "first get: value: %d, %s\n", tmp->a, tmp->b);
+		MODULE_FUN_NAME(QueueA, get)(q, &tmp);
+		fprintf(stdout, "i: %d, \n", i);
+		if (tmp != NULL)
+			fprintf(stdout, "first get: value: %d, %s\n", tmp->a, tmp->b);
 	}
 
-	for (i = 0; i < 20000; i++)
+	fprintf(stdout, "puttiing 2\n");
+	for (i = 0; i < QUEUEA_ITEM_LEN; i++)
 	{
 		struct aa tmp; 
 		tmp.a = i;
 		strcpy(tmp.b, "world");
-		MODULE_FUN_NAME(Queue, put)(q, &tmp);
+		fprintf(stdout, "i: %d, \n", i);
+		MODULE_FUN_NAME(QueueA, put)(q, &tmp);
 	}
 
-	while (MODULE_FUN_NAME(Queue, isEmpty)(q) == 0)
+	fprintf(stdout, "gettiing \n");
+	while (MODULE_FUN_NAME(QueueA, isEmpty)(q) == 0)
 	{
 		struct aa *tmp = NULL;
-		MODULE_FUN_NAME(Queue, get)(q, &tmp);
-//		fprintf(stdout, "second get: value: %d, %s\n", tmp->a, tmp->b);
+		MODULE_FUN_NAME(QueueA, get)(q, &tmp);
+		if (tmp != NULL)
+		{
+			fprintf(stdout, "second get: value: %d, %s\n", tmp->a, tmp->b);
+		}
 	}
 
-	MODULE_FUN_NAME(Queue, free)(&q, 0);
+	fprintf(stdout, "freeing \n");
+	MODULE_FUN_NAME(QueueA, free)(&q);
 }
 #endif
 
@@ -1307,6 +1320,16 @@ static void test_fib(void)
 
 }
 
+#include "os_rank.h"
+
+static void test_os_rank(void)
+{
+#define OS_RANK_ITEM_LEN	1024
+}
+
+
+
+
 struct test_routine {
 	void (*call_back)(void);
 	char *name;
@@ -1318,7 +1341,7 @@ struct test_routine my_test_routines[] =
 //		{test_dlist, "dlist"},				// ko
 //		{test_queue_link, "queue_link"},	// ko
 //		{test_stack_link, "stack_link"},	// ko
-//		{test_queue_array, "queue_array"},
+		{test_queue_array, "queue_array"},
 //		{test_stack_array, "stack_array"},
 //		{test_ap, "ap"},					// kko
 //		{test_arena, "arena"},				// ko
@@ -1333,6 +1356,7 @@ struct test_routine my_test_routines[] =
 //		{test_ap2, "ap2"},					// ko
 //		{test_rb, "rb_tree"},				// ko
 //		{test_fib, "fib"},					// ko
+		{test_os_rank, "os_rank"},					// ko
 		{NULL,NULL},
 };
 
