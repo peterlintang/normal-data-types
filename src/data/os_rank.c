@@ -35,11 +35,14 @@ static NODE tree_search(T tree, NODE x, void *key)
 
 NODE MODULE_FUN_NAME(OsRank, search)(T tree, void *key)
 {
+	assert(tree && key);
 	return tree_search(tree, tree->root, key);
 }
 
 NODE MODULE_FUN_NAME(OsRank, iterative_search)(T tree, void *key)
 {
+	assert(tree && key);
+
 	NODE x = tree->root;
 
 	while ((x != tree->nil) && (tree->cmp(x->key, key) != 0))
@@ -55,6 +58,8 @@ NODE MODULE_FUN_NAME(OsRank, iterative_search)(T tree, void *key)
 
 static NODE tree_minimum(T tree, NODE x)
 {
+	int count = 0;
+
 	if (x == tree->nil)
 	{
 //		fprintf(stdout, "%s: nil: %p\n", __func__, x);
@@ -62,13 +67,19 @@ static NODE tree_minimum(T tree, NODE x)
 	}
 
 	while (x->left != tree->nil)
+	{
+		count++;
 		x = x->left;
+	}
+	fprintf(stdout, "%s: count: %d\n", __func__, count);
 
 	return x;
 }
 
 NODE MODULE_FUN_NAME(OsRank, minimum)(T tree)
 {
+	assert(tree);
+
 	NODE x = tree->root;
 
 	if (x == tree->nil)
@@ -79,14 +90,22 @@ NODE MODULE_FUN_NAME(OsRank, minimum)(T tree)
 
 static NODE tree_maximum(T tree, NODE x)
 {
-	while (x->right != tree->nil)
-		x = x->right;
+	int count = 0;
 
+	while (x->right != tree->nil)
+	{
+		count++;
+		x = x->right;
+	}
+
+	fprintf(stdout, "%s: count: %d\n", __func__, count);
 	return x;
 }
 
 NODE MODULE_FUN_NAME(OsRank, maximum)(T tree)
 {
+	assert(tree);
+
 	NODE x = tree->root;
 
 	if (x == tree->nil)
@@ -99,6 +118,8 @@ NODE MODULE_FUN_NAME(OsRank, successor)(T tree, NODE x)
 {
 	NODE y = NULL;
 	NODE p = NULL;
+
+	assert(tree && x);
 
 	if (x->right != tree->nil)
 		return tree_minimum(tree, x->right);
@@ -117,6 +138,8 @@ NODE MODULE_FUN_NAME(OsRank, predecessor)(T tree, NODE x)
 {
 	NODE y = NULL;
 	NODE p = NULL;
+
+	assert(tree && x);
 
 	if (x->left != tree->nil)
 		return tree_maximum(tree, x->left);
@@ -250,6 +273,8 @@ NODE MODULE_FUN_NAME(OsRank, insert)(T tree, NODE node)
 	NODE y = NULL;
 	NODE x = NULL;
 
+	assert(tree && node);
+
 	node->size = 1;
 
 	y = tree->nil;
@@ -379,6 +404,8 @@ NODE MODULE_FUN_NAME(OsRank, delete)(T tree, NODE z)
 	NODE y = NULL;
 	NODE x = NULL;
 
+	assert(tree && z);
+
 	y = z;
 	y_origin_color = y->color;
 
@@ -434,6 +461,8 @@ int MODULE_FUN_NAME(OsRank, rank)(T tree, NODE x)
 	int r = 0;
 	NODE y = NULL;
 
+	assert(tree && x);
+
 	r = x->left->size + 1;
 	y = x;
 
@@ -457,7 +486,7 @@ NODE MODULE_FUN_NAME(OsRank, select)(T tree, int i)
 
 	x = tree->root;
 
-	assert(i <= x->size && i > 0);
+//	assert(i <= x->size && i > 0);
 
 	if (i > x->size || i <= 0)
 		return NULL;
@@ -481,16 +510,21 @@ NODE MODULE_FUN_NAME(OsRank, select)(T tree, int i)
 
 static void os_delete_fix(T tree, NODE x)
 {
-	if (x == tree->nil)
+		/*
+	if (x->parent == tree->nil)
 	{
 		return ;
 	}
-	fprintf(stdout, "%s: node: %p, parent: %p, left: %p, right: %p, priv: %d, size: %d, color: %s, \n", 
-					__func__, 
-					x, x->parent, x->left, x->right, (int)x->key, x->size, x->color == RED ? "red" : "black");
+	*/
 
-	x = x->parent;
-	x->size = x->left->size + x->right->size + 1;
+//	fprintf(stdout, "%s: node: %p, priv: %d, parent: %p, left: %p, right: %p, size: %d, color: %s, \n", 
+//					__func__, 
+//					x, (int)x->key, x->parent, x->left, x->right, x->size, x->color == RED ? "red" : "black");
+
+	if (x != tree->nil)
+	{
+		x->size = x->left->size + x->right->size + 1;
+	}
 
 	while (x->parent != tree->nil)
 	{
@@ -505,6 +539,8 @@ static void os_delete_fix(T tree, NODE x)
 T MODULE_FUN_NAME(OsRank, new)(int (*cmp)(void *, void *))
 {
 	T tree = NULL;
+
+	assert(cmp);
 
 	tree = (T)calloc(1, sizeof(*tree));
 	if (tree == NULL) 
@@ -536,7 +572,7 @@ void MODULE_FUN_NAME(OsRank, free)(T *treep)
 	while ((node = tree->root) != tree->nil)
 	{
 		MODULE_FUN_NAME(OsRank, delete)(tree, node);
-		MODULE_FUN_NAME(OsRank, inorder_walk)(tree, tree->root, os_map, NULL);
+//		MODULE_FUN_NAME(OsRank, inorder_walk)(tree, tree->root, os_map, NULL);
 		free(node);
 	}
 
@@ -593,6 +629,7 @@ void MODULE_FUN_NAME(OsRank, postorder_walk)(T tree, NODE x, int (*map)(void *, 
 	}
 }
 
+#if 0
 
 /*
  * test code
@@ -619,8 +656,8 @@ static int os_cmp(void *arg1, void *arg2)
 static int os_map(void *x, void *priv)
 {
 	NODE node = (NODE )x;
-	fprintf(stdout, "node: %p, parent: %p, left: %p, right: %p, priv: %d, size: %d, color: %s\n", 
-					node, node->parent, node->left, node->right, (int)node->key, node->size, node->color == RED ? "red" : "black");
+	fprintf(stdout, "node: %p, priv: %d, parent: %p, left: %p, right: %p, size: %d, color: %s\n", 
+					node, (int)node->key, node->parent, node->left, node->right, node->size, node->color == RED ? "red" : "black");
 	return 0;
 }
 
@@ -629,13 +666,11 @@ int main(int argc, char *argv[])
 	T tree = NULL;
 	NODE node = NULL;
 	int num = 16;
-	int key = 18;
 	int index = 8;
 
-	if (argc == 3)
+	if (argc == 2)
 	{
 		num = atoi(argv[1]);
-		key = atoi(argv[2]);
 	}
 
 	tree = MODULE_FUN_NAME(OsRank, new)(os_cmp);
@@ -668,18 +703,28 @@ int main(int argc, char *argv[])
 	MODULE_FUN_NAME(OsRank, inorder_walk)(tree, tree->root, os_map, NULL);
 
 	fprintf(stdout, "select...\n");
-	for (int i = 0; i < num; i++)
+	for (int i = num; i > 0; i--)
 	{
-		node = MODULE_FUN_NAME(OsRank, select)(tree, i + 1);
+		int select = random() % i + 1;
+		fprintf(stdout, "num: %d\n", select);
+		node = MODULE_FUN_NAME(OsRank, select)(tree, select);
 		if (node == NULL)
 		{
-			fprintf(stderr, "not found index: %d node\n", index);
+			fprintf(stderr, "not found index: %d node\n", select);
 			continue;
 		}
 
 		index = MODULE_FUN_NAME(OsRank, rank)(tree, node);
-		fprintf(stdout, "node: %p, parent: %p, left: %p, right: %p, priv: %d, size: %d, color: %s, rank: %d\n", 
-					node, node->parent, node->left, node->right, (int)node->key, node->size, node->color == RED ? "red" : "black", index);
+		if (index != (select))
+		{
+		fprintf(stdout, "error node: %p, priv: %d, parent: %p, left: %p, right: %p, size: %d, color: %s, rank: %d\n", 
+					node, (int)node->key, node->parent, node->left, node->right, node->size, node->color == RED ? "red" : "black", index);
+		}
+		fprintf(stdout, "delet node: %p, priv: %d\n", node, (int)node->key);
+		MODULE_FUN_NAME(OsRank, delete)(tree, node);
+		MODULE_FUN_NAME(OsRank, maximum)(tree);
+		MODULE_FUN_NAME(OsRank, minimum)(tree);
+//	MODULE_FUN_NAME(OsRank, inorder_walk)(tree, tree->root, os_map, NULL);
 	}
 	
 	fprintf(stdout, "release....\n");
@@ -688,5 +733,8 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+
+
+#endif
 
 
