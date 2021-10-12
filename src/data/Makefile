@@ -26,6 +26,7 @@ DATA_SRCS := ./ap.c			\
 		./arena.c		\
 		./thread_pool.c		\
 		./queue_link.c		\
+		./queue_array.c		\
 		./stack_link.c		\
 		./text.c		\
 		./stree.c	\
@@ -50,6 +51,7 @@ DATA_OBJS := ./ap.o			\
 		./arena.o		\
 		./thread_pool.o		\
 		./queue_link.o		\
+		./queue_array.o		\
 		./stack_link.o		\
 		./text.o			\
 		./stree.o	\

@@ -39,7 +39,7 @@
 
 /**********************************************************/
 /* defines */
-#define QUEUE	Queue_T
+#define QUEUE	QueueL_T
 #define T 		ThreadPool_T
 
 #define TASK	Task_T
@@ -86,7 +86,7 @@ T MODULE_FUN_NAME(ThreadPool, new)(int size)
 	}
 
 	p->size = size;
-	p->queue = MODULE_FUN_NAME(Queue, new)(0);
+	p->queue = MODULE_FUN_NAME(QueueL, new)(0);
 	if (NULL == p->queue)
 	{
 		free(p);
@@ -108,7 +108,7 @@ void MODULE_FUN_NAME(ThreadPool, free)(T *p)
 	assert(p);
 	assert(*p);
 
-	MODULE_FUN_NAME(Queue, free)(&(*p)->queue);
+	MODULE_FUN_NAME(QueueL, free)(&(*p)->queue);
 
 	free(*p);
 	*p = NULL;
@@ -228,7 +228,7 @@ int MODULE_FUN_NAME(ThreadPool, post)(
 
 	MUTEX_LOCK(&p->mutex);
 
-	ret = MODULE_FUN_NAME(Queue, put)(p->queue, task);
+	ret = MODULE_FUN_NAME(QueueL, put)(p->queue, task);
 	if (0 != ret)
 	{
 		goto out;
@@ -269,7 +269,7 @@ static void *thread_cycle(void *priv)
 	{
 		MUTEX_LOCK(&p->mutex);
 try_again:
-		if (MODULE_FUN_NAME(Queue, get)(p->queue, (void *)&task) != 0)
+		if (MODULE_FUN_NAME(QueueL, get)(p->queue, (void *)&task) != 0)
 		{
 			COND_WAIT(&p->cond, &p->mutex);
 			goto try_again;

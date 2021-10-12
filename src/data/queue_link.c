@@ -19,7 +19,7 @@
 
 #include "queue_link.h"
 
-#define T Queue_T
+#define T QueueL_T
 #define LIST List_T
 #define NODE ListNode_T
 
@@ -30,12 +30,12 @@ struct T {
 
 
 /*
- * name: MODULE_FUN_NAME(Queue, new)
+ * name: MODULE_FUN_NAME(QueueL, new)
  * description: create a new queue
  * return value: return the pointer to queue
  * args: @length: user sugget length of queue
  */
-T MODULE_FUN_NAME(Queue, new)(int length)
+T MODULE_FUN_NAME(QueueL, new)(int length)
 {
 	T q = (T)calloc(1, sizeof(*q));
 	if (q)
@@ -52,12 +52,12 @@ T MODULE_FUN_NAME(Queue, new)(int length)
 }
 
 /*
- * name: MODULE_FUN_NAME(Queue, free)
+ * name: MODULE_FUN_NAME(QueueL, free)
  * description: free the queue
  * return value: void
  * args: @q pointer to queue
  */
-void MODULE_FUN_NAME(Queue, free)(T *q)
+void MODULE_FUN_NAME(QueueL, free)(T *q)
 {
 	NODE node = NULL;
 
@@ -77,14 +77,14 @@ void MODULE_FUN_NAME(Queue, free)(T *q)
 }
 
 /*
- * name: MODULE_FUN_NAME(Queue, put)
+ * name: MODULE_FUN_NAME(QueueL, put)
  * description: put @x at the end of queue
  * return value: 0: put success
  * 				-1: no mem
  * args: @q pointer to queue
  * 		@x data to put in queue
  */
-int MODULE_FUN_NAME(Queue, put)(T q, void *x)
+int MODULE_FUN_NAME(QueueL, put)(T q, void *x)
 {
 	NODE node = NULL;
 
@@ -101,14 +101,14 @@ int MODULE_FUN_NAME(Queue, put)(T q, void *x)
 }
 
 /*
- * name: MODULE_FUN_NAME(Queue, get)
+ * name: MODULE_FUN_NAME(QueueL, get)
  * description: get the head of the queue
  * return value: 0 : get success
  * 				-1 : error (maybe queue is empty)
  * args: @q pointer to queue
  * 		@x pointer's pointer to store the return value
  */
-int MODULE_FUN_NAME(Queue, get)(T q, void **x)
+int MODULE_FUN_NAME(QueueL, get)(T q, void **x)
 {
 	NODE node = NULL;
 
@@ -127,13 +127,13 @@ int MODULE_FUN_NAME(Queue, get)(T q, void **x)
 }
 
 /*
- * name: MODULE_FUN_NAME(Queue, isEmpty)
+ * name: MODULE_FUN_NAME(QueueL, isEmpty)
  * description: is queue is empty or not
  * return value: 1: queue is empty
  * 				0 : queue is not empty
  * args: @q pointer to queue
  */
-int MODULE_FUN_NAME(Queue, isEmpty)(T q)
+int MODULE_FUN_NAME(QueueL, isEmpty)(T q)
 {
 	assert(q);
 
