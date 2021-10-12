@@ -39,37 +39,37 @@ static void test_bit(void)
 static void test_dlist(void)
 {
 #define DLIST_ITEM_LEN	10240000
-	List_T list = NULL;
-	ListNode_T node = NULL;
+	ListD_T list = NULL;
+	ListDNode_T node = NULL;
 
 	int i;
 
-	list = MODULE_FUN_NAME(List, new)();
+	list = MODULE_FUN_NAME(ListD, new)();
 	if (NULL == list)
 		return ;
 
 	for (i = 0; i < DLIST_ITEM_LEN; i++)
 	{
-		node = MODULE_FUN_NAME(ListNode, new)((void *)(i + 1));
-		MODULE_FUN_NAME(List, insert)(list, node);
+		node = MODULE_FUN_NAME(ListDNode, new)((void *)(i + 1));
+		MODULE_FUN_NAME(ListD, insert)(list, node);
 	}
 
-	for (i = MODULE_FUN_NAME(List, count)(list), 
-			node = MODULE_FUN_NAME(List, head)(list);
+	for (i = MODULE_FUN_NAME(ListD, count)(list), 
+			node = MODULE_FUN_NAME(ListD, head)(list);
 			i > 0;
-			i--, node = MODULE_FUN_NAME(List, next)(node))
+			i--, node = MODULE_FUN_NAME(ListD, next)(node))
 	{
 		fprintf(stdout, "i: %d, value: %d\n", i, (int)node->priv);
 	}
 
-	while (node = MODULE_FUN_NAME(List, head)(list))
+	while (node = MODULE_FUN_NAME(ListD, head)(list))
 	{
 		fprintf(stdout, "value: %d\n", (int)node->priv);
-		MODULE_FUN_NAME(List, remove)(list, node);
-		MODULE_FUN_NAME(ListNode, free)(&node);
+		MODULE_FUN_NAME(ListD, remove)(list, node);
+		MODULE_FUN_NAME(ListDNode, free)(&node);
 	}
 
-	MODULE_FUN_NAME(List, free)(&list);
+	MODULE_FUN_NAME(ListD, free)(&list);
 
 }
 
@@ -1328,6 +1328,15 @@ static void test_os_rank(void)
 #define OS_RANK_ITEM_LEN	1024
 }
 
+#include "list.h"
+static void test_list(void)
+{
+#define LIST_ITEM_LEN	1024
+
+	List_T list = NULL;
+	list = MODULE_FUN_NAME(List, list)("hello", "world", "morning");
+	MODULE_FUN_NAME(List, free)(&list);
+}
 
 
 
@@ -1357,7 +1366,8 @@ struct test_routine my_test_routines[] =
 //		{test_ap2, "ap2"},					// ko
 //		{test_rb, "rb_tree"},				// ko
 //		{test_fib, "fib"},					// ko
-		{test_os_rank, "os_rank"},					// ko
+//		{test_os_rank, "os_rank"},					// ko
+		{test_list, "list"},					// ko
 		{NULL,NULL},
 };
 
