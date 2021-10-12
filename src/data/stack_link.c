@@ -19,7 +19,7 @@
 
 #include "stack_link.h"
 
-#define T Stack_T
+#define T StackL_T
 #define LIST List_T
 #define NODE ListNode_T
 
@@ -29,12 +29,12 @@ struct T {
 
 
 /*
- * name: MODULE_FUN_NAME(Stack, new)
+ * name: MODULE_FUN_NAME(StackL, new)
  * description: create a new stack
  * return value: return the pointer to stack
  * args: void
  */
-T MODULE_FUN_NAME(Stack, new)(void)
+T MODULE_FUN_NAME(StackL, new)(void)
 {
 	T s = (T)calloc(1, sizeof(*s));
 	if (s)
@@ -51,21 +51,21 @@ T MODULE_FUN_NAME(Stack, new)(void)
 }
 
 /*
- * name: MODULE_FUN_NAME(Stack, free)
+ * name: MODULE_FUN_NAME(StackL, free)
  * description: free the stack
  * return value: void
  * args: @q pointer to stack
  * 		@withdata: 1: means free user's data too
  * 					0: menas not free user's data
  */
-void MODULE_FUN_NAME(Stack, free)(T *s)
+void MODULE_FUN_NAME(StackL, free)(T *s)
 {
 	void *p = NULL;
 
 	assert(s);
 	assert(*s);
 
-	while (MODULE_FUN_NAME(Stack, pop)(*s, &p) == 0)
+	while (MODULE_FUN_NAME(StackL, pop)(*s, &p) == 0)
 	{
 	}
 
@@ -74,14 +74,14 @@ void MODULE_FUN_NAME(Stack, free)(T *s)
 }
 
 /*
- * name: MODULE_FUN_NAME(Stack, push)
+ * name: MODULE_FUN_NAME(StackL, push)
  * description: push @x at the end of stack
  * return value: 0: push success
  * 				-1: no mem
  * args: @q pointer to stack
  * 		@x data to push in stack
  */
-int MODULE_FUN_NAME(Stack, push)(T s, void *x)
+int MODULE_FUN_NAME(StackL, push)(T s, void *x)
 {
 	NODE node = NULL;
 
@@ -96,14 +96,14 @@ int MODULE_FUN_NAME(Stack, push)(T s, void *x)
 }
 
 /*
- * name: MODULE_FUN_NAME(Stack, pop)
+ * name: MODULE_FUN_NAME(StackL, pop)
  * description: pop the end of the stack
  * return value: 0 : pop success
  * 				-1 : error (maybe stack is empty)
  * args: @q pointer to stack
  * 		@x pointer's pointer to store the return value
  */
-int MODULE_FUN_NAME(Stack, pop)(T s, void **x)
+int MODULE_FUN_NAME(StackL, pop)(T s, void **x)
 {
 	NODE node = NULL;
 
@@ -122,13 +122,13 @@ int MODULE_FUN_NAME(Stack, pop)(T s, void **x)
 }
 
 /*
- * name: MODULE_FUN_NAME(Stack, isEmpty)
+ * name: MODULE_FUN_NAME(StackL, isEmpty)
  * description: is stack is empty or not
  * return value: 1: stack is empty
  * 				0 : stack is not empty
  * args: @q pointer to stack
  */
-int MODULE_FUN_NAME(Stack, isEmpty)(T s)
+int MODULE_FUN_NAME(StackL, isEmpty)(T s)
 {
 	assert(s);
 
