@@ -28,6 +28,7 @@ DATA_SRCS := ./ap.c			\
 		./queue_link.c		\
 		./queue_array.c		\
 		./stack_link.c		\
+		./stack_array.c		\
 		./text.c		\
 		./stree.c	\
 		./rb_tree.c	\
@@ -53,6 +54,7 @@ DATA_OBJS := ./ap.o			\
 		./queue_link.o		\
 		./queue_array.o		\
 		./stack_link.o		\
+		./stack_array.o		\
 		./text.o			\
 		./stree.o	\
 		./rb_tree.o	\
