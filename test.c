@@ -1329,12 +1329,60 @@ static void test_os_rank(void)
 }
 
 #include "list.h"
+
+static void list_map(void **arg, void *priv)
+{
+	void *num = *arg;
+	fprintf(stdout, "map: %d\n", (int)num);
+}
+
 static void test_list(void)
 {
-#define LIST_ITEM_LEN	1024
+#define LIST_ITEM_LEN	10240000
 
 	List_T list = NULL;
-	list = MODULE_FUN_NAME(List, list)("hello", "world", "morning");
+	List_T list2 = NULL;
+	int num = 0;
+	int len = 0;
+	int *value = NULL;
+	void **array = NULL;
+
+	list = (List_T) calloc(1, sizeof(*list));
+	list->first = NULL;
+	list->rest = NULL;
+
+//	list = MODULE_FUN_NAME(List, list)(&num, 1, 2);
+	for (int i = 0; i < LIST_ITEM_LEN; i++)
+	{
+		list = MODULE_FUN_NAME(List, push)(list, (i + 1));
+	}
+
+	len = MODULE_FUN_NAME(List, length)(list);
+	fprintf(stdout, "list len: %d\n", len);
+
+	fprintf(stdout, "copy...\n");
+	list2 = MODULE_FUN_NAME(List, copy)(list);
+//	MODULE_FUN_NAME(List, map)(list2, list_map, NULL);
+
+	fprintf(stdout, "reverse...\n");
+	list = MODULE_FUN_NAME(List, reverse)(list);
+//	MODULE_FUN_NAME(List, map)(list, list_map, NULL);
+
+	fprintf(stdout, "pop...\n");
+	for (int i = 0; i < len; i++)
+	{
+		list = MODULE_FUN_NAME(List, pop)(list, &value);
+//		fprintf(stdout, "i: %d, value: %d, list: %p\n", i, (int)value, list);
+	}
+
+	fprintf(stdout, "toarray...\n");
+	list = MODULE_FUN_NAME(List, append)(list2, list);
+	array = MODULE_FUN_NAME(List, toArray)(list, (void *)(LIST_ITEM_LEN + 1));
+	for (int i = 0; array[i] != (void *)(LIST_ITEM_LEN + 1); i++)
+	{
+//		fprintf(stdout, "i: %d, %d\n", i, (int)(array[i]));
+	}
+
 	MODULE_FUN_NAME(List, free)(&list);
 }
 
