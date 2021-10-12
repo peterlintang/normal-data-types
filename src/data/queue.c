@@ -1,17 +1,72 @@
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-
-#include "queue.h"
-
 /*
  * 10-1 
  * implement the queue described by this sector
  */
 
+#include <stdlib.h>
+#include <assert.h>
 
-int queue_empty(struct Queue *q)
+#include "queue.h"
+
+
+#define T Queue_T
+
+struct Queue_T {
+	int head;
+	int tail;
+	int size;
+	void **array;
+};
+
+/*
+ * 创建一个队列,返回队列指针，失败返回空指针
+ * size: 队列大小
+ */
+T MODULE_FUN_NAME(Queue, new)(int size)
+{
+	T q = NULL;
+
+	assert(size > 0);
+
+	q = (T)calloc(1, sizeof(*q));
+	if (q)
+	{
+		q->array = (void **)calloc(1, size * sizeof(void *));
+		if (q->array == NULL)
+		{
+			free(q);
+			q = NULL;
+		}
+		else
+		{
+			q->size = size;
+		}
+	}
+
+	return q;
+}
+
+/*
+ * 销毁一个队列,
+ * qp:	指向队列的指针
+ */
+void MODULE_FUN_NAME(Queue, free)(T *qp)
+{
+	assert(qp && (*qp));
+
+//	if ((*qp)->head != (*qp)->tail)
+			// not empty
+
+	free(*qp);
+	*qp = NULL;
+}
+
+/*
+ * 判断队列是否为空，是返回1，不是返回0,
+ * qp:	指向队列的指针
+ */
+int MODULE_FUN_NAME(Queue, isEmpty)(T q)
 {
 	assert(q);
 
@@ -21,50 +76,61 @@ int queue_empty(struct Queue *q)
 		return 0;
 }
 
-int queue_full(struct Queue *q)
+/*
+ * 判断队列是否满，是返回1，不是返回0,
+ * qp:	指向队列的指针
+ */
+int MODULE_FUN_NAME(Queue, isFull)(T q)
 {
 	assert(q);
 
-	if (((q->tail + 1) % QUEUE_SIZE) == q->head)
+	if (((q->tail + 1) % q->size) == q->head)
 		return 1;
 	else
 		return 0;
 }
 
-int queue_en(struct Queue *q, void *x)
+/*
+ * 往队列压元素x，成功返回0，失败返回-1
+ * qp:	指向队列的指针
+ * x:	待压送数据
+ */
+int MODULE_FUN_NAME(Queue, en)(T q, void *x)
 {
 	assert(q);
-	assert(x);
 
-	if (queue_full(q))
+	if (MODULE_FUN_NAME(Queue, isFull)(q))
 	{
-		fprintf(stderr, "queue full\n");
 		return -1;
 	}
 
-	q->q[q->tail] = x;
-	if (q->tail == QUEUE_SIZE)
-		q->tail = (q->tail + 1) % QUEUE_SIZE;
+	q->array[q->tail] = x;
+	if (q->tail == q->size)
+		q->tail = (q->tail + 1) % q->size;
 	else
 		q->tail = q->tail + 1;
 
 	return 0;
 }
 
-int queue_de(struct Queue *q, void **p)
+/*
+ * 从队列压元素对头，成功返回0，失败返回-1
+ * qp:	指向队列的指针
+ * p:	取回的数据存放的地方
+ */
+int MODULE_FUN_NAME(Queue, de)(T q, void **p)
 {
 	assert(q);
 	assert(p);
 
-	if (queue_empty(q))
+	if (MODULE_FUN_NAME(Queue, isEmpty)(q))
 	{
-		fprintf(stderr, "queue empty\n");
 		return -1;
 	}
 
-	*p = q->q[q->head];
-	if (q->head == QUEUE_SIZE)
-		q->head = (q->head + 1) % QUEUE_SIZE;
+	*p = q->array[q->head];
+	if (q->head == q->size)
+		q->head = (q->head + 1) % q->size;
 	else
 		q->head = q->head + 1;
 
@@ -105,7 +171,5 @@ int main(int argc, char *argv[])
 	return 0;
 }
  */
-
-
 
 

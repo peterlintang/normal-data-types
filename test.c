@@ -1338,7 +1338,7 @@ static void list_map(void **arg, void *priv)
 
 static void test_list(void)
 {
-#define LIST_ITEM_LEN	10240000
+#define LIST_ITEM_LEN	102400000
 
 	List_T list = NULL;
 	List_T list2 = NULL;
@@ -1386,6 +1386,40 @@ static void test_list(void)
 	MODULE_FUN_NAME(List, free)(&list);
 }
 
+#include "queue.h"
+
+static void test_queue(void)
+{
+#define QUEUE_ITEM_LEN	10240000
+	Queue_T q = NULL;
+	int ret = 0;
+	int *value = NULL;
+
+	q = MODULE_FUN_NAME(Queue, new)(QUEUE_ITEM_LEN + 1);
+
+	for (int i = 0; i <	QUEUE_ITEM_LEN; i++)
+	{
+		ret = MODULE_FUN_NAME(Queue, en)(q, (void *)i);
+		if (ret != 0)
+		{
+			fprintf(stdout, "put i: %d to queue failed\n", i);
+		}
+	}
+	for (int i = 0; i < QUEUE_ITEM_LEN; i++)
+	{
+		ret = MODULE_FUN_NAME(Queue, de)(q, (void **)&value);
+		if (ret != 0)
+		{
+			fprintf(stdout, "get i: %d from queue failed\n", i);
+		}
+		if ((int)value != i)
+		{
+			fprintf(stdout, "i: %d, value: %d\n", i, (int)value);
+		}
+	}
+
+	MODULE_FUN_NAME(Queue, free)(&q);
+}
 
 
 struct test_routine {
@@ -1415,7 +1449,8 @@ struct test_routine my_test_routines[] =
 //		{test_rb, "rb_tree"},				// ko
 //		{test_fib, "fib"},					// ko
 //		{test_os_rank, "os_rank"},					// ko
-		{test_list, "list"},					// ko
+//		{test_list, "list"},					// ko
+		{test_queue, "queue"},					// ko
 		{NULL,NULL},
 };
 
