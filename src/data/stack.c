@@ -1,21 +1,29 @@
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
 
 /*
  * 10-1 
  * implement the stack described by this sector
  */
 
-#define STACK_SIZE	1024
+#include <stdlib.h>
+#include <assert.h>
 
-struct Stack {
-	int s[STACK_SIZE];
+#include "stack.h"
+
+#define T Stack_T
+
+struct Stack_T {
+	int size;
 	int top;
+	void **array;
 };
 
-int stack_empty(struct Stack *s)
+
+/*
+ * 判断堆栈是否为空，是返回1，否返回0
+ * sp: 堆栈的指针
+ */
+int MODULE_FUN_NAME(Stack, isEmpty)(T s)
 {
 	assert(s);
 
@@ -25,63 +33,86 @@ int stack_empty(struct Stack *s)
 		return 0;
 }
 
-int stack_push(struct Stack *s, int x)
+/*
+ * 往堆栈压入数据, 成功返回0，失败返回-1
+ * sp: 堆栈的指针
+ * x: 待压入的数据
+ */
+int MODULE_FUN_NAME(Stack, push)(T s, void *x)
 {
 	assert(s);
 
-	if (s->top >= STACK_SIZE)
+	if (s->top >= s->size)
 	{
-		fprintf(stderr, "overflow\n");
 		return -1;
 	}
 
-	s->s[s->top] = x;
+	s->array[s->top] = x;
 	s->top = s->top + 1;
+
+	return 0;
 }
 
-int stack_pop(struct Stack *s)
+/*
+ * 从堆栈取出数据, 成功返回0，失败返回-1
+ * sp: 堆栈的指针
+ * xp: 存放数据指针的地方
+ */
+int MODULE_FUN_NAME(Stack, pop)(T s, void **xp)
 {
-	if (stack_empty(s))
+	assert(s && xp);
+
+	if (MODULE_FUN_NAME(Stack, isEmpty)(s))
 	{
-		fprintf(stderr, "underflow\n");
 		return -1;
 	}
 
 	s->top = s->top - 1;
-	return s->s[s->top];
+	*xp = s->array[s->top];
+	return 0;
 }
 
 
 /*
- * test code
+ * 初始化一个堆栈,成功返回指针，失败返回空指针
+ * size: 堆栈大小
  */
-int main(int argc, char *argv[])
+T MODULE_FUN_NAME(Stack, new)(int size)
 {
-	struct Stack *s = NULL;
-	int ret = 0;
+	T s = NULL;
 
-	s = (struct Stack *)calloc(1, sizeof(*s));
-	if (s == NULL)
+	assert(size > 0);
+
+	s = (T)calloc(1, sizeof(*s));
+	if (s)
 	{
-		fprintf(stderr, "no mem\n");
-		return -1;
+		s->array = (void **)calloc(1, size * sizeof(void *));
+		if (s->array)
+		{
+			s->size = size;
+		}
+		else
+		{
+			free(s);
+			s = NULL;
+		}
 	}
 
-	for (int i = 0; i < 10; i++)
-	{
-		stack_push(s, i);
-	}
-
-	for (int i = 0; i < 10; i++)
-	{
-		ret = stack_pop(s);
-		fprintf(stdout, "i: %d, s: %d\n", i, ret);
-	}
-
-		ret = stack_pop(s);
-	return 0;
+	return s;
 }
 
+/*
+ * 销毁一个堆栈结构
+ * sp: 堆栈的指针
+ */
+void MODULE_FUN_NAME(Stack, free)(T *sp)
+{
+	assert(sp && *sp);
+
+	free((*sp)->array);
+	free(*sp);
+	*sp = NULL;
+}
 
 
 
