@@ -58,6 +58,7 @@ void MODULE_FUN_NAME(Queue, free)(T *qp)
 //	if ((*qp)->head != (*qp)->tail)
 			// not empty
 
+	free((*qp)->array);
 	free(*qp);
 	*qp = NULL;
 }
