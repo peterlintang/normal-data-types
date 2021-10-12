@@ -106,26 +106,26 @@ static void test_queue_link(void)
 static void test_stack_link(void)
 {
 #define STACK_LINK_ITEM_LEN	1024000
-	Stack_T s = NULL;
+	StackL_T s = NULL;
 	int i;
 	int *p = NULL;
 
-	s = MODULE_FUN_NAME(Stack, new)();
+	s = MODULE_FUN_NAME(StackL, new)();
 	if (NULL == s)
 		return ;
 
 	for (i = 0; i < STACK_LINK_ITEM_LEN; i++)
 	{
-		MODULE_FUN_NAME(Stack, push)(s, (void *)i);
+		MODULE_FUN_NAME(StackL, push)(s, (void *)i);
 	}
 
-	while (MODULE_FUN_NAME(Stack, isEmpty)(s) == 0)
+	while (MODULE_FUN_NAME(StackL, isEmpty)(s) == 0)
 	{
-		MODULE_FUN_NAME(Stack, pop)(s, (void **)&p);
+		MODULE_FUN_NAME(StackL, pop)(s, (void **)&p);
 		fprintf(stdout, "value: %d\n", (int)p);
 	}
 
-	MODULE_FUN_NAME(Stack, free)(&s);
+	MODULE_FUN_NAME(StackL, free)(&s);
 }
 #endif
 
@@ -194,30 +194,31 @@ static void test_queue_array(void)
 }
 #endif
 
-#if 0
+#if 1
 #include "stack_array.h"
 static void test_stack_array(void)
 {
-	Stack_T s = NULL;
+#define STACK_ITEM_LEN	10240000
+	StackA_T s = NULL;
 	int i;
 	int *p = NULL;
 
-	s = MODULE_FUN_NAME(Stack, new)(300000, sizeof(int));
+	s = MODULE_FUN_NAME(StackA, new)(STACK_ITEM_LEN + 1, sizeof(int));
 	if (NULL == s)
 		return ;
 
-	for (i = 0; i < 300000; i++)
+	for (i = 0; i < STACK_ITEM_LEN; i++)
 	{
-		MODULE_FUN_NAME(Stack, push)(s, &i);
+		MODULE_FUN_NAME(StackA, push)(s, &i);
 	}
 
-	while (MODULE_FUN_NAME(Stack, isEmpty)(s) == 0)
+	while (MODULE_FUN_NAME(StackA, isEmpty)(s) == 0)
 	{
-		MODULE_FUN_NAME(Stack, pop)(s, &p);
-//		fprintf(stdout, "value: %d\n", *p);
+		MODULE_FUN_NAME(StackA, pop)(s, &p);
+		fprintf(stdout, "value: %d\n", *p);
 	}
 
-	MODULE_FUN_NAME(Stack, free)(&s);
+	MODULE_FUN_NAME(StackA, free)(&s);
 }
 #endif
 
@@ -1341,8 +1342,8 @@ struct test_routine my_test_routines[] =
 //		{test_dlist, "dlist"},				// ko
 //		{test_queue_link, "queue_link"},	// ko
 //		{test_stack_link, "stack_link"},	// ko
-		{test_queue_array, "queue_array"},
-//		{test_stack_array, "stack_array"},
+//		{test_queue_array, "queue_array"},	// ko
+//		{test_stack_array, "stack_array"},	// ko
 //		{test_ap, "ap"},					// kko
 //		{test_arena, "arena"},				// ko
 //		{test_threadPool, "threadPool"},	// ko
