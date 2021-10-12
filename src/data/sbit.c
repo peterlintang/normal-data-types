@@ -5,7 +5,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "bit2.h"
+#include "sbit.h"
 
 
 #define T SBit_T

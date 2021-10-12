@@ -14,15 +14,18 @@ LIBS:=$(LIBDATATYPE)
 DATA_SRCS := ./ap.c			\
 		./arrayrep.c	\
 		./ring.c		\
+		./ring_buf.c		\
 		./set.c			\
 		./table.c		\
 		./xp.c			\
 		./array.c		\
 		./bit.c			\
+		./sbit.c			\
 		./mp.c			\
 		./seq.c			\
 		./str.c			\
 		./dlist.c		\
+		./sentinel-linked-list.c		\
 		./list.c		\
 		./arena.c		\
 		./thread_pool.c		\
@@ -41,15 +44,18 @@ DATA_SRCS := ./ap.c			\
 DATA_OBJS := ./ap.o			\
 		./arrayrep.o	\
 		./ring.o		\
+		./ring_buf.o		\
 		./set.o			\
 		./table.o		\
 		./xp.o			\
 		./array.o		\
 		./bit.o			\
+		./sbit.o			\
 		./mp.o			\
 		./seq.o			\
 		./str.o			\
 		./dlist.o		\
+		./sentinel-linked-list.o		\
 		./list.o		\
 		./arena.o		\
 		./thread_pool.o		\
