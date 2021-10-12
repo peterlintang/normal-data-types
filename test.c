@@ -198,16 +198,16 @@ static void test_queue_array(void)
 #include "stack_array.h"
 static void test_stack_array(void)
 {
-#define STACK_ITEM_LEN	10240000
+#define STACKA_ITEM_LEN	10240000
 	StackA_T s = NULL;
 	int i;
 	int *p = NULL;
 
-	s = MODULE_FUN_NAME(StackA, new)(STACK_ITEM_LEN + 1, sizeof(int));
+	s = MODULE_FUN_NAME(StackA, new)(STACKA_ITEM_LEN + 1, sizeof(int));
 	if (NULL == s)
 		return ;
 
-	for (i = 0; i < STACK_ITEM_LEN; i++)
+	for (i = 0; i < STACKA_ITEM_LEN; i++)
 	{
 		MODULE_FUN_NAME(StackA, push)(s, &i);
 	}
@@ -1421,6 +1421,41 @@ static void test_queue(void)
 	MODULE_FUN_NAME(Queue, free)(&q);
 }
 
+#include "stack.h"
+
+static void test_stack(void)
+{
+#define STACK_ITEM_LEN	10240000
+	Stack_T s = NULL;
+	int ret = 0;
+	int *value = NULL;
+
+	s = MODULE_FUN_NAME(Stack, new)(STACK_ITEM_LEN + 1);
+
+	for (int i = 0; i < STACK_ITEM_LEN; i++)
+	{
+		ret = MODULE_FUN_NAME(Stack, push)(s, (void *)i);
+		if (ret != 0)
+		{
+			fprintf(stdout, "push i: %d error\n", i);
+		}
+	}
+
+	for (int i = 0; i < STACK_ITEM_LEN; i++)
+	{
+		ret = MODULE_FUN_NAME(Stack, pop)(s, (void **)&value);
+		if (ret != 0)
+		{
+			fprintf(stdout, "pop i: %d, error\n", i);
+		}
+		if ((int)value != STACK_ITEM_LEN - i - 1) 
+		{
+			fprintf(stdout, "pop i: %d, error, value: %d\n", i, (int)value);
+		}
+	}
+
+	MODULE_FUN_NAME(Stack, free)(&s);
+}
 
 struct test_routine {
 	void (*call_back)(void);
@@ -1451,6 +1486,7 @@ struct test_routine my_test_routines[] =
 //		{test_os_rank, "os_rank"},					// ko
 //		{test_list, "list"},					// ko
 //		{test_queue, "queue"},					// ko
+		{test_stack, "stack"},					// ko
 		{NULL,NULL},
 };
 
