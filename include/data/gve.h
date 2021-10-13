@@ -22,33 +22,6 @@ typedef struct V *V;
 typedef struct E *E;
 typedef struct G *G;
 
-struct V {
-	void *priv;				// 用户的数据 (信息)
-	int color;				// 颜色 白 灰 黑三者之一
-
-	int d;					// 不太记得用途了，后面看能否补充注释
-	int f;					// 不太记得用途了，后面看能否补充
-	V p;					// 前驱节点,有的话
-
-	SenDlink_T l;			// 以此节点为边的一个节点的边,对于有向节点，以@v为开始节点，以边中的另一节点为终止节点
-	int e_num;				// 以此节点为边的一个节点的边的数量,
-};
-
-
-struct E {
-	V v;		// 开始节点
-	V u;		// 终止节点
-	void *priv;	//用户数据
-};
-
-
-struct G {
-	V *vs;					// 图中顶点
-	int vs_num;				// 图中顶点数目
-	E *es;					// 图中边信息
-	int es_num;				// 图中边数目
-};
-
 
 /*
  * 创建一个图顶点，成功返回指针，失败返回NULL
