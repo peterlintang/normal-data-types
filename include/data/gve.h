@@ -97,6 +97,14 @@ int MODULE_FUN_NAME(Graph, EdgeAdd)(G g, E e);
 int MODULE_FUN_NAME(Graph, EdgeRemove)(G g, E e);
 
 /*
+ * 根据@priv在图@g中查找边，找到返回指针，失败返回NULL
+ * g:		图
+ * cmp: 	比较函数，比较成功返回0，不成功-1；
+ * priv: 	用户数据，会在cmp中回传
+ */
+E MODULE_FUN_NAME(Graph, EdgeSearch)(G g, int (*cmp)(E e, void *priv), void *priv);
+
+/*
  * 将节点@v添加到图@g中，成功返回0，失败-1；
  * g: 图
  * v: 节点
@@ -109,6 +117,14 @@ int MODULE_FUN_NAME(Graph, VnodeAdd)(G g, V v);
  * v: 节点
  */
 int MODULE_FUN_NAME(Graph, VnodeRemove)(G g, V v);
+
+/*
+ * 根据@priv在图@g中查找节点，找到返回指针，失败返回NULL
+ * g:		图
+ * cmp: 	比较函数，比较成功返回0，不成功-1；
+ * priv: 	用户数据，会在cmp中回传
+ */
+V MODULE_FUN_NAME(Graph, VnodeSearch)(G g, int (*cmp)(V v, void *priv), void *priv);
 
 /*
  * 创建一个最大包含@size个节点的图,成功返回指针，失败NULL

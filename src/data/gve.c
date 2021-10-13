@@ -86,6 +86,16 @@ void MODULE_FUN_NAME(Graph, GPrint)(G g, int (*print)(G g, void *priv), void *pr
 }
 
 /*
+ * 根据@priv在图@g中查找边，找到返回指针，失败返回NULL
+ * g:           图
+ * cmp:         比较函数，比较成功返回0，不成功-1；
+ * priv:        用户数据，会在cmp中回传
+ */
+E MODULE_FUN_NAME(Graph, EdgeSearch)(G g, int (*cmp)(E e, void *priv), void *priv)
+{
+}
+
+/*
  * 添加边@e到图@g中,并更新相关节点信息
  * 成功返回0，失败-1
  * 将以@e->v为开始节点，@e->u为终止节点的边@e->v添加到v的链表上
@@ -106,6 +116,16 @@ int MODULE_FUN_NAME(Graph, EdgeAdd)(G g, E e)
  * @e:	以@v为开始节点的边 (v->u, 对于有向)
  */
 int MODULE_FUN_NAME(Graph, EdgeRemove)(G g, E e)
+{
+}
+
+/*
+ * 根据@priv在图@g中查找节点，找到返回指针，失败返回NULL
+ * g:           图
+ * cmp:         比较函数，比较成功返回0，不成功-1；
+ * priv:        用户数据，会在cmp中回传
+ */
+V MODULE_FUN_NAME(Graph, VnodeSearch)(G g, int (*cmp)(V v, void *priv), void *priv)
 {
 }
 
