@@ -40,6 +40,7 @@ DATA_SRCS := ./ap.c			\
 		./rb_tree.c	\
 		./fib-heap.c	\
 		./os_rank.c	\
+		./gve.c	\
 		./simple_tree.c
 
 
@@ -72,6 +73,7 @@ DATA_OBJS := ./ap.o			\
 		./rb_tree.o	\
 		./fib-heap.o	\
 		./os_rank.o	\
+		./gve.o	\
 		./simple_tree.o
 
 

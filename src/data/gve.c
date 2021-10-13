@@ -1,113 +1,132 @@
 
+/*
+ * 实现图基本数据结构
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 
-#include "sentinel-linked-list.h"
 #include "queue.h"
 #include "gve.h"
 
+#define V VNode_T
+#define E Edge_T
+#define G Graph_T
 
 
-struct V *V_create(int p)
+/*
+ * 创建一个图顶点，成功返回指针，失败返回NULL
+ * @v: 用户数据
+ */
+V MODULE_FUN_NAME(Graph, VNodeCreate)(void *priv)
 {
-	struct V *v = NULL;
-
-	v = (struct V *)calloc(1, sizeof(*v));
-	if (NULL == v)
-	{
-		return NULL;
-	}
-
-	v->v = p;
-	v->color = WHITE;
-	v->d = INFINITE;
-	v->p = NULL;
-	v->e_num = 0;
-	v->l.nil.next = v->l.nil.prev = &(v->l.nil);
-
-	return v;
 }
 
-int E_create(struct V *v, struct V *u)
+/*
+ * 释放一个图顶点，
+ * @vp: 节点数据的指针
+ */
+void MODULE_FUN_NAME(Graph, VnodeFree)(V *vp)
 {
-	assert(v);
-	assert(u);
-
-	list_insert(&(v->l), u);
-	v->e_num += 1;
 }
 
-struct G *G_create(void)
+/*
+ * 创建一条以@v为开始节点，@u为终止节点的边，成功返回指针，失败返回NULL
+ * @v:   边节点
+ * @u:   边节点
+ * @priv: 用户数据, 可以存放与边有关的信息
+ */
+E MODULE_FUN_NAME(Graph, EdgeCreate)(V v, V u, void *priv)
 {
-	int key= 0;
-	int e_num = 0;
-	int p1 = 0;
-	int p2 = 0;
-	struct V *v = NULL;
-	struct V *u = NULL;
-	struct G *g = NULL;
-
-	g = (struct G *)calloc(1, sizeof(*g));
-	if (g == NULL)
-	{
-		return NULL;
-	}
-
-	scanf("%d", &(g->vs_num));
-
-	g->vs = (struct V **)calloc(g->vs_num, sizeof(struct V*));
-
-//	fprintf(stdout, "total vs: %d\n", g->vs_num);
-	for (int i = 0; i < g->vs_num; i++)
-	{
-		scanf("%d", &key);
-		g->vs[i] = V_create(key);
-	}
-
-	scanf("%d", &e_num);
-//	fprintf(stdout, "total es: %d\n", e_num);
-	for (int i = 0; i < e_num; i++)
-	{
-		scanf("%d,%d", &p1, &p2);
-		v = g->vs[p1 - 1];
-		u = g->vs[p2 - 1];
-		E_create(v, u);
-//		fprintf(stdout, "es: %d, %d\n", p1, p2);
-	}
-
-//	fprintf(stdout, "done\n");
-
-	return g;
 }
 
-void V_print(struct V *v)
+/*
+ * 释放边@ep的内容
+ * @ep:   边指针
+ */
+void MODULE_FUN_NAME(Graph, EdgeFree)(E *ep)
 {
-	struct item *cur = NULL;
-	struct V *u = NULL;
-
-	assert(v);
-	fprintf(stdout, "v: %d, color: %d, p: %p, d: %d, f: %d, es: %d\n",
-					v->v, v->color, v->p, v->d, v->f, v->e_num);
-	for (cur = v->l.nil.next; cur != &(v->l.nil); cur = cur->next)
-	{
-		u = (struct V *)cur->key;
-		fprintf(stdout, "v: %d, color: %d, p: %p, d: %d, f: %d\n",
-					u->v, u->color, u->p, u->d, u->f);
-	}
 }
 
-void G_print(struct G *g)
+/*
+ * 创建一个最大包含@size个节点的图,成功返回指针，失败NULL
+ * @size: 图中最大节点数目
+ */
+G MODULE_FUN_NAME(Graph, GCreate)(int size)
 {
-	assert(g);
-
-	for (int i = 0; i < g->vs_num; i++)
-	{
-		fprintf(stdout, "\n");
-		V_print(g->vs[i]);
-		fprintf(stdout, "\n");
-	}
 }
+
+/*
+ * 释放图@gp的内容
+ * gp: 图指针
+ */
+void MODULE_FUN_NAME(Graph, GFree)(G *gp)
+{
+}
+
+/*
+ * 打印节点信息
+ */
+void MODULE_FUN_NAME(Graph, VNodePrint)(V v, int (*print)(V e, void *priv), void *priv)
+{
+}
+
+/*
+ * 打印边信息
+ */
+void MODULE_FUN_NAME(Graph, EdgePrint)(E e, int (*print)(E e, void *priv), void *priv)
+{
+}
+
+/*
+ * 打印图信息
+ */
+void MODULE_FUN_NAME(Graph, GPrint)(G g, int (*print)(G g, void *priv), void *priv)
+{
+}
+
+/*
+ * 添加边@e到图@g中,并更新相关节点信息
+ * 成功返回0，失败-1
+ * 将以@e->v为开始节点，@e->u为终止节点的边@e->v添加到v的链表上
+ * 成功返回0，失败返回-1
+ * @v:	节点
+ * @e:	以@v为开始节点的边 (v->u, 对于有向)
+ */
+int MODULE_FUN_NAME(Graph, EdgeAdd)(G g, E e)
+{
+}
+
+/*
+ * 将边@e从图@g中删除,并更新相关节点的信息
+ * 成功返回0，失败-1
+ * 将以@e->v为开始节点，@e->u为终止节点的边@e->v的链表上删除
+ * 成功返回0，失败返回-1
+ * @v:	节点
+ * @e:	以@v为开始节点的边 (v->u, 对于有向)
+ */
+int MODULE_FUN_NAME(Graph, EdgeRemove)(G g, E e)
+{
+}
+
+/*
+ * 将节点@v添加到图@g中，成功返回0，失败-1；
+ * g: 图
+ * v: 节点
+ */
+int MODULE_FUN_NAME(Graph, VnodeAdd)(G g, V v)
+{
+}
+
+/*
+ * 将节点@v从图@g中删除，成功返回0，失败-1；
+ * g: 图
+ * v: 节点
+ */
+int MODULE_FUN_NAME(Graph, VnodeRemove)(G g, V v)
+{
+}
+
 
 /*
  * test code
@@ -123,6 +142,10 @@ int main(int argc, char *argv[])
 }
 
 */
+
+
+
+
 
 
 
