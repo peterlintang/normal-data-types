@@ -6,13 +6,13 @@
 #define CI_GVE_HEADER__
 
 #include "module.h"
-#include "sentinel-linked-list.h"
+//#include "sentinel-linked-list.h"
 
-#define WHITE	0
-#define GRAY	1
-#define BLACK	2
+//#define WHITE	0
+//#define GRAY	1
+//#define BLACK	2
 
-#define INFINITE	77777777
+//#define INFINITE	77777777
 
 #define V VNode_T
 #define E Edge_T
