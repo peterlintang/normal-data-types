@@ -39,8 +39,10 @@ struct G {
 	void *priv;				// 用户数据
 	V *vs;					// 图中顶点
 	int vs_num;				// 图中顶点数目
+	int vs_size;
 	E *es;					// 图中边信息
 	int es_num;				// 图中边数目
+	int es_size;
 };
 
 
@@ -225,7 +227,7 @@ int MODULE_FUN_NAME(Graph, EdgeAdd)(G g, E e)
 	assert(g && e);
 	assert(e->v && e->u);
 
-	for (int i = 0; i < g->es_num; i++)
+	for (int i = 0; i < g->es_size; i++)
 	{
 		if (g->es[i] == NULL)
 		{
@@ -250,7 +252,7 @@ int MODULE_FUN_NAME(Graph, EdgeRemove)(G g, E e)
 	assert(g && e);
 	assert(e->v && e->u);
 
-	for (int i = 0; i < g->es_num; i++)
+	for (int i = 0; i < g->es_size; i++)
 	{
 		if ((g->es[i]) && (g->es[i]->v == e->v) && (g->es[i]->u == e->u))
 		{
@@ -276,7 +278,7 @@ E MODULE_FUN_NAME(Graph, EdgeSearch)(G g, int (*cmp)(void *arg, void *priv), voi
 
 	assert(g && cmp);
 
-	for (int i = 0; i < g->es_num; i++)
+	for (int i = 0; i < g->es_size; i++)
 	{
 		if ((g->es[i]) && (cmp(g->es[i]->priv, priv) == 0))
 		{
@@ -298,7 +300,7 @@ int MODULE_FUN_NAME(Graph, VnodeAdd)(G g, V v)
 	
 	assert(g && v);
 
-	for (int i = 0; i < g->vs_num; i++)
+	for (int i = 0; i < g->vs_size; i++)
 	{
 		if (g->vs[i] == NULL)
 		{
@@ -322,7 +324,7 @@ int MODULE_FUN_NAME(Graph, VnodeRemove)(G g, V v)
 
 	assert(g && v);
 
-	for (int i = 0; i < g->vs_num; i++)
+	for (int i = 0; i < g->vs_size; i++)
 	{
 		if ((g->vs[i]) && (g->vs[i]->iner_key == v->iner_key))
 		{
@@ -347,7 +349,7 @@ V MODULE_FUN_NAME(Graph, VnodeSearch)(G g, int (*cmp)(void *arg, void *priv), vo
 
 	assert(g && cmp);
 
-	for (int i = 0; i < g->vs_num; i++)
+	for (int i = 0; i < g->vs_size; i++)
 	{
 		if ((g->vs[i]) && (cmp(g->vs[i]->priv, priv) == 0))
 			return g->vs[i];
@@ -371,8 +373,10 @@ G MODULE_FUN_NAME(Graph, GCreate)(int node_size, int edge_size, void *priv)
 	if (g)
 	{
 		g->priv = priv;
-		g->vs_num = node_size;
-		g->es_num = edge_size;
+		g->vs_num = 0;
+		g->es_num = 0;
+		g->vs_size = node_size;
+		g->es_size = edge_size;
 		g->vs = (V *)(g + 1);
 		g->es = (E *)(g->es + node_size);
 	}
@@ -399,14 +403,17 @@ V MODULE_FUN_NAME(Graph, FirstVnode)(G g)
 {
 	assert(g);
 
-	for (int i = 0; i < g->vs_num; i++)
+	for (int i = 0; i < g->vs_size; i++)
 	{
+//		fprintf(stdout, "%s: g->vs[%d]: %p\n", __func__, i, g->vs[i]);
 		if (g->vs[i] != NULL)
 		{
+//		fprintf(stdout, "%s: g->vs[%d]: %p, return\n", __func__, i, g->vs[i]);
 			return g->vs[i];
 		}
 	}
 
+//	fprintf(stdout, "%s: return NULL\n", __func__);
 	return NULL;
 }
 
@@ -418,16 +425,19 @@ V MODULE_FUN_NAME(Graph, NextVnode)(G g, V v)
 	int i = 0;
 	assert(g && v);
 
-	for (i = 0; i < g->vs_num; i++)
+//	fprintf(stdout, "%s: i: %d, %d   size\n", __func__, i, g->vs_size);
+	for (i = 0; i < g->vs_size; i++)
 	{
-		if ((g->vs[i]->iner_key == v->iner_key))
+//		fprintf(stdout, "%s: i: %d, %p   hello\n", __func__, i, g->vs[i]);
+		if ((g->vs[i] != NULL) && (g->vs[i]->iner_key == v->iner_key))
 		{
 			break;
 		}
 	}
 
-	for (i = i + 1; i < g->vs_num; i++)
+	for (i = i + 1; i < g->vs_size; i++)
 	{
+//		fprintf(stdout, "%s: i: %d, %p\n", __func__, i, g->vs[i]);
 		if (g->vs[i])
 		{
 			return g->vs[i];
@@ -445,21 +455,25 @@ int MODULE_FUN_NAME(Graph, IsLastVnode)(G g, V v)
 	int i = 0;
 	assert(g && v);
 
-	for (i = 0; i < g->vs_num; i++)
+//	fprintf(stdout, "%s: i: %d, %d   size\n", __func__, i, g->vs_size);
+	for (i = 0; i < g->vs_size; i++)
 	{
-		if ((g->vs[i]->iner_key == v->iner_key))
+//	fprintf(stdout, "%s: i: %d, %d  , %p\n", __func__, i, g->vs_size, g->vs[i]);
+		if ((g->vs[i] != NULL) && (g->vs[i]->iner_key == v->iner_key))
 		{
 			break;
 		}
 	}
 
-	if (i >= g->vs_num)
+//	fprintf(stdout, "%s: i: %d, %d  , \n", __func__, i, g->vs_size);
+	if (i >= g->vs_size)
 	{
-		return 0;
+		return 1;
 	}
 
-	for (i = i + 1; i < g->vs_num; i++)
+	for (i = i + 1; i < g->vs_size; i++)
 	{
+//	fprintf(stdout, "%s: i: %d, %d  , %p\n", __func__, i, g->vs_size, g->vs[i]);
 		if (g->vs[i])
 		{
 			return 0;
@@ -477,7 +491,7 @@ E MODULE_FUN_NAME(Graph, FirstEdge)(G g)
 {
 	assert(g);
 
-	for (int i = 0; i < g->es_num; i++)
+	for (int i = 0; i < g->es_size; i++)
 	{
 		if (g->es[i] != NULL)
 		{
@@ -496,7 +510,7 @@ E MODULE_FUN_NAME(Graph, NextEdge)(G g, E e)
 	int i = 0;
 	assert(g && e);
 
-	for (i = 0; i < g->es_num; i++)
+	for (i = 0; i < g->es_size; i++)
 	{
 		if ((g->es[i]== e))
 		{
@@ -504,7 +518,7 @@ E MODULE_FUN_NAME(Graph, NextEdge)(G g, E e)
 		}
 	}
 
-	for (i = i + 1; i < g->es_num; i++)
+	for (i = i + 1; i < g->es_size; i++)
 	{
 		if (g->es[i])
 		{
@@ -523,7 +537,7 @@ int MODULE_FUN_NAME(Graph, IsLastEdge)(G g, E e)
 	int i = 0;
 	assert(g && e);
 
-	for (i = 0; i < g->es_num; i++)
+	for (i = 0; i < g->es_size; i++)
 	{
 		if ((g->es[i] == e))
 		{
@@ -531,12 +545,12 @@ int MODULE_FUN_NAME(Graph, IsLastEdge)(G g, E e)
 		}
 	}
 
-	if (i >= g->es_num)
+	if (i >= g->es_size)
 	{
 		return 0;
 	}
 
-	for (i = i + 1; i < g->es_num; i++)
+	for (i = i + 1; i < g->es_size; i++)
 	{
 		if (g->es[i])
 		{

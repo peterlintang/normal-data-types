@@ -1457,6 +1457,97 @@ static void test_stack(void)
 	MODULE_FUN_NAME(Stack, free)(&s);
 }
 
+#include "gve.h"
+
+static int graph_node_cmp(void *arg, void *priv)
+{
+	int num1 = (int )arg;
+	int num2 = (int )priv;
+
+	if (num1 == num2) return 0;
+	else return -1;
+}
+
+static void test_gve(void)
+{
+#define GRAPH_EDGE_LEN	102400 * 1
+#define GRAPH_NODE_LEN	102400 * 1
+
+	Graph_T g = NULL;
+	Edge_T e = NULL;
+	VNode_T v = NULL;
+	VNode_T prev = NULL;
+	int ret = 0;
+
+	g = MODULE_FUN_NAME(Graph, GCreate)(GRAPH_NODE_LEN, GRAPH_EDGE_LEN, NULL);
+
+	fprintf(stdout, "first\n");
+	for (int i = 0; i < GRAPH_NODE_LEN; i++)
+	{
+		v = MODULE_FUN_NAME(Graph, VnodeCreate)((void *)i);
+		ret = MODULE_FUN_NAME(Graph, VnodeAdd)(g, v);
+		if (ret != 0)
+		{
+			fprintf(stdout, "add node: %d failed\n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v));
+		}
+	}
+
+	for (int i = GRAPH_NODE_LEN - 1; i >= 0; i--)
+	{
+		v = MODULE_FUN_NAME(Graph, VnodeSearch)(g, graph_node_cmp, (void *)i);
+//		fprintf(stdout, "i: %d, v: %p, g: %p\n", i, v, g);
+		ret = MODULE_FUN_NAME(Graph, VnodeRemove)(g, v);
+		if (ret != 0)
+		{
+			fprintf(stdout, "remove node: %d failed\n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v));
+		}
+		else
+		{
+//			fprintf(stdout, "remove node: %d \n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v));
+			MODULE_FUN_NAME(Graph, VnodeFree)(&v);
+		}
+	}
+
+	fprintf(stdout, "second\n");
+	for (int i = 0; i < GRAPH_NODE_LEN; i++)
+	{
+		v = MODULE_FUN_NAME(Graph, VnodeCreate)((void *)i);
+		ret = MODULE_FUN_NAME(Graph, VnodeAdd)(g, v);
+		if (ret != 0)
+		{
+			fprintf(stdout, "add node: %d failed\n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v));
+		}
+	}
+
+	for (v = MODULE_FUN_NAME(Graph, FirstVnode)(g); v != NULL; )
+	{
+		ret = MODULE_FUN_NAME(Graph, VnodeRemove)(g, v);
+		if (ret != 0)
+		{
+			fprintf(stdout, "remove node: %d failed\n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v));
+		}
+		else
+		{
+//			fprintf(stdout, "remove node: %d \n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v));
+		}
+
+		prev = v;
+		if (MODULE_FUN_NAME(Graph, IsLastVnode)(g, v))
+		{
+			fprintf(stdout, "break\n");
+			break;
+		}
+		v = MODULE_FUN_NAME(Graph, NextVnode)(g, v);
+//		fprintf(stdout, "%s: prev: %p, v: %p\n", __func__, prev, v);
+		MODULE_FUN_NAME(Graph, VnodeFree)(&prev);
+//		fprintf(stdout, "%s: prev: %p\n", __func__, prev);
+	}
+//		fprintf(stdout, "%s: prev: %p  tin tin\n", __func__, prev);
+	MODULE_FUN_NAME(Graph, VnodeFree)(&prev);
+
+	MODULE_FUN_NAME(Graph, GFree)(&g);
+}
+
 struct test_routine {
 	void (*call_back)(void);
 	char *name;
@@ -1487,6 +1578,7 @@ struct test_routine my_test_routines[] =
 //		{test_list, "list"},					// ko
 //		{test_queue, "queue"},					// ko
 //		{test_stack, "stack"},					// ko
+		{test_gve, "gve"},					// ko
 		{NULL,NULL},
 };
 
