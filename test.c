@@ -1470,12 +1470,14 @@ static int graph_node_cmp(void *arg, void *priv)
 
 static void test_gve(void)
 {
-#define GRAPH_EDGE_LEN	102400 * 1
-#define GRAPH_NODE_LEN	102400 * 1
+#define GRAPH_EDGE_LEN	1024 * 1
+#define GRAPH_NODE_LEN	1024 * 2
 
 	Graph_T g = NULL;
 	Edge_T e = NULL;
+	Edge_T e_priv = NULL;
 	VNode_T v = NULL;
+	VNode_T u = NULL;
 	VNode_T prev = NULL;
 	int ret = 0;
 
@@ -1495,7 +1497,6 @@ static void test_gve(void)
 	for (int i = GRAPH_NODE_LEN - 1; i >= 0; i--)
 	{
 		v = MODULE_FUN_NAME(Graph, VnodeSearch)(g, graph_node_cmp, (void *)i);
-//		fprintf(stdout, "i: %d, v: %p, g: %p\n", i, v, g);
 		ret = MODULE_FUN_NAME(Graph, VnodeRemove)(g, v);
 		if (ret != 0)
 		{
@@ -1503,47 +1504,78 @@ static void test_gve(void)
 		}
 		else
 		{
-//			fprintf(stdout, "remove node: %d \n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v));
 			MODULE_FUN_NAME(Graph, VnodeFree)(&v);
 		}
 	}
 
 	fprintf(stdout, "second\n");
-	for (int i = 0; i < GRAPH_NODE_LEN; i++)
+	for (int i = 0; i < GRAPH_EDGE_LEN; i++)
 	{
-		v = MODULE_FUN_NAME(Graph, VnodeCreate)((void *)i);
+		v = MODULE_FUN_NAME(Graph, VnodeCreate)((void *)(2 * i));
+		u = MODULE_FUN_NAME(Graph, VnodeCreate)((void *)(2 * i + 1));
+		e = MODULE_FUN_NAME(Graph, EdgeCreate)(v, u, (void *)i);
 		ret = MODULE_FUN_NAME(Graph, VnodeAdd)(g, v);
 		if (ret != 0)
 		{
 			fprintf(stdout, "add node: %d failed\n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v));
 		}
+
+		ret = MODULE_FUN_NAME(Graph, VnodeAdd)(g, u);
+		if (ret != 0)
+		{
+			fprintf(stdout, "add node: %d failed\n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(u));
+		}
+
+		ret = MODULE_FUN_NAME(Graph, EdgeAdd)(g, e);
+		if (ret != 0)
+		{
+			fprintf(stdout, "add edge: %d %p failed\n", (int)MODULE_FUN_NAME(Graph, EdgeGetPriv)(e), e);
+		}
+		else
+		{
+//			fprintf(stdout, "add edge: %d %p \n", (int)MODULE_FUN_NAME(Graph, EdgeGetPriv)(e), e);
+		}
 	}
 
-	for (v = MODULE_FUN_NAME(Graph, FirstVnode)(g); v != NULL; )
+	for (e = MODULE_FUN_NAME(Graph, FirstEdge)(g); e != NULL; e = MODULE_FUN_NAME(Graph, NextEdge)(g, e))
 	{
+		fprintf(stdout, "edge: %d \n", (int)MODULE_FUN_NAME(Graph, EdgeGetPriv)(e));
+		if (MODULE_FUN_NAME(Graph, IsLastEdge)(g, e))
+		{
+			fprintf(stdout, "break: %d \n", (int)MODULE_FUN_NAME(Graph, EdgeGetPriv)(e));
+			break;
+		}
+	}
+
+	for (e = MODULE_FUN_NAME(Graph, FirstEdge)(g); e != NULL; e = MODULE_FUN_NAME(Graph, FirstEdge)(g))
+	{
+		fprintf(stdout, "remove edge: %d \n", (int)MODULE_FUN_NAME(Graph, EdgeGetPriv)(e));
+		ret = MODULE_FUN_NAME(Graph, EdgeRemove)(g, e);
+		if (ret != 0)
+		{
+			fprintf(stdout, "remove edge: %d failed\n", (int)MODULE_FUN_NAME(Graph, EdgeGetPriv)(e));
+		}
+	}
+
+	for (v = MODULE_FUN_NAME(Graph, FirstVnode)(g); v != NULL; v = MODULE_FUN_NAME(Graph, NextVnode)(g, v))
+	{
+		fprintf(stdout, "node: %d \n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v));
+		if (MODULE_FUN_NAME(Graph, IsLastVnode)(g, v))
+		{
+			fprintf(stdout, "break: %d \n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v));
+			break;
+		}
+	}
+
+	for (v = MODULE_FUN_NAME(Graph, FirstVnode)(g); v != NULL; v = MODULE_FUN_NAME(Graph, FirstVnode)(g))
+	{
+		fprintf(stdout, "remove node: %d \n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v));
 		ret = MODULE_FUN_NAME(Graph, VnodeRemove)(g, v);
 		if (ret != 0)
 		{
 			fprintf(stdout, "remove node: %d failed\n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v));
 		}
-		else
-		{
-//			fprintf(stdout, "remove node: %d \n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v));
-		}
-
-		prev = v;
-		if (MODULE_FUN_NAME(Graph, IsLastVnode)(g, v))
-		{
-			fprintf(stdout, "break\n");
-			break;
-		}
-		v = MODULE_FUN_NAME(Graph, NextVnode)(g, v);
-//		fprintf(stdout, "%s: prev: %p, v: %p\n", __func__, prev, v);
-		MODULE_FUN_NAME(Graph, VnodeFree)(&prev);
-//		fprintf(stdout, "%s: prev: %p\n", __func__, prev);
 	}
-//		fprintf(stdout, "%s: prev: %p  tin tin\n", __func__, prev);
-	MODULE_FUN_NAME(Graph, VnodeFree)(&prev);
 
 	MODULE_FUN_NAME(Graph, GFree)(&g);
 }
