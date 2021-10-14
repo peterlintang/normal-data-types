@@ -36,10 +36,10 @@ struct E {
 
 struct G {
 	void *priv;				// 用户数据
-	V *vs;					// 图中顶点
+	V *vs;					// 图中顶点	// can use dlist instead ，但性能估计会差不多
 	int vs_num;				// 图中顶点数目
 	int vs_size;
-	E *es;					// 图中边信息
+	E *es;					// 图中边信息 // can use dlist instead
 	int es_num;				// 图中边数目
 	int es_size;
 };

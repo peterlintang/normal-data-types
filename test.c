@@ -1470,8 +1470,8 @@ static int graph_node_cmp(void *arg, void *priv)
 
 static void test_gve(void)
 {
-#define GRAPH_EDGE_LEN	1024 * 1
-#define GRAPH_NODE_LEN	1024 * 2
+#define GRAPH_EDGE_LEN	10240 * 1
+#define GRAPH_NODE_LEN	10240 * 2
 
 	Graph_T g = NULL;
 	Edge_T e = NULL;
@@ -1600,7 +1600,7 @@ struct test_routine my_test_routines[] =
 //		{test_set, "set"},					// ko
 //		{test_table, "table"},				// ko
 //		{test_seq, "seq"},					// ko
-//		{test_ring, "ring"},
+//		{test_ring, "ring"},				// kko
 //		{test_str, "string"},
 //		{test_xp, "xp"},					// ko
 //		{test_ap2, "ap2"},					// ko
@@ -1610,7 +1610,7 @@ struct test_routine my_test_routines[] =
 //		{test_list, "list"},					// ko
 //		{test_queue, "queue"},					// ko
 //		{test_stack, "stack"},					// ko
-		{test_gve, "gve"},					// ko
+//		{test_gve, "gve"},					// ko
 		{NULL,NULL},
 };
 
