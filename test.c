@@ -1470,8 +1470,8 @@ static int graph_node_cmp(void *arg, void *priv)
 
 static void test_gve(void)
 {
-#define GRAPH_EDGE_LEN	10240 * 1
-#define GRAPH_NODE_LEN	10240 * 2
+#define GRAPH_EDGE_LEN	102400 * 1
+#define GRAPH_NODE_LEN	102400 * 2
 
 	Graph_T g = NULL;
 	Edge_T e = NULL;
@@ -1537,6 +1537,7 @@ static void test_gve(void)
 		}
 	}
 
+#if 0
 	for (e = MODULE_FUN_NAME(Graph, FirstEdge)(g); e != NULL; e = MODULE_FUN_NAME(Graph, NextEdge)(g, e))
 	{
 		fprintf(stdout, "edge: %d \n", (int)MODULE_FUN_NAME(Graph, EdgeGetPriv)(e));
@@ -1576,6 +1577,7 @@ static void test_gve(void)
 			fprintf(stdout, "remove node: %d failed\n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v));
 		}
 	}
+#endif
 
 	MODULE_FUN_NAME(Graph, GFree)(&g);
 }
@@ -1610,7 +1612,7 @@ struct test_routine my_test_routines[] =
 //		{test_list, "list"},					// ko
 //		{test_queue, "queue"},					// ko
 //		{test_stack, "stack"},					// ko
-//		{test_gve, "gve"},					// ko
+		{test_gve, "gve"},					// ko
 		{NULL,NULL},
 };
 

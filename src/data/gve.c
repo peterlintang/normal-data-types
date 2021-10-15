@@ -7,6 +7,7 @@
 
 #include "queue.h"
 #include "gve.h"
+#include "seq.h"
 
 #define V VNode_T
 #define E Edge_T
@@ -36,12 +37,12 @@ struct E {
 
 struct G {
 	void *priv;				// 用户数据
-	V *vs;					// 图中顶点	// can use dlist instead ，但性能估计会差不多
+//	V *vs;					// 图中顶点	// can use dlist instead ，但性能估计会差不多
+	Seq_T vs;
 	int vs_num;				// 图中顶点数目
-	int vs_size;
-	E *es;					// 图中边信息 // can use dlist instead
+//	E *es;					// 图中边信息 // can use dlist instead
+	Seq_T es;					// 图中边信息 // can use dlist instead
 	int es_num;				// 图中边数目
-	int es_size;
 };
 
 
@@ -226,17 +227,10 @@ int MODULE_FUN_NAME(Graph, EdgeAdd)(G g, E e)
 	assert(g && e);
 	assert(e->v && e->u);
 
-	for (int i = 0; i < g->es_size; i++)
-	{
-		if (g->es[i] == NULL)
-		{
-			g->es[i] = e;
-			g->es_num++;
-			return 0;
-		}
-	}
+	MODULE_FUN_NAME(Seq, addhi)(g->es, (void *)e);
+	g->es_num++;
 
-	return -1;
+	return 0;
 }
 
 /*
@@ -249,14 +243,20 @@ int MODULE_FUN_NAME(Graph, EdgeAdd)(G g, E e)
  */
 int MODULE_FUN_NAME(Graph, EdgeRemove)(G g, E e)
 {
+	int len = 0;
+	E edge = NULL;
+
 	assert(g && e);
 	assert(e->v && e->u);
 
-	for (int i = 0; i < g->es_size; i++)
+	len = MODULE_FUN_NAME(Seq, length)(g->es);
+
+	for (int i = 0; i < len; i++)
 	{
-		if ((g->es[i]) && (g->es[i]->v == e->v) && (g->es[i]->u == e->u))
+		edge = (E)MODULE_FUN_NAME(Seq, get)(g->es, i);
+		if ((edge) && (edge->v == e->v) && (edge->u == e->u))
 		{
-			g->es[i] = NULL;
+			MODULE_FUN_NAME(Seq, put)(g->es, i, NULL);
 			g->es_num--;
 			return 0;
 		}
@@ -275,14 +275,18 @@ int MODULE_FUN_NAME(Graph, EdgeRemove)(G g, E e)
 E MODULE_FUN_NAME(Graph, EdgeSearch)(G g, int (*cmp)(void *arg, void *priv), void *priv)
 {
 	E e = NULL;
+	int len = 0;
 
 	assert(g && cmp);
 
-	for (int i = 0; i < g->es_size; i++)
+	len = MODULE_FUN_NAME(Seq, length)(g->es);
+
+	for (int i = 0; i < len; i++)
 	{
-		if ((g->es[i]) && (cmp(g->es[i]->priv, priv) == 0))
+		e = (E)MODULE_FUN_NAME(Seq, get)(g->es, i);
+		if ((e) && (cmp(e->priv, priv) == 0))
 		{
-			return g->es[i];
+			return e;
 		}
 	}
 
@@ -300,17 +304,10 @@ int MODULE_FUN_NAME(Graph, VnodeAdd)(G g, V v)
 	
 	assert(g && v);
 
-	for (int i = 0; i < g->vs_size; i++)
-	{
-		if (g->vs[i] == NULL)
-		{
-			g->vs[i] = v;
-			g->vs_num++;
-			return 0;
-		}
-	}
+	MODULE_FUN_NAME(Seq, addhi)(g->vs, (void *)v);
+	g->vs_num++;
 
-	return -1;
+	return 0;
 }
 
 /*
@@ -321,14 +318,18 @@ int MODULE_FUN_NAME(Graph, VnodeAdd)(G g, V v)
 int MODULE_FUN_NAME(Graph, VnodeRemove)(G g, V v)
 {
 	V node = NULL;
+	int len = 0;
 
 	assert(g && v);
 
-	for (int i = 0; i < g->vs_size; i++)
+	len = MODULE_FUN_NAME(Seq, length)(g->vs);
+
+	for (int i = 0; i < len; i++)
 	{
-		if ((g->vs[i]) && (g->vs[i]->iner_key == v->iner_key))
+		node = (V)MODULE_FUN_NAME(Seq, get)(g->vs, i);
+		if ((node) && (node->iner_key == v->iner_key))
 		{
-			g->vs[i] = NULL;
+			MODULE_FUN_NAME(Seq, put)(g->vs, i, NULL);
 			g->vs_num--;
 			return 0;
 		}
@@ -346,13 +347,17 @@ int MODULE_FUN_NAME(Graph, VnodeRemove)(G g, V v)
 V MODULE_FUN_NAME(Graph, VnodeSearch)(G g, int (*cmp)(void *arg, void *priv), void *priv)
 {
 	V node = NULL;
+	int len = 0;
 
 	assert(g && cmp);
 
-	for (int i = 0; i < g->vs_size; i++)
+	len = MODULE_FUN_NAME(Seq, length)(g->vs);
+
+	for (int i = 0; i < len; i++)
 	{
-		if ((g->vs[i]) && (cmp(g->vs[i]->priv, priv) == 0))
-			return g->vs[i];
+		node = (V)MODULE_FUN_NAME(Seq, get)(g->vs, i);
+		if ((node) && (cmp(node->priv, priv) == 0))
+			return node;
 	}
 
 	return NULL;
@@ -372,12 +377,12 @@ G MODULE_FUN_NAME(Graph, GCreate)(int node_size, int edge_size, void *priv)
 	g = (G)calloc(1, sizeof(*g)); 
 	if (g)
 	{
-		g->vs = (V *)calloc(1, node_size * sizeof(V));
-	    g->es = (E *)calloc(1, edge_size * sizeof(E));
+		g->vs = (Seq_T)MODULE_FUN_NAME(Seq, new)(node_size);
+		g->es = (Seq_T)MODULE_FUN_NAME(Seq, new)(edge_size);
 		if (g->vs == NULL || g->es == NULL)
 		{
-			if (g->vs) free(g->vs);
-			if (g->es) free(g->es);
+			if (g->vs) MODULE_FUN_NAME(Seq, free)(&(g->vs));
+			if (g->es) MODULE_FUN_NAME(Seq, free)(&(g->es));
 			free(g);
 		}
 		else
@@ -385,8 +390,6 @@ G MODULE_FUN_NAME(Graph, GCreate)(int node_size, int edge_size, void *priv)
 			g->priv = priv;
 			g->vs_num = 0;
 			g->es_num = 0;
-			g->vs_size = node_size;
-			g->es_size = edge_size;
 		}
 	}
 
@@ -401,10 +404,54 @@ void MODULE_FUN_NAME(Graph, GFree)(G *gp)
 {
 	assert(gp && *gp);
 
+	MODULE_FUN_NAME(Array, free)(&((*gp)->vs));
+	MODULE_FUN_NAME(Array, free)(&((*gp)->es));
 	free(*gp);
 	*gp = NULL;
 }
 
+
+
+/***********************************util****************************/
+/*
+ * 打印节点信息
+ */
+void MODULE_FUN_NAME(Graph, VnodePrint)(V v, int (*print)(V v, void *priv), void *priv)
+{
+}
+
+/*
+ * 打印边信息
+ */
+void MODULE_FUN_NAME(Graph, EdgePrint)(E e, int (*print)(E e, void *priv), void *priv)
+{
+}
+
+/*
+ * 打印图信息
+ */
+void MODULE_FUN_NAME(Graph, GPrint)(G g, int (*print)(G g, void *priv), void *priv)
+{
+}
+
+/*
+ * test code
+
+int main(int argc, char *argv[])
+{
+	struct G *g = NULL;
+
+	g = G_create();
+	G_print(g);
+
+	return 0;
+}
+
+*/
+
+
+
+#if 0
 /*
  * 返回图g的第一个节点;
  */
@@ -572,42 +619,7 @@ void **MODULE_FUN_NAME(Graph, VnodeToArray)(G g, void *priv)
 {
 }
 
-/***********************************util****************************/
-/*
- * 打印节点信息
- */
-void MODULE_FUN_NAME(Graph, VnodePrint)(V v, int (*print)(V v, void *priv), void *priv)
-{
-}
-
-/*
- * 打印边信息
- */
-void MODULE_FUN_NAME(Graph, EdgePrint)(E e, int (*print)(E e, void *priv), void *priv)
-{
-}
-
-/*
- * 打印图信息
- */
-void MODULE_FUN_NAME(Graph, GPrint)(G g, int (*print)(G g, void *priv), void *priv)
-{
-}
-
-/*
- * test code
-
-int main(int argc, char *argv[])
-{
-	struct G *g = NULL;
-
-	g = G_create();
-	G_print(g);
-
-	return 0;
-}
-
-*/
+#endif
 
 
 
