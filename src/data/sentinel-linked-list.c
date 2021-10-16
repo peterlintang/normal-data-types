@@ -175,6 +175,24 @@ unsigned int MODULE_FUN_NAME(SenDlink, count)(T l)
 	return l->count;
 }
 
+void *MODULE_FUN_NAME(SenDlink, get)(T l, int i)
+{
+	int len = 0;
+	NODE cur = NULL;
+
+	assert(l);
+	assert(i >= 0);
+
+	len = MODULE_FUN_NAME(SenDlink, count)(l);
+
+	assert(i < len);
+	for (cur = l->nil.next; i != 0; i--, cur = cur->next)
+	{
+	}
+
+	return cur->key;
+}
+
 
 /*
  * @fun 返回0表示成功，遍历继续；返回非0失败，遍历停止

@@ -95,6 +95,14 @@ int MODULE_FUN_NAME(SenDlink, delete_by_index)(T l, unsigned int index);
  * */
 unsigned int MODULE_FUN_NAME(SenDlink, count)(T l);
 
+/*
+ * 获取@l中第@i个元素
+ * 0 <= i < (count)
+ * l: 链表
+ * i: 索引
+ */
+void *MODULE_FUN_NAME(SenDlink, get)(T l, int i);
+
 /**
  * * _SenDlink_search
  * *@brief 在带哨兵的双向链表结构中，遍历每个元素，并对每个元素调用fun
