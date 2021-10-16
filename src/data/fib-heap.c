@@ -29,7 +29,22 @@ struct T {
 	void *infinite;
 };
 
-static void print_info(NODE node);
+#if 0
+static void print_info(NODE node)
+{
+	NODE start = NULL;
+	fprintf(stdout, "%s: %p\n", __func__, node);
+	for (start = node; start != NULL; start = start->right)
+	{
+		fprintf(stdout, "node %p, right: %p, left: %p, p: %p, priv: %d\n", 
+						start, start->right, start->left, start->p, (int)start->priv);
+		if (start->right == node)
+		{
+			break;
+		}
+	}
+}
+#endif
 
 static int default_cmp(void *arg1, void *arg2)
 {
@@ -344,20 +359,6 @@ NODE MODULE_FUN_NAME(FibHeap, minmum)(T h)
 	return h->min;
 }
 
-static void print_info(NODE node)
-{
-	NODE start = NULL;
-	fprintf(stdout, "%s: %p\n", __func__, node);
-	for (start = node; start != NULL; start = start->right)
-	{
-		fprintf(stdout, "node %p, right: %p, left: %p, p: %p, priv: %d\n", 
-						start, start->right, start->left, start->p, (int)start->priv);
-		if (start->right == node)
-		{
-			break;
-		}
-	}
-}
 
 NODE MODULE_FUN_NAME(FibHeap, extractMin)(T h)
 {

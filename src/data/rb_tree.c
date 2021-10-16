@@ -480,7 +480,7 @@ void MODULE_FUN_NAME(RB_Tree, free)(T *treep)
 
 	while ((node = (tree->root)) != tree->nil)
 	{
-		fprintf(stdout, "delete node: %d\n", (int)node->priv);
+//		fprintf(stdout, "delete node: %d\n", (int)node->priv);
 		MODULE_FUN_NAME(RB_Tree, delete)(tree, node);
 		free(node);
 		node = NULL;

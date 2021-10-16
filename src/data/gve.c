@@ -451,8 +451,8 @@ void MODULE_FUN_NAME(Graph, GFree)(G *gp)
 	fprintf(stdout, "es free\n");
 #endif 
 
-	MODULE_FUN_NAME(Array, free)(&((*gp)->vs));
-	MODULE_FUN_NAME(Array, free)(&((*gp)->es));
+	MODULE_FUN_NAME(Seq, free)(&((*gp)->vs));
+	MODULE_FUN_NAME(Seq, free)(&((*gp)->es));
 	free(*gp);
 	*gp = NULL;
 }
