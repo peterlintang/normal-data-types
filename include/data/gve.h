@@ -138,6 +138,13 @@ E MODULE_FUN_NAME(Graph, EdgeSearch)(G g, int (*cmp)(void *, void *), void *priv
 E MODULE_FUN_NAME(Graph, EdgeGet)(G g, int i);
 
 /*
+ * 根据i设置edge，返回旧指针
+ * g:	图
+ * i:   下标
+ */
+E MODULE_FUN_NAME(Graph, EdgePut)(G g, int i, E e);
+
+/*
  * 获取图g edges 数组的长度
  * g:	图
  */
@@ -171,6 +178,13 @@ V MODULE_FUN_NAME(Graph, VnodeSearch)(G g, int (*cmp)(void *, void *), void *pri
  * i:   下标
  */
 V MODULE_FUN_NAME(Graph, VnodeGet)(G g, int i);
+
+/*
+ * 根据i设置vnode，返回指针
+ * g:	图
+ * i:   下标
+ */
+V MODULE_FUN_NAME(Graph, VnodePut)(G g, int i, V v);
 
 /*
  * 获取图g vnodes 数组的长度

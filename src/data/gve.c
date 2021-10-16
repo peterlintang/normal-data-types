@@ -290,6 +290,12 @@ E MODULE_FUN_NAME(Graph, EdgeGet)(G g, int i)
 	return (E)MODULE_FUN_NAME(Seq, get)(g->es, i);
 }
 
+E MODULE_FUN_NAME(Graph, EdgePut)(G g, int i, E e)
+{
+	assert(g);
+	return (E)MODULE_FUN_NAME(Seq, put)(g->es, i, (void *)e);
+}
+
 int MODULE_FUN_NAME(Graph, EdgesLength)(G g)
 {
 	assert(g);
@@ -370,6 +376,12 @@ V MODULE_FUN_NAME(Graph, VnodeGet)(G g, int i)
 {
 	assert(g);
 	return (E)MODULE_FUN_NAME(Seq, get)(g->vs, i);
+}
+
+V MODULE_FUN_NAME(Graph, VnodePut)(G g, int i, V v)
+{
+	assert(g);
+	return (E)MODULE_FUN_NAME(Seq, put)(g->vs, i, (void *)v);
 }
 
 int MODULE_FUN_NAME(Graph, VnodesLength)(G g)
