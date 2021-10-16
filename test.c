@@ -1483,6 +1483,7 @@ static void test_gve(void)
 
 	g = MODULE_FUN_NAME(Graph, GCreate)(GRAPH_NODE_LEN, GRAPH_EDGE_LEN, NULL);
 
+	/*
 	fprintf(stdout, "first\n");
 	for (int i = 0; i < GRAPH_NODE_LEN; i++)
 	{
@@ -1507,6 +1508,7 @@ static void test_gve(void)
 			MODULE_FUN_NAME(Graph, VnodeFree)(&v);
 		}
 	}
+	*/
 
 	fprintf(stdout, "second\n");
 	for (int i = 0; i < GRAPH_EDGE_LEN; i++)
@@ -1535,6 +1537,29 @@ static void test_gve(void)
 		{
 //			fprintf(stdout, "add edge: %d %p \n", (int)MODULE_FUN_NAME(Graph, EdgeGetPriv)(e), e);
 		}
+	}
+
+	int len = 0;
+	len = MODULE_FUN_NAME(Graph, EdgesLength)(g);
+	fprintf(stdout, "edges len: %d\n", len);
+	for (int i = 0; i < len; i++)
+	{
+		e = (Edge_T)MODULE_FUN_NAME(Graph, EdgeGet)(g, i);
+		if (e == NULL) continue;
+		fprintf(stdout, "edge: %d %p \n", (int)MODULE_FUN_NAME(Graph, EdgeGetPriv)(e), e);
+		MODULE_FUN_NAME(Graph, EdgeRemove)(g, e);
+		MODULE_FUN_NAME(Graph, EdgeFree)(&e);
+	}
+
+	len = MODULE_FUN_NAME(Graph, VnodesLength)(g);
+	fprintf(stdout, "nodes len: %d\n", len);
+	for (int i = 0; i < len; i++)
+	{
+		v = (VNode_T)MODULE_FUN_NAME(Graph, VnodeGet)(g, i);
+		if (v == NULL) continue;
+		fprintf(stdout, "vnode: %d %p \n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v), v);
+		MODULE_FUN_NAME(Graph, VnodeRemove)(g, v);
+		MODULE_FUN_NAME(Graph, VnodeFree)(&v);
 	}
 
 #if 0
