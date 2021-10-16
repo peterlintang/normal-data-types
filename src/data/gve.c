@@ -375,13 +375,13 @@ V MODULE_FUN_NAME(Graph, VnodeSearch)(G g, int (*cmp)(void *arg, void *priv), vo
 V MODULE_FUN_NAME(Graph, VnodeGet)(G g, int i)
 {
 	assert(g);
-	return (E)MODULE_FUN_NAME(Seq, get)(g->vs, i);
+	return (V)MODULE_FUN_NAME(Seq, get)(g->vs, i);
 }
 
 V MODULE_FUN_NAME(Graph, VnodePut)(G g, int i, V v)
 {
 	assert(g);
-	return (E)MODULE_FUN_NAME(Seq, put)(g->vs, i, (void *)v);
+	return (V)MODULE_FUN_NAME(Seq, put)(g->vs, i, (void *)v);
 }
 
 int MODULE_FUN_NAME(Graph, VnodesLength)(G g)
