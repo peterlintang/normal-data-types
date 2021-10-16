@@ -18,14 +18,6 @@ static int iner_key = 0;
 struct V {
 	int iner_key;			// 内部分配的记录节点，每个节点的iner_key不一样
 	void *priv;				// 用户的数据 (信息)
-//	int color;				// 颜色 白 灰 黑三者之一
-
-//	int d;					// 不太记得用途了，后面看能否补充注释
-//	int f;					// 不太记得用途了，后面看能否补充
-//	V p;					// 前驱节点,有的话
-
-//	SenDlink_T l;			// 以此节点为边的一个节点的边,对于有向节点，以@v为开始节点，以边中的另一节点为终止节点
-//	int e_num;				// 以此节点为边的一个节点的边的数量,
 };
 
 
@@ -37,12 +29,10 @@ struct E {
 
 struct G {
 	void *priv;				// 用户数据
-//	V *vs;					// 图中顶点	// can use dlist instead ，但性能估计会差不多
 	Seq_T vs;
-	int vs_num;				// 图中顶点数目
-//	E *es;					// 图中边信息 // can use dlist instead
+	int vs_num;				// 图中顶点数组大小
 	Seq_T es;					// 图中边信息 // can use dlist instead
-	int es_num;				// 图中边数目
+	int es_num;				// 图中边数组大小
 };
 
 
@@ -228,7 +218,7 @@ int MODULE_FUN_NAME(Graph, EdgeAdd)(G g, E e)
 	assert(e->v && e->u);
 
 	MODULE_FUN_NAME(Seq, addhi)(g->es, (void *)e);
-	g->es_num++;
+//	g->es_num++;
 
 	return 0;
 }
@@ -257,7 +247,7 @@ int MODULE_FUN_NAME(Graph, EdgeRemove)(G g, E e)
 		if ((edge) && (edge->v == e->v) && (edge->u == e->u))
 		{
 			MODULE_FUN_NAME(Seq, put)(g->es, i, NULL);
-			g->es_num--;
+//			g->es_num--;
 			return 0;
 		}
 	}
@@ -293,6 +283,18 @@ E MODULE_FUN_NAME(Graph, EdgeSearch)(G g, int (*cmp)(void *arg, void *priv), voi
 	return NULL;
 }
 
+E MODULE_FUN_NAME(Graph, EdgeGet)(G g, int i)
+{
+	assert(g);
+	return (E)MODULE_FUN_NAME(Seq, get)(g->es, i);
+}
+
+int MODULE_FUN_NAME(Graph, EdgesLength)(G g)
+{
+	assert(g);
+	return g->es_num;
+}
+
 /*
  * 将节点@v添加到图@g中，成功返回0，失败-1；
  * g: 图
@@ -305,7 +307,7 @@ int MODULE_FUN_NAME(Graph, VnodeAdd)(G g, V v)
 	assert(g && v);
 
 	MODULE_FUN_NAME(Seq, addhi)(g->vs, (void *)v);
-	g->vs_num++;
+//	g->vs_num++;
 
 	return 0;
 }
@@ -330,7 +332,7 @@ int MODULE_FUN_NAME(Graph, VnodeRemove)(G g, V v)
 		if ((node) && (node->iner_key == v->iner_key))
 		{
 			MODULE_FUN_NAME(Seq, put)(g->vs, i, NULL);
-			g->vs_num--;
+//			g->vs_num--;
 			return 0;
 		}
 	}
@@ -363,6 +365,18 @@ V MODULE_FUN_NAME(Graph, VnodeSearch)(G g, int (*cmp)(void *arg, void *priv), vo
 	return NULL;
 }
 
+V MODULE_FUN_NAME(Graph, VnodeGet)(G g, int i)
+{
+	assert(g);
+	return (E)MODULE_FUN_NAME(Seq, get)(g->vs, i);
+}
+
+int MODULE_FUN_NAME(Graph, VnodesLength)(G g)
+{
+	assert(g);
+	return g->vs_num;
+}
+
 /*
  * 创建一个最大包含@size个节点的图,成功返回指针，失败NULL
  * @size: 图中最大节点数目
@@ -388,8 +402,8 @@ G MODULE_FUN_NAME(Graph, GCreate)(int node_size, int edge_size, void *priv)
 		else
 		{
 			g->priv = priv;
-			g->vs_num = 0;
-			g->es_num = 0;
+			g->vs_num = node_size;
+			g->es_num = edge_size;
 		}
 	}
 

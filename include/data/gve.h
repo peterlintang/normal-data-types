@@ -131,6 +131,19 @@ int MODULE_FUN_NAME(Graph, EdgeRemove)(G g, E e);
 E MODULE_FUN_NAME(Graph, EdgeSearch)(G g, int (*cmp)(void *, void *), void *priv);
 
 /*
+ * 根据i获取edge，返回其指针
+ * g:	图
+ * i:   下标
+ */
+E MODULE_FUN_NAME(Graph, EdgeGet)(G g, int i);
+
+/*
+ * 获取图g edges 数组的长度
+ * g:	图
+ */
+int MODULE_FUN_NAME(Graph, EdgesLength)(G g);
+
+/*
  * 将节点@v添加到图@g中，成功返回0，失败-1；
  * g: 图
  * v: 节点
@@ -153,6 +166,19 @@ int MODULE_FUN_NAME(Graph, VnodeRemove)(G g, V v);
 V MODULE_FUN_NAME(Graph, VnodeSearch)(G g, int (*cmp)(void *, void *), void *priv);
 
 /*
+ * 根据i获取vnode，返回其指针
+ * g:	图
+ * i:   下标
+ */
+V MODULE_FUN_NAME(Graph, VnodeGet)(G g, int i);
+
+/*
+ * 获取图g vnodes 数组的长度
+ * g:	图
+ */
+int MODULE_FUN_NAME(Graph, VnodesLength)(G g);
+
+/*
  * 创建一个最大包含@size个节点的图,成功返回指针，失败NULL
  * @node_size: 图中最大节点数目
  * @edge_size: 图中最大边数目
@@ -166,36 +192,6 @@ G MODULE_FUN_NAME(Graph, GCreate)(int node_size, int edge_size, void *priv);
  */
 void MODULE_FUN_NAME(Graph, GFree)(G *gp);
 
-/*
- * 返回图g的第一个节点
- */
-V MODULE_FUN_NAME(Graph, FirstVnode)(G g);
-
-/*
- * 返回图g中v后面的节点，若没有则返回NULL
- */
-V MODULE_FUN_NAME(Graph, NextVnode)(G g, V v);
-
-/*
- * 判断v是否为g中最后一个节点，是返回1， 不是返回0
- */
-int MODULE_FUN_NAME(Graph, IsLastVnode)(G g, V v);
-
-
-/*
- * 返回图g的第一条边
- */
-E MODULE_FUN_NAME(Graph, FirstEdge)(G g);
-
-/*
- * 返回图g中e后面的边，若没有则返回NULL
- */
-E MODULE_FUN_NAME(Graph, NextEdge)(G g, E e);
-
-/*
- * 判断e是否为g中最后一条边，是返回1， 不是返回0
- */
-int MODULE_FUN_NAME(Graph, IsLastEdge)(G g, E e);
 
 
 void **MODULE_FUN_NAME(Graph, EdgeToArray)(G g, void *priv);
@@ -218,6 +214,41 @@ void MODULE_FUN_NAME(Graph, EdgePrint)(E e, int (*print)(E e, void *priv), void 
  * 打印图信息
  */
 void MODULE_FUN_NAME(Graph, GPrint)(G g, int (*print)(G g, void *priv), void *priv);
+
+#if 0
+
+/*
+ * 返回图g的第一个节点
+ */
+V MODULE_FUN_NAME(Graph, FirstVnode)(G g);
+
+/*
+ * 返回图g中v后面的节点，若没有则返回NULL
+ */
+V MODULE_FUN_NAME(Graph, NextVnode)(G g, V v);
+
+/*
+ * 判断v是否为g中最后一个节点，是返回1， 不是返回0
+ */
+int MODULE_FUN_NAME(Graph, IsLastVnode)(G g, V v);
+
+/*
+ * 返回图g的第一条边
+ */
+E MODULE_FUN_NAME(Graph, FirstEdge)(G g);
+
+/*
+ * 返回图g中e后面的边，若没有则返回NULL
+ */
+E MODULE_FUN_NAME(Graph, NextEdge)(G g, E e);
+
+/*
+ * 判断e是否为g中最后一条边，是返回1， 不是返回0
+ */
+int MODULE_FUN_NAME(Graph, IsLastEdge)(G g, E e);
+
+#endif 
+
 
 #undef V
 #undef E
