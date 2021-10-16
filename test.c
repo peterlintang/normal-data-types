@@ -1607,6 +1607,88 @@ static void test_gve(void)
 	MODULE_FUN_NAME(Graph, GFree)(&g);
 }
 
+
+#include "gve_array.h"
+
+static int graphA_node_cmp(void *arg, void *priv)
+{
+	int num1 = (int )arg;
+	int num2 = (int )priv;
+
+	if (num1 == num2) return 0;
+	else return -1;
+}
+
+static void test_gve_array(void)
+{
+#define GVE_A_NODE_LEN	10240000 * 2
+#define GVE_A_EDGE_LEN	10240000
+	struct node_ext {
+		int index;
+		int value;
+	};
+	struct edge_ext {
+		int value;
+		int d;
+		int f;
+	};
+
+#define GVE_A_NODE_SIZE	sizeof(struct node_ext)
+#define GVE_A_EDGE_SIZE	sizeof(struct edge_ext)
+
+	GraphA_T g = NULL;
+	int len = 0;
+	struct node_ext *node_p = NULL;
+	struct node_ext *node_v = NULL;
+	struct node_ext *node_u = NULL;
+	struct node_ext node;
+	EdgeA_T edge = NULL;
+	struct edge_ext *edge_ext_p = NULL;
+
+	fprintf(stdout, "node size: %d, len: %d, edge size: %d, len: %d\n", GVE_A_NODE_SIZE, GVE_A_NODE_LEN, GVE_A_EDGE_SIZE, GVE_A_EDGE_LEN);
+
+	g = MODULE_FUN_NAME(GraphA, create)(GVE_A_NODE_SIZE, GVE_A_NODE_LEN, GVE_A_EDGE_SIZE, GVE_A_EDGE_LEN, NULL);
+
+	len = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
+	fprintf(stdout, "vnodes len: %d\n", len);
+	for (int i = 0; i < len; i++)
+	{
+		node.index = i;
+		node.value = i;
+		MODULE_FUN_NAME(GraphA, VnodePut)(g, i, (void *)&node);
+		node_p = (struct node_ext *)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
+//		fprintf(stdout, "i: %d, index: %d, value: %d, node: %p\n", i, node_p->index, node_p->value, node_p);
+	}
+
+	len = MODULE_FUN_NAME(GraphA, EdgesLength)(g);
+	fprintf(stdout, "edges len: %d\n", len);
+	for (int i = 0; i < len; i++)
+	{
+		edge = (EdgeA_T)MODULE_FUN_NAME(GraphA, EdgeGet)(g, i);
+		node_v = (struct node_ext *)MODULE_FUN_NAME(GraphA, VnodeGet)(g, 2 * i);
+		node_u = (struct node_ext *)MODULE_FUN_NAME(GraphA, VnodeGet)(g, 2 * i + 1);
+		MODULE_FUN_NAME(GraphA, EdgeSetVnodes)(edge, (void *)node_v, (void *)node_u, NULL, NULL);
+		edge_ext_p = (struct edge_ext *)MODULE_FUN_NAME(GraphA, EdgeGetPriv)(edge);
+		edge_ext_p->value = i;
+		edge_ext_p->d = i;
+		edge_ext_p->f = i;
+		fprintf(stdout, "i: %d, value: %d, d: %d, f: %d, v: %p, u: %p, edge: %p, ext: %p\n", 
+						i, edge_ext_p->value, edge_ext_p->d, edge_ext_p->f, node_v, node_u, edge, edge_ext_p);
+	}
+
+	fprintf(stdout, "edges: third\n");
+	for (int i = 0; i < len; i++)
+	{
+		edge = (EdgeA_T)MODULE_FUN_NAME(GraphA, EdgeGet)(g, i);
+		edge_ext_p = MODULE_FUN_NAME(GraphA, EdgeGetPriv)(edge);
+		MODULE_FUN_NAME(GraphA, EdgeGetVnodes)(edge, (void **)&node_v, (void **)&node_u);
+		fprintf(stdout, "i: %d, value: %d, d: %d, f: %d, v: %p, u: %p, edge: %p, ext: %p\n", 
+						i, edge_ext_p->value, edge_ext_p->d, edge_ext_p->f, node_v, node_u, edge, edge_ext_p);
+	}
+
+	MODULE_FUN_NAME(GraphA, free)(&g);
+}
+
 struct test_routine {
 	void (*call_back)(void);
 	char *name;
@@ -1637,7 +1719,8 @@ struct test_routine my_test_routines[] =
 //		{test_list, "list"},					// ko
 //		{test_queue, "queue"},					// ko
 //		{test_stack, "stack"},					// ko
-		{test_gve, "gve"},					// ko
+//		{test_gve, "gve"},					// ko
+//		{test_gve_array, "gve_array"},					// ko
 		{NULL,NULL},
 };
 
