@@ -2,6 +2,7 @@
 /*
  * 实现图基本数据结构
  */
+#include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 
@@ -417,6 +418,26 @@ G MODULE_FUN_NAME(Graph, GCreate)(int node_size, int edge_size, void *priv)
 void MODULE_FUN_NAME(Graph, GFree)(G *gp)
 {
 	assert(gp && *gp);
+
+#if 0 // test
+	int len = 0;
+
+	fprintf(stdout, "vs free\n");
+	len = MODULE_FUN_NAME(Seq, length)((*gp)->vs);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "vs: %d, %p\n", i, MODULE_FUN_NAME(Seq, get)((*gp)->vs, i));
+	}
+	fprintf(stdout, "vs free\n");
+
+	fprintf(stdout, "es free\n");
+	len = MODULE_FUN_NAME(Seq, length)((*gp)->es);
+	for (int i = 0; i < len; i++)
+	{
+		fprintf(stdout, "es: %d, %p\n", i, MODULE_FUN_NAME(Seq, get)((*gp)->es, i));
+	}
+	fprintf(stdout, "es free\n");
+#endif 
 
 	MODULE_FUN_NAME(Array, free)(&((*gp)->vs));
 	MODULE_FUN_NAME(Array, free)(&((*gp)->es));
