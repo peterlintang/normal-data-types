@@ -1689,6 +1689,68 @@ static void test_gve_array(void)
 	MODULE_FUN_NAME(GraphA, free)(&g);
 }
 
+
+#include "sentinel-linked-list.h"
+
+static int sen_link_cmp(void *arg, void *key)
+{
+	int num1 = 0;
+	int num2 = 0;
+
+	num1 = (int )arg;
+	num2 = (int )key;
+
+//	fprintf(stdout, "%s: num1: %d, num2: %d\n", __func__, num1, num2);
+
+	if (num1 == num2) return 0;
+	else return -1;
+}
+
+static  void test_sential_list(void)
+{
+#define SENDLINK_ITEM_LEN	102400
+	SenDlink_T senLink = NULL;
+	int ret = 0;
+	int value = 0;
+	int *out = NULL;
+
+	senLink = MODULE_FUN_NAME(SenDlink, create)();
+
+	fprintf(stdout, "first\n");
+	for (int i = 0; i < SENDLINK_ITEM_LEN; i++)
+	{
+		MODULE_FUN_NAME(SenDlink, insert)(senLink, (void *)i);
+	}
+
+	for (int i = 0; i < SENDLINK_ITEM_LEN; i++)
+	{
+		value = random() % SENDLINK_ITEM_LEN;
+		ret = MODULE_FUN_NAME(SenDlink, search)(senLink, sen_link_cmp, (void *)value, (void **)&out);
+		if (ret != 0 || (int)out != value)
+		{
+			fprintf(stdout, "search: %d, failed, ret: %d, out: %d\n", value, ret, (int)out);
+		}
+	}
+
+	fprintf(stdout, "second\n");
+	for (int i = 0; i < SENDLINK_ITEM_LEN - 10; i++)
+	{
+		MODULE_FUN_NAME(SenDlink, delete)(senLink, sen_link_cmp, (void *)i);
+		ret = MODULE_FUN_NAME(SenDlink, count)(senLink);
+//		fprintf(stdout, "count: %d\n", ret);
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+//		fprintf(stdout, "i: %d\n", i);
+		ret = MODULE_FUN_NAME(SenDlink, count)(senLink);
+//		fprintf(stdout, "count: %d\n", ret);
+		MODULE_FUN_NAME(SenDlink, delete_by_index)(senLink, 0);
+	}
+
+	MODULE_FUN_NAME(SenDlink, destroy)(&senLink);
+}
+
 struct test_routine {
 	void (*call_back)(void);
 	char *name;
@@ -1721,6 +1783,7 @@ struct test_routine my_test_routines[] =
 //		{test_stack, "stack"},					// ko
 //		{test_gve, "gve"},					// ko
 //		{test_gve_array, "gve_array"},					// ko
+		{test_sential_list, "sential_list"},					// ko
 		{NULL,NULL},
 };
 
