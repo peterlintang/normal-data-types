@@ -1772,7 +1772,6 @@ struct test_routine my_test_routines[] =
 //		{test_table, "table"},				// ko
 //		{test_seq, "seq"},					// ko
 //		{test_ring, "ring"},				// kko
-//		{test_str, "string"},
 //		{test_xp, "xp"},					// ko
 //		{test_ap2, "ap2"},					// ko
 //		{test_rb, "rb_tree"},				// ko
@@ -1783,7 +1782,14 @@ struct test_routine my_test_routines[] =
 //		{test_stack, "stack"},					// ko
 //		{test_gve, "gve"},					// ko
 //		{test_gve_array, "gve_array"},					// ko
-		{test_sential_list, "sential_list"},					// ko
+//		{test_sential_list, "sential_list"},					// ko
+//		{test_mp, "mp"},
+//		{test_text, "text"},
+//		{test_str, "string"},
+//		{test_b_tree, "b_tree"},
+//		{test_db, "db"},
+//		{test_sbit, "sbit"},					// ko 其他地方验证过ok
+//		{test_ring_buf, "ring_buf"},			// ko 其他地方验证过ok
 		{NULL,NULL},
 };
 
