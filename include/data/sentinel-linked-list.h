@@ -44,12 +44,14 @@ void MODULE_FUN_NAME(SenDlink, destroy)(T *pl);
  * * _SenDlink_search
  * *@brief 在带哨兵的双向链表结构中，根据@key关键字查找;
  * *@param [in] pl 双向链表头部的指针的指针, key 关键字
+ * cmp: 比较函数，相等返回0，非0不相等,
+ * out: 输出函数，返回指针给用户,找不到不变
  * *@param [out] 无
  * *@return 返回值 0 成功
  * * - 成功：0
  * * - 其他：失败,
  * */
-int MODULE_FUN_NAME(SenDlink, search)(T l, void *key);
+int MODULE_FUN_NAME(SenDlink, search)(T l, int (*cmp)(void *, void *), void *key, void **out);
 
 /**
  * * _SenDlink_search
@@ -66,12 +68,13 @@ int MODULE_FUN_NAME(SenDlink, insert)(T l, void *key);
  * * _SenDlink_search
  * *@brief 在带哨兵的双向链表结构中，根据@key关键字删除元素;
  * *@param [in] pl 双向链表头部的指针的指针, key 关键字
+ * *@param [in] cmp: 比较函数,相同返回0，不同-1
  * *@param [out] 无
  * *@return 返回值 0 成功
  * * - 成功：0
  * * - 其他：失败,
  * */
-int MODULE_FUN_NAME(SenDlink, delete)(T l, void *key);
+int MODULE_FUN_NAME(SenDlink, delete)(T l, int (*cmp)(void *, void *), void *key);
 
 /**
  * * _SenDlink_search

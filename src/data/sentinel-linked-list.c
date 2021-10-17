@@ -63,21 +63,26 @@ void MODULE_FUN_NAME(SenDlink, destroy)(T *pl)
 }
 
 
-int MODULE_FUN_NAME(SenDlink, search)(T l, void *key)
+int MODULE_FUN_NAME(SenDlink, search)(T l, int (*cmp)(void *, void *), void *key, void **out)
 {
 	NODE x = NULL;
 
 	assert(l);
-	assert(key);
+//	assert(key);
+	assert(cmp);
 
 	x = l->nil.next;
-	while ((x != &(l->nil)) && (x->key != key))
+	while ((x != &(l->nil)) && cmp(x->key, key) != 0)
 		x = x->next;
+
 
 	if (x == NULL)
 		return -1;
 	else
+	{
+		if (out) *out = x->key;
 		return 0;
+	}
 }
 
 int MODULE_FUN_NAME(SenDlink, insert)(T l, void *key)
@@ -106,16 +111,17 @@ int MODULE_FUN_NAME(SenDlink, insert)(T l, void *key)
 	}
 }
 
-int MODULE_FUN_NAME(SenDlink, delete)(T l, void *key)
+int MODULE_FUN_NAME(SenDlink, delete)(T l, int (*cmp)(void *, void *), void *key)
 {
 	NODE cur = NULL;
 
 	assert(l);
+	assert(cmp);
 //	assert(key);
 
 	for (cur = l->nil.next; cur != &(l->nil); cur = cur->next)
 	{
-		if (cur->key == key)
+		if (cmp(cur->key, key) == 0)
 			break;
 	}
 
