@@ -82,7 +82,7 @@ int MODULE_FUN_NAME(ProcessLockCond, releaseLock)(T plc);
  * return value: 
  * args: @: 
  */
-int broadcast_process_cond(T plc);
+int MODULE_FUN_NAME(ProcessLockCond, broadcast)(T plc);
 
 /*
  * name: MODULE_FUN_NAME(ProcessLockCond, signal)

@@ -285,7 +285,7 @@ int MODULE_FUN_NAME(ProcessLockCond, signal)(T plc)
  * return value: 
  * args: @: 
  */
-int broadcast_process_cond(T plc)
+int MODULE_FUN_NAME(ProcessLockCond, broadcast)(T plc)
 {
 	assert(plc != NULL);
 
