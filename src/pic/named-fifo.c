@@ -91,7 +91,7 @@ int MODULE_FUN_NAME(NamedFifo, destroy)(const char *pathname)
  * args: @pathname: path of named fifo
  * 		 @mode: 
  */
-T open_named_fifo(const char *pathname, mode_t mode)
+T MODULE_FUN_NAME(NamedFifo, open)(const char *pathname, mode_t mode)
 {
 	T nfifo = NULL;
 
@@ -121,7 +121,7 @@ T open_named_fifo(const char *pathname, mode_t mode)
  * return value: 
  * args: @pnfifo: 
  */
-void close_named_fifo(T *pnfifo)
+void MODULE_FUN_NAME(NamedFifo, close)(T *pnfifo)
 {
 	T nfifo = NULL;
 
