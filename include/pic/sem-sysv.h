@@ -21,16 +21,6 @@
 
 #include "module.h"
 
-/*
-#define T SysvSem_T
-typedef struct T *T;
-struct T {
-	char	*pathname;
-	int	id;
-	int	semid;
-};
-#undef T
-*/
 
 /*
  * name: MODULE_FUN_NAME(SysvSem, create)
