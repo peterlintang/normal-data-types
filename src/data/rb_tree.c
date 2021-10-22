@@ -55,6 +55,7 @@ NODE MODULE_FUN_NAME(RB_Tree, iterative_search)(T tree, void *key)
 	return x;
 }
 
+static int minimax = 0;
 static NODE tree_minimum(T tree, NODE x)
 {
 	int count = 0;
@@ -69,7 +70,11 @@ static NODE tree_minimum(T tree, NODE x)
 		count++;
 		x = x->left;
 	}
-//	fprintf(stdout, "minimum: %d\n", count);
+	if (minimax < count)
+	{
+		minimax = count;
+		fprintf(stdout, "minimum: %d\n", count);
+	}
 
 	return x;
 }
@@ -86,6 +91,7 @@ NODE MODULE_FUN_NAME(RB_Tree, minimum)(T tree)
 	return tree_minimum(tree, x);
 }
 
+static int maximax = 0;
 static NODE tree_maximum(T tree, NODE x)
 {
 	int count = 0;
@@ -95,7 +101,11 @@ static NODE tree_maximum(T tree, NODE x)
 		x = x->right;
 	}
 
-	fprintf(stdout, "maximum: %d\n", count);
+	if (maximax < count)
+	{
+		maximax = count;
+		fprintf(stdout, "maximum: %d\n", count);
+	}
 	return x;
 }
 
