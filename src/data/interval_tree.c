@@ -394,6 +394,12 @@ static void	rb_delete_fixup(T tree, NODE x)
 	NODE w = NULL;
 	while ((x != tree->root) && (x->color == BLACK))
 	{
+			/*
+		x->max = x->left->max > x->right->max ? x->left->max : x->right->max;
+		x->max = x->max > x->in.high ? x->max : x->in.high;
+		x->parent->max = x->parent->left->max > x->parent->right->max ? x->parent->left->max : x->parent->right->max;
+		x->parent->max = x->parent->in.high > x->parent->max ? x->parent->in.high : x->parent->max;
+		*/
 		if (x == x->parent->left)
 		{
 			w = x->parent->right;
@@ -473,6 +479,8 @@ static void	rb_delete_fixup(T tree, NODE x)
 		}
 	}
 
+	x->max = x->left->max > x->right->max ? x->left->max : x->right->max;
+	x->max = x->max > x->in.high ? x->max : x->in.high;
 	x->color = BLACK;
 }
 
@@ -647,8 +655,41 @@ static int cmp(void *arg1, void *arg2)
 static int myprint(void *priv, void *arg)
 {
 	NODE node = (NODE)priv;
+	int flag = 0;
+
+	if (node->in.high > node->left->max 
+		&& node->in.high > node->right->max)
+	{
+		if (node->max != node->in.high)
+		{
+			flag = 1;
+		}
+	}
+	if (node->left->max > node->in.high
+		&& node->left->max > node->right->max)
+	{
+		if (node->max != node->left->max)
+		{
+			flag = 1;
+		}
+	}
+	if (node->right->max > node->left->max 
+		&& node->right->max > node->in.high)
+	{
+		if (node->max != node->right->max)
+		{
+			flag = 1;
+		}
+	}
+
+	if (flag)
+		fprintf(stdout, "error node: %p, low: %d, high: %d, max: %d, parent: %p, left: %p, right: %p, color: %s\n", 
+			node, node->in.low, node->in.high, node->max, node->parent, node->left, node->right, node->color == RED ? "red" : "black");
+
+	/*
 	fprintf(stdout, "node: %p, low: %d, high: %d, max: %d, parent: %p, left: %p, right: %p, color: %s\n", 
 					node, node->in.low, node->in.high, node->max, node->parent, node->left, node->right, node->color == RED ? "red" : "black");
+					*/
 	return 0;
 }
 
@@ -696,7 +737,7 @@ int main(int argc, char *argv[])
 	fprintf(stdout, "post order wal:\n");
 	MODULE_FUN_NAME(RB_Tree, postorder_walk)(tree, tree->root, myprint, NULL);
 
-	struct interval in = { 1, 3 };
+	struct interval in = { 26, 26 };
 	node = MODULE_FUN_NAME(RB_Tree, search)(tree, (void *)&in);
 	if (node)
 	{
