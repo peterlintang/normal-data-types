@@ -1201,12 +1201,12 @@ static void test_rb(void)
 	{
 		node = MODULE_FUN_NAME(RB_Tree, search)(tree, (void *)(i + 1));
 //		fprintf(stdout, "i: %d, value: %d\n", i, (int)(node->priv));
-//		MODULE_FUN_NAME(RB_Tree, delete)(tree, node);
+		MODULE_FUN_NAME(RB_Tree, delete)(tree, node);
+		MODULE_FUN_NAME(RB_Tree, minimum)(tree);
+		MODULE_FUN_NAME(RB_Tree, maximum)(tree);
 //	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
 	}
 //	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
-	node = MODULE_FUN_NAME(RB_Tree, minimum)(tree);
-	node = MODULE_FUN_NAME(RB_Tree, maximum)(tree);
 
 //	MODULE_FUN_NAME(RB_Tree, free)(&tree);
 }
