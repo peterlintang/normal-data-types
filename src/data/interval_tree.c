@@ -87,12 +87,12 @@ NODE MODULE_FUN_NAME(RB_Tree, iterative_search)(T tree, struct interval *in)
 	return x;
 }
 
+static int minimax = 0;
 static NODE tree_minimum(T tree, NODE x)
 {
 	int count = 0;
 	if (x == tree->nil)
 	{
-//		fprintf(stdout, "%s: nil: %p\n", __func__, x);
 		return x;
 	}
 
@@ -101,7 +101,11 @@ static NODE tree_minimum(T tree, NODE x)
 		count++;
 		x = x->left;
 	}
-//	fprintf(stdout, "minimum: %d\n", count);
+	if (minimax < count)
+	{
+		minimax = count;
+		fprintf(stdout, "minimum: %d\n", count);
+	}
 
 	return x;
 }
@@ -118,6 +122,7 @@ NODE MODULE_FUN_NAME(RB_Tree, minimum)(T tree)
 	return tree_minimum(tree, x);
 }
 
+static int maximax = 0;
 static NODE tree_maximum(T tree, NODE x)
 {
 	int count = 0;
@@ -127,7 +132,11 @@ static NODE tree_maximum(T tree, NODE x)
 		x = x->right;
 	}
 
-	fprintf(stdout, "maximum: %d\n", count);
+	if (maximax < count)
+	{
+		maximax = count;
+		fprintf(stdout, "maximum: %d\n", count);
+	}
 	return x;
 }
 
@@ -385,24 +394,31 @@ static void	rb_delete_fixup(T tree, NODE x)
 	NODE w = NULL;
 	while ((x != tree->root) && (x->color == BLACK))
 	{
-//			fprintf(stdout, "x: %p, parent: %p, left: %p, right: %p, color: %s\n", 
-//							x, x->parent, x->left, x->right, x->color == RED ? "red" : "black");
 		if (x == x->parent->left)
 		{
 			w = x->parent->right;
-		//	fprintf(stdout, "w: %p, parent: %p, left: %p, right: %p, color: %s\n", 
-	//						w, w->parent, w->left, w->right, w->color == RED ? "red" : "black");
 			if (w->color == RED)
 			{
 				w->color = BLACK;
 				x->parent->color = RED;
 				left_rotate(tree, x->parent);
+
+				/*
+				x->parent->max = x->parent->left->max > x->parent->right->max ? x->parent->left->max : x->parent->right->max;
+				x->parent->max = x->parent->in.high > x->parent->max ? x->parent->in.high : x->parent->max;
+				w->max = w->left->max > w->right->max ? w->left->max : w->right->max;
+				w->max = w->in.high > w->max ? w->in.high : w->max;
+				*/
+
 				w = x->parent->right;
 			}
 			if ((w->left->color == BLACK) && (w->right->color == BLACK))
 			{
 				w->color = RED;
 				x = x->parent;
+
+				x->max = x->left->max > x->right->max ? x->left->max : x->right->max;
+				x->max = x->in.high > x->max ? x->in.high : x->max;
 			}
 			else if (w->right->color == BLACK)
 			{
@@ -434,6 +450,10 @@ static void	rb_delete_fixup(T tree, NODE x)
 			{
 				w->color = RED;
 				x = x->parent;
+
+				x->max = x->left->max > x->right->max ? x->left->max : x->right->max;
+				x->max = x->in.high > x->max ? x->in.high : x->max;
+
 			}
 			else if (w->left->color == BLACK)
 			{
@@ -610,7 +630,7 @@ void MODULE_FUN_NAME(RB_Tree, postorder_walk)(T tree, NODE x, int (*map)(void *,
 }
 
 
-#if 1
+#if 0
 /*
  * test code
  */
@@ -627,8 +647,8 @@ static int cmp(void *arg1, void *arg2)
 static int myprint(void *priv, void *arg)
 {
 	NODE node = (NODE)priv;
-	fprintf(stdout, "node: %p, low: %d, high: %d, max: %d, parent: %p, left: %p, right: %p\n", 
-					node, node->in.low, node->in.high, node->max, node->parent, node->left, node->right);
+	fprintf(stdout, "node: %p, low: %d, high: %d, max: %d, parent: %p, left: %p, right: %p, color: %s\n", 
+					node, node->in.low, node->in.high, node->max, node->parent, node->left, node->right, node->color == RED ? "red" : "black");
 	return 0;
 }
 
@@ -676,14 +696,16 @@ int main(int argc, char *argv[])
 	fprintf(stdout, "post order wal:\n");
 	MODULE_FUN_NAME(RB_Tree, postorder_walk)(tree, tree->root, myprint, NULL);
 
-	/*
-	fprintf(stdout, "\ndeleting %d...\n", key);
-	node = MODULE_FUN_NAME(RB_Tree, search)(tree, (void *)key);
+	struct interval in = { 1, 3 };
+	node = MODULE_FUN_NAME(RB_Tree, search)(tree, (void *)&in);
 	if (node)
+	{
+		fprintf(stdout, "deleting %d %d, %d %d\n", in.low, in.high, node->in.low, node->in.high);
 		MODULE_FUN_NAME(RB_Tree, delete)(tree, node);
+	}
 	else
 	{
-		fprintf(stderr, "not found\n");
+		fprintf(stderr, "not found: %d, %d\n", in.low, in.high);
 	}
 	fprintf(stdout, "in order wal:\n");
 	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, myprint, NULL);
@@ -691,7 +713,7 @@ int main(int argc, char *argv[])
 	MODULE_FUN_NAME(RB_Tree, preorder_walk)(tree, tree->root, myprint, NULL);
 	fprintf(stdout, "post order wal:\n");
 	MODULE_FUN_NAME(RB_Tree, postorder_walk)(tree, tree->root, myprint, NULL);
-	*/
+	
 
 	return 0;
 }
