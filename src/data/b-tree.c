@@ -332,6 +332,7 @@ void MODULE_FUN_NAME(BTree, free)(T *treep)
 
 
 
+#if 0
 /*
  *
  * test code
@@ -420,4 +421,5 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
+#endif
 
