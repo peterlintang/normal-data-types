@@ -1189,9 +1189,9 @@ static void test_rb(void)
 	for (int i = 0; i < RB_ITEM_LEN; i++)
 	{
 		node = (RB_Node)calloc(1, sizeof(*node));
-		node->priv = (void *)((i) % RB_ITEM_LEN + 1);
+		node->priv = (void *)((random()) % RB_ITEM_LEN + 1);
 		MODULE_FUN_NAME(RB_Tree, insert)(tree, node);
-//		fprintf(stdout, "insert %d...\n", (i + 1));
+//		fprintf(stdout, "insert i: %d, %d...\n", i, (int)(node->priv));
 //		MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
 	}
 
@@ -1199,11 +1199,14 @@ static void test_rb(void)
 	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
 	for (int i = 0; i < RB_ITEM_LEN; i++)
 	{
-		node = MODULE_FUN_NAME(RB_Tree, search)(tree, (void *)(i + 1));
-//		fprintf(stdout, "i: %d, value: %d\n", i, (int)(node->priv));
+		node = MODULE_FUN_NAME(RB_Tree, search)(tree, (void *)(random() % RB_ITEM_LEN + 1));
+		if (node)
+		{
+//		fprintf(stdout, "delete i: %d, value: %d\n", i, (int)(node->priv));
 		MODULE_FUN_NAME(RB_Tree, delete)(tree, node);
 		MODULE_FUN_NAME(RB_Tree, minimum)(tree);
 		MODULE_FUN_NAME(RB_Tree, maximum)(tree);
+		}
 //	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
 	}
 //	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
@@ -1326,6 +1329,121 @@ static void test_fib(void)
 static void test_os_rank(void)
 {
 #define OS_RANK_ITEM_LEN	1024
+}
+
+#include "interval_tree.h"
+
+static int myprint(void *priv, void *arg)
+{
+	In_Node node = (In_Node)priv;
+	int flag = 0;
+
+	if (node->in.high > node->left->max 
+		&& node->in.high > node->right->max)
+	{
+		if (node->max != node->in.high)
+		{
+			flag = 1;
+		}
+	}
+	if (node->left->max > node->in.high
+		&& node->left->max > node->right->max)
+	{
+		if (node->max != node->left->max)
+		{
+			flag = 1;
+		}
+	}
+	if (node->right->max > node->left->max 
+		&& node->right->max > node->in.high)
+	{
+		if (node->max != node->right->max)
+		{
+			flag = 1;
+		}
+	}
+
+	if (flag)
+	{
+		fprintf(stdout, "error node: %p, low: %d, high: %d, max: %d, parent: %p, left: %p, left_max: %d, right: %p, right_max: %d, color: %s\n", 
+			node, node->in.low, node->in.high, node->max, node->parent, node->left, node->left->max, node->right, node->right->max, node->color == RED ? "red" : "black");
+		exit(0);
+	}
+			
+
+	/*
+	fprintf(stdout, "node: %p, low: %d, high: %d, max: %d, parent: %p, left: %p, right: %p, color: %s\n", 
+					node, node->in.low, node->in.high, node->max, node->parent, node->left, node->right, node->color == RED ? "red" : "black");
+					*/
+					
+	return 0;
+}
+
+static void test_interval_tree(void)
+{
+#define INTERVAL_TREE_ITEM	10240000
+	In_Tree tree = NULL;
+	In_Node node = NULL;
+	int low = 0;
+	int high = 0;
+	int tmp = 0;
+	struct interval in;
+
+	tree = MODULE_FUN_NAME(InTree, new)();
+	fprintf(stdout, "root: %p, nil: %p\n", tree->root, tree->nil);
+	for (int i = 0; i < INTERVAL_TREE_ITEM; i++)
+	{
+		node = (In_Node)calloc(1, sizeof(*node));
+		if (node == NULL)
+		{
+			fprintf(stderr, "i: %d no mem exit\n", i);
+			return 0;
+		}
+		low = random() % INTERVAL_TREE_ITEM + 1;
+		high = random() % INTERVAL_TREE_ITEM + 1;
+		if (low > high)
+		{
+			tmp = low;
+			low = high;
+			high = tmp;
+		}
+		node->in.low = low;
+		node->in.high = high;
+//		fprintf(stdout, "insert: i: %d, node: %p, %d, %d\n", i, node, node->in.low, node->in.high);
+		MODULE_FUN_NAME(InTree, insert)(tree, node);
+//		MODULE_FUN_NAME(InTree, inorder_walk)(tree, tree->root, myprint, NULL);
+	}
+
+	MODULE_FUN_NAME(InTree, inorder_walk)(tree, tree->root, myprint, NULL);
+	fprintf(stdout, "second\n");
+	for (int i = 0; i < INTERVAL_TREE_ITEM; i++)
+	{
+		low = random() % INTERVAL_TREE_ITEM + 1;
+		high = random() % INTERVAL_TREE_ITEM + 1;
+		if (low > high)
+		{
+			tmp = low;
+			low = high;
+			high = tmp;
+		}
+		in.low = low;
+		in.high = high;
+		node = MODULE_FUN_NAME(InTree, search)(tree, (void *)&in);
+		if (node)
+		{
+				
+				/*
+			fprintf(stdout, "deleting low: %d, high: %d, node: %p, left: %p, right: %p\n", 
+							node->in.low, node->in.high, node, node->left, node->right);
+							*/
+							
+			MODULE_FUN_NAME(InTree, delete)(tree, node);
+//			MODULE_FUN_NAME(InTree, inorder_walk)(tree, tree->root, myprint, NULL);	// 每删除一个元素跑一次是为了验证区间树维护正常
+		}
+	}
+	fprintf(stdout, "third\n");
+	MODULE_FUN_NAME(InTree, inorder_walk)(tree, tree->root, myprint, NULL);
+	MODULE_FUN_NAME(InTree, free)(&tree);
 }
 
 #include "list.h"
@@ -1776,7 +1894,8 @@ struct test_routine my_test_routines[] =
 //		{test_ap2, "ap2"},					// ko
 //		{test_rb, "rb_tree"},				// ko
 //		{test_fib, "fib"},					// ko
-//		{test_os_rank, "os_rank"},					// ko
+//		{test_os_rank, "os_rank"},					// 
+		{test_interval_tree, "interval_tree"},
 //		{test_list, "list"},					// ko
 //		{test_queue, "queue"},					// ko
 //		{test_stack, "stack"},					// ko
