@@ -1,101 +1,204 @@
 
-#include <stdio.h>
-#include <stdlib.h>
-
 /*
- *
- * implement a simple bin search tree
+ * 普通的二叉树
  *
  */
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include "module.h"
+#include "b-tree.h"
 
-struct node {
-	struct node *left;
-	struct node *right;
-	struct node *parent;
-	int key;
+#define T BTree_T
+#define NODE BNode_T
+
+struct NODE {
+	NODE left;
+	NODE right;
+	NODE parent;
+	void *key;
 };
 
-struct b_tree {
-	struct node *root;
+struct T {
+	NODE root;
+	int (*cmp)(void *, void *);
 };
 
-void inorder_tree_walk(struct node *x)
+
+/*
+ * 接口函数负责检查参数
+ */
+static void inorder_walk(NODE x, int (*map)(void *priv, void *arg), void *arg)
 {
-	if (x != NULL)
+	if (x == NULL)
 	{
-		inorder_tree_walk(x->left);
-		fprintf(stdout, "%4d \n", x->key);
-		inorder_tree_walk(x->right);
+		return ;
+	}
+
+	inorder_walk(x->left, map, arg);
+	if (map)
+	{
+		if (map(x->key, arg) != 0)
+		{
+			return ;
+		}
+	}
+	inorder_walk(x->right, map, arg);
+}
+
+void MODULE_FUN_NAME(BTree, inorder_walk)(T tree, int (*map)(void *priv, void *arg), void *arg)
+{
+	assert(tree);
+
+	if (tree->root)
+	{
+		inorder_walk(tree->root, map, arg);
 	}
 }
 
-void preorder_tree_walk(struct node *x)
+void preorder_walk(NODE x, int (*map)(void *priv, void *arg), void *arg)
 {
-	if (x != NULL)
+	if (x == NULL)
 	{
-		fprintf(stdout, "%4d \n", x->key);
-		inorder_tree_walk(x->left);
-		inorder_tree_walk(x->right);
+		return ;
+	}
+
+	if (map)
+	{
+		if (map(x->key, arg) != 0)
+		{
+			return ;
+		}
+	}
+	preorder_walk(x->left, map, arg);
+	preorder_walk(x->right, map, arg);
+}
+
+void MODULE_FUN_NAME(BTree, preorder_walk)(T tree, int (*map)(void *priv, void *arg), void *arg)
+{
+	assert(tree);
+
+	if (tree->root)
+	{
+		preorder_walk(tree->root, map, arg);
 	}
 }
 
 
-void postorder_tree_walk(struct node *x)
+void postorder_walk(NODE x, int (*map)(void *priv, void *arg), void *arg)
 {
-	if (x != NULL)
+	if (x == NULL)
 	{
-		inorder_tree_walk(x->left);
-		inorder_tree_walk(x->right);
-		fprintf(stdout, "%4d \n", x->key);
+		return ;
+	}
+
+	postorder_walk(x->left, map, arg);
+	postorder_walk(x->right, map, arg);
+	if (map)
+	{
+		if (map(x->key, arg) != 0)
+		{
+			return ;
+		}
 	}
 }
 
-struct node *tree_search(struct node *x, int key)
+void MODULE_FUN_NAME(BTree, postorder_walk)(T tree, int (*map)(void *priv, void *arg), void *arg)
 {
-	if (x == NULL || x->key == key)
-		return x;
-	if (x->key > key)
-		return tree_search(x->left, key);
+	assert(tree);
+
+	if (tree->root)
+	{
+		postorder_walk(tree->root, map, arg);
+	}
+}
+
+
+
+
+
+static NODE _search(T tree, NODE x, void *key)
+{
+	int ret = 0;
+	if (x == NULL)
+	{
+		return NULL;
+	}
+
+	ret = tree->cmp(x->key, key);
+	if (ret > 0)
+		return _search(tree, x->left, key);
+	else if (ret < 0)
+		return _search(tree, x->right, key);
 	else
-		return tree_search(x->right, key);
+		return x;
 }
 
-struct node *iterative_tree_search(struct node *x, int key)
+NODE MODULE_FUN_NAME(BTree, search)(T tree, void *key)
 {
-	while ((x != NULL) && (x->key != key))
+	assert(tree);
+
+	return _search(tree, tree->root, key);
+}
+
+NODE MODULE_FUN_NAME(BTree, iterative_search)(T tree, void *key)
+{
+	assert(tree);
+
+	int ret = 0;
+	NODE x = tree->root;
+
+	while ((x != NULL))
 	{
-		if (x->key > key)
+		ret = tree->cmp(x->key, key);
+		if (ret > 0)
 			x = x->left;
-		else
+		else if (ret < 0)
 			x = x->right;
+		else
+			return x;
 	}
 
 	return x;
 }
 
-struct node *tree_minimum(struct node *x)
+NODE MODULE_FUN_NAME(BTree, minimum)(T tree, NODE x)
 {
+	assert(tree);
+
+	if (tree->root == NULL) return NULL;
+
+	if (x == NULL) x = tree->root;
+
 	while (x->left != NULL)
 		x = x->left;
 
 	return x;
 }
 
-struct node *tree_maximum(struct node *x)
+NODE MODULE_FUN_NAME(BTree, maximum)(T tree, NODE x)
 {
+	assert(tree);
+
+	if (tree->root == NULL) return NULL;
+
+	if (x == NULL) x = tree->root;
+
 	while (x->right != NULL)
 		x = x->right;
 
 	return x;
 }
 
-struct node *tree_successor(struct node *x)
+NODE MODULE_FUN_NAME(BTree, successor)(T tree, NODE x)
 {
-	struct node *y = NULL;
-	struct node *p = NULL;
+	assert(tree && x);
+
+	NODE y = NULL;
+	NODE p = NULL;
 
 	if (x->right)
-		return tree_minimum(x->right);
+		return MODULE_FUN_NAME(BTree, minimum)(tree, x->right);
 
 	y = x->parent;
 	while ((y != NULL) && (x == y->right))
@@ -107,13 +210,15 @@ struct node *tree_successor(struct node *x)
 	return y;
 }
 
-struct node *tree_predecessor(struct node *x)
+NODE MODULE_FUN_NAME(BTree, predecessor)(T tree, NODE x)
 {
-	struct node *y = NULL;
-	struct node *p = NULL;
+	assert(tree && x);
+
+	NODE y = NULL;
+	NODE p = NULL;
 
 	if (x->left)
-		return tree_maximum(x->left);
+		return MODULE_FUN_NAME(BTree, maximum)(tree, x->left);
 
 	y = x->parent;
 	while ((y != NULL) && (x == y->left))
@@ -125,16 +230,18 @@ struct node *tree_predecessor(struct node *x)
 	return y;
 }
 
-struct node *tree_insert(struct b_tree *tree, struct node *new)
+NODE MODULE_FUN_NAME(BTree, insert)(T tree, NODE new)
 {
-	struct node *y = NULL;
-	struct node *x = NULL;
+	assert(tree && new);
+
+	NODE y = NULL;
+	NODE x = NULL;
 
 	x = tree->root;
 	while (x != NULL)
 	{
 		y = x;
-		if (new->key < x->key)
+		if (tree->cmp(new->key, x->key) < 0)
 			x = x->left;
 		else
 			x = x->right;
@@ -142,8 +249,11 @@ struct node *tree_insert(struct b_tree *tree, struct node *new)
 
 	new->parent = y;
 	if (y == NULL)
+	{
 		tree->root = new;
-	else if (new->key < y->key)
+		new->parent = NULL;
+	}
+	else if (tree->cmp(new->key, y->key) < 0)
 		y->left = new;
 	else
 		y->right = new;
@@ -151,12 +261,13 @@ struct node *tree_insert(struct b_tree *tree, struct node *new)
 	return new;
 }
 
-static struct node *transplant(struct b_tree *tree, 
-				struct node *u,
-				struct node *v)
+static NODE transplant(T tree, NODE u, NODE v)
 {
 	if (u->parent == NULL)
+	{
 		tree->root = v;
+		v->parent = NULL;
+	}
 	else if (u == u->parent->left)
 		u->parent->left = v;
 	else
@@ -168,9 +279,11 @@ static struct node *transplant(struct b_tree *tree,
 	return u;
 }
 
-struct node *tree_delete(struct b_tree *tree, struct node *old)
+NODE MODULE_FUN_NAME(BTree, delete)(T tree, NODE old)
 {
-	struct node *y = NULL;
+	assert(tree && old);
+
+	NODE y = NULL;
 
 	if (old->left == NULL)
 		transplant(tree, old, old->right);
@@ -178,7 +291,7 @@ struct node *tree_delete(struct b_tree *tree, struct node *old)
 		transplant(tree, old, old->left);
 	else
 	{
-		y = tree_minimum(old->right);
+		y = MODULE_FUN_NAME(BTree, minimum)(tree, old->right);
 		if (y->parent != old)
 		{
 			transplant(tree, y, y->right);
@@ -194,6 +307,28 @@ struct node *tree_delete(struct b_tree *tree, struct node *old)
 }
 
 
+T MODULE_FUN_NAME(BTree, new)(int (*cmp)(void *, void *))
+{
+	assert(cmp);
+
+	T tree = NULL;
+
+	tree = (T)calloc(1, sizeof(*tree));
+	if (tree)
+	{
+		tree->cmp = cmp;
+	}
+
+	return tree;
+}
+
+void MODULE_FUN_NAME(BTree, free)(T *treep)
+{
+	assert(treep && *treep);
+
+	free(*treep);
+	*treep = NULL;
+}
 
 
 
@@ -202,13 +337,30 @@ struct node *tree_delete(struct b_tree *tree, struct node *old)
  * test code
  *
  */
+
+static int print(void *priv, void *arg)
+{
+	fprintf(stdout, "%d\n", (int)priv);
+	return 0;
+}
+
+static int cmp(void *priv, void *arg)
+{
+	int num1 = (int)priv;
+	int num2 = (int)arg;
+
+	if (num1 > num2) return 1;
+	else if (num1 < num2) return -1;
+	else return 0;
+}
+
 int main(int argc, char *argv[])
 {
 	int seed = 73;
 	int num = 1024;
 	int key = 75;
-	struct node *node = NULL;
-	struct b_tree tree;
+	NODE node = NULL;
+	T tree;
 
 	if (argc == 4)
 	{
@@ -228,20 +380,20 @@ int main(int argc, char *argv[])
 		seed = atoi(argv[1]);
 	}
 
-	tree.root = NULL;
+	tree = MODULE_FUN_NAME(BTree, new)(cmp);
 
 	srand(seed);
 
 	for (int i = 0; i < num; i++)
 	{
-		node = (struct node *)calloc(1, sizeof(*node));
+		node = (NODE )calloc(1, sizeof(*node));
 		if (node)
 		{
-			node->key = rand();
+			node->key = (void *)(rand() % num + 1);
 			node->left = NULL;
 			node->right = NULL;
 			node->parent = NULL;
-			tree_insert(&tree, node);
+			MODULE_FUN_NAME(BTree, insert)(tree, node);
 		}
 		else
 		{
@@ -250,24 +402,22 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	inorder_tree_walk(tree.root);
+	MODULE_FUN_NAME(BTree, inorder_walk)(tree, print, NULL);
 
-	node = tree_search(tree.root, key);
+	node = MODULE_FUN_NAME(BTree, search)(tree, (void *)key);
 	if (node)
 	{
 		fprintf(stdout, "key: %d to search: %p->%d\n", 
-				key, node, node->key);
+				key, node, (int)(node->key));
 	}
 	else
 	{
 		fprintf(stdout, "no found key: %d in tree\n", key);
 	}
 
-	fprintf(stdout, "root key: %d\n", tree.root->key);
+	MODULE_FUN_NAME(BTree, free)(&tree);
 
 	return 0;
 }
-
-
 
 
