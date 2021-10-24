@@ -16,6 +16,26 @@ typedef struct T *T;
 typedef struct NODE *NODE;
 
 /*
+ * 新建一个二叉树的节点，成功返回指针，失败NULL
+ */
+NODE MODULE_FUN_NAME(BTree, NodeNew)(void *priv);
+
+/*
+ * 释放一个二叉树的节点内容
+ */
+void MODULE_FUN_NAME(BTree, NodeFree)(NODE *nodep);
+
+/*
+ * 获取二叉树节点的私有数据
+ */
+void *MODULE_FUN_NAME(BTree, NodeGetPriv)(NODE node);
+
+/*
+ * 设置二叉树节点的私有数据,并返回旧的数据
+ */
+void *MODULE_FUN_NAME(BTree, NodeSetPriv)(NODE node, void *priv);
+
+/*
  * 遍历树，
  * map: 成功返回0，失败非0，并停止遍历
  */

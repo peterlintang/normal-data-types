@@ -25,6 +25,45 @@ struct T {
 };
 
 
+NODE MODULE_FUN_NAME(BTree, NodeNew)(void *priv)
+{
+	NODE node = NULL;
+
+	node = (NODE)calloc(1, sizeof(*node));
+	if (node)
+	{
+		node->key = priv;
+	}
+
+	return node;
+}
+
+void MODULE_FUN_NAME(BTree, NodeFree)(NODE *nodep)
+{
+	assert(nodep && *nodep);
+
+	free(*nodep);
+	*nodep = NULL;
+}
+
+void *MODULE_FUN_NAME(BTree, NodeGetPriv)(NODE node)
+{
+	assert(node);
+
+	return node->key;
+}
+
+void *MODULE_FUN_NAME(BTree, NodeSetPriv)(NODE node, void *priv)
+{
+	assert(node);
+
+	void *old = node->key;
+
+	node->key = priv;
+
+	return old;
+}
+
 /*
  * 接口函数负责检查参数
  */
@@ -166,12 +205,19 @@ NODE MODULE_FUN_NAME(BTree, minimum)(T tree, NODE x)
 {
 	assert(tree);
 
+	int count = 0;
+
 	if (tree->root == NULL) return NULL;
 
 	if (x == NULL) x = tree->root;
 
 	while (x->left != NULL)
+	{
 		x = x->left;
+		count++;
+	}
+
+//	fprintf(stdout, "%s: count: %d\n", __func__, count);
 
 	return x;
 }
@@ -180,12 +226,19 @@ NODE MODULE_FUN_NAME(BTree, maximum)(T tree, NODE x)
 {
 	assert(tree);
 
+	int count = 0;
+
 	if (tree->root == NULL) return NULL;
 
 	if (x == NULL) x = tree->root;
 
 	while (x->right != NULL)
+	{
 		x = x->right;
+		count++;
+	}
+
+//	fprintf(stdout, "%s: count: %d\n", __func__, count);
 
 	return x;
 }
@@ -266,7 +319,6 @@ static NODE transplant(T tree, NODE u, NODE v)
 	if (u->parent == NULL)
 	{
 		tree->root = v;
-		v->parent = NULL;
 	}
 	else if (u == u->parent->left)
 		u->parent->left = v;
@@ -286,9 +338,13 @@ NODE MODULE_FUN_NAME(BTree, delete)(T tree, NODE old)
 	NODE y = NULL;
 
 	if (old->left == NULL)
+	{
 		transplant(tree, old, old->right);
+	}
 	else if (old->right == NULL)
+	{
 		transplant(tree, old, old->left);
+	}
 	else
 	{
 		y = MODULE_FUN_NAME(BTree, minimum)(tree, old->right);
