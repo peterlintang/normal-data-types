@@ -2,7 +2,7 @@
  *
  * filename:	list2.h
  * description:	implement the new list operations
- * 双向链表
+ * 循环双向链表
  * author:
  * date:		2019-12-19
  * version:		0.0.1
@@ -130,6 +130,17 @@ NODE MODULE_FUN_NAME(ListD, head)(T list);
  * args: @list: the pointer to list
  */
 NODE MODULE_FUN_NAME(ListD, tail)(T list);
+
+/*
+ * 根据index返回链表中相应序号的元素
+ * index超过count，返回NULL
+ */
+NODE MODULE_FUN_NAME(ListD, get)(T list, int index);
+
+/*
+ * 根据key在链表中查找元素，找到返回指针，没有返回NULL
+ */
+NODE MODULE_FUN_NAME(ListD, search)(T list, int (*cmp)(void *, void *), void *key);
 
 /*
  * name: MODULE_FUN_NAME(ListD, count)

@@ -2,6 +2,7 @@
  *
  * filename:	dlist.c
  * description:	implement the new list operations
+ * 循环双向链表
  * author:
  * date:		2019-12-19
  * version:		0.0.1
@@ -256,6 +257,44 @@ NODE MODULE_FUN_NAME(ListD, tail)(T list)
 	assert(list);
 
 	return list->head ? list->head->prev : NULL;
+}
+
+NODE MODULE_FUN_NAME(ListD, get)(T list, int index)
+{
+	assert(list);
+
+	NODE node = NULL;
+
+	if (index < 0 || index > list->count - 1)
+	{
+		return NULL;
+	}
+
+	for (node = MODULE_FUN_NAME(ListD, head); index > 0; index--)
+	{
+		node = MODULE_FUN_NAME(ListD, next)(node);
+	}
+
+	return node;
+}
+
+NODE MODULE_FUN_NAME(ListD, search)(T list, int (*cmp)(void *priv, void *arg), void *arg)
+{
+	assert(list && cmp);
+
+	NODE node = NULL;
+
+	node = MODULE_FUN_NAME(ListD, head);
+	for (int i = 0; i < list->count; i++)
+	{
+		if (cmp(node->priv, arg) == 0)
+		{
+			break;
+		}
+		node = MODULE_FUN_NAME(ListD, next)(node);
+	}
+
+	return node;
 }
 
 /*
