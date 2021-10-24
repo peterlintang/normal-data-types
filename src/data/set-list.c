@@ -14,83 +14,216 @@
 
 struct T {
 	ListD_T l;
-	int n;
 	int (*cmp)(void *priv, void *arg);
 };
 
 /*
  * 新建一个链表集合，成功返回指针，失败NULL
  */
-T MODULE_FUN_NAME(SetL, new)(int (*cmp)(void *, void *));
+T MODULE_FUN_NAME(SetL, new)(int (*cmp)(void *, void *))
+{
+	assert(cmp);
+
+	T set = NULL;
+
+	set = (T)calloc(1, sizeof(*set));
+	if (set)
+	{
+		set->l = MODULE_FUN_NAME(ListD, new)();
+		if (set->l)
+		{
+			set->cmp = cmp;
+		}
+		else
+		{
+			free(set);
+			set = NULL;
+		}
+	}
+
+	return set;
+}
 
 /*
  * 释放一个链表集合内容
  */
-void MODULE_FUN_NAME(SetL, free)(T *setp);
+void MODULE_FUN_NAME(SetL, free)(T *setp)
+{
+	assert(setp);
+	assert(*setp);
+
+	MODULE_FUN_NAME(ListD, free)(&((*setp)->l));
+
+	free(*setp);
+	*setp = NULL;
+}
 
 /*
  * 将新元素priv添加到集合set中
- * 成功返回0，失败-1
+ * 成功返回0，失败-1, -2 已存在
  */
-int MODULE_FUN_NAME(SetL, add)(T set, void *priv);
+int MODULE_FUN_NAME(SetL, add)(T set, void *priv)
+{
+	assert(set);
+
+	ListDNode_T node = NULL;
+
+	if (MODULE_FUN_NAME(SetL, isMember)(set, priv))
+	{
+		return -2;
+	}
+
+	node = MODULE_FUN_NAME(ListDNode, new)(priv);
+	if (node == NULL)
+	{
+		return -1;
+	}
+
+	MODULE_FUN_NAME(ListD, insert)(set->l, node);
+	return 0;
+}
 
 /*
  * 将元素priv从集合set中删除
  * 成功返回指针，失败NULL
  */
-void *MODULE_FUN_NAME(SetL, remove)(T set, void *priv);
+void *MODULE_FUN_NAME(SetL, remove)(T set, void *priv)
+{
+	assert(set);
+
+	ListDNode_T node = NULL;
+	void *key = NULL;
+
+	node = MODULE_FUN_NAME(ListD, search)(set->l, set->cmp, priv);
+	if (node)
+	{
+		key = node->priv;
+		MODULE_FUN_NAME(ListD, remove)(set->l, node);
+		MODULE_FUN_NAME(ListDNode, free)(&node);
+		return priv;
+	}
+	else
+	{
+		return NULL;
+	}
+}
 
 /*
  * 集合set中查找元素,
  * 成功返回指针，失败NULL
  */
-void *MODULE_FUN_NAME(SetL, search)(T set, void *priv);
+void *MODULE_FUN_NAME(SetL, search)(T set, void *priv)
+{
+	assert(set);
+
+	ListDNode_T node = NULL;
+
+	node = MODULE_FUN_NAME(ListD, search)(set->l, set->cmp, priv);
+	if (node)
+	{
+		return node->priv;
+	}
+	else
+	{
+		return NULL;
+	}
+}
 
 /*
  * 判断priv是否在集合set中，
  * 是返回1，不是0
  */
-int MODULE_FUN_NAME(SetL, isMember)(T set, void *priv);
+int MODULE_FUN_NAME(SetL, isMember)(T set, void *priv)
+{
+	assert(set);
+
+	ListDNode_T node = NULL;
+
+	node = MODULE_FUN_NAME(ListD, search)(set->l, set->cmp, priv);
+	if (node)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
 
 /*
  * 返回集合set中元素的数目
  */
-int MODULE_FUN_NAME(SetL, count)(T set);
+int MODULE_FUN_NAME(SetL, count)(T set)
+{
+	assert(set);
+
+	return MODULE_FUN_NAME(ListD, count)(set->l);
+}
 
 /*
  * 根据索引返回集合中的第index个元素
  * 超出元素个数返回NULL,成功返回指针
  */
-void *MODULE_FUN_NAME(SetL, get)(T set, int index);
+void *MODULE_FUN_NAME(SetL, get)(T set, int index)
+{
+	assert(set);
+
+	ListDNode_T node = NULL;
+
+	if (index < 0 || index >= MODULE_FUN_NAME(ListD, count))
+	{
+		return NULL;
+	}
+
+	node = MODULE_FUN_NAME(ListD, get)(set->l, index);
+	return node->priv;
+}
 
 /********************集合高级操作*******************/
 /*
  * 新的集合为s U t，失败NULL
  * 集合s与t的并集
  */
-T MODULE_FUN_NAME(SetL, union)(T s, T t);
+T MODULE_FUN_NAME(SetL, union)(T s, T t)
+{
+	T set = NULL;
+	return set;
+}
 
 /*
  * 新的集合为s * t，失败NULL
  * 集合s与t的集
  */
-T MODULE_FUN_NAME(SetL, inter)(T s, T t);
+T MODULE_FUN_NAME(SetL, inter)(T s, T t)
+{
+	T set = NULL;
+	return set;
+}
 
 /*
  * 新的集合为s / t，失败NULL
  * 新集合的元素：仅在集合s,或仅在集合t
  */
-T MODULE_FUN_NAME(SetL, diff)(T s, T t);
+T MODULE_FUN_NAME(SetL, diff)(T s, T t)
+{
+	T set = NULL;
+	return set;
+}
 
 /*
  * 新的集合为s - t，失败NULL
  * 新集合的元素：在集合s,但不在t
  */
-T MODULE_FUN_NAME(SetL, minus)(T s, T t);
+T MODULE_FUN_NAME(SetL, minus)(T s, T t)
+{
+	T set = NULL;
+	return set;
+}
 
 
 
 
+#if 0
 
 static void _set_destroy(struct set **setp)
 {
@@ -483,5 +616,8 @@ int main(int argc, char *argv[])
 	return 0;
 }
  */
+
+
+#endif
 
 

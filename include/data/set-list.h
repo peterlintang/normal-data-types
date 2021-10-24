@@ -14,11 +14,12 @@
 
 typedef struct T *T;
 
+/*
 struct T {
 	ListD_T l;
-	int n;
 	int (*cmp)(void *priv, void *arg);
 };
+*/
 
 /*
  * 新建一个链表集合，成功返回指针，失败NULL
@@ -32,7 +33,7 @@ void MODULE_FUN_NAME(SetL, free)(T *setp);
 
 /*
  * 将新元素priv添加到集合set中
- * 成功返回0，失败-1
+ * 成功返回0，失败-1(申请新节点失败), -2已存在
  */
 int MODULE_FUN_NAME(SetL, add)(T set, void *priv);
 

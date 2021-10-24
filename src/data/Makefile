@@ -16,6 +16,7 @@ DATA_SRCS := ./ap.c			\
 		./ring.c		\
 		./ring_buf.c		\
 		./set.c			\
+		./set-list.c			\
 		./table.c		\
 		./xp.c			\
 		./array.c		\
@@ -52,6 +53,7 @@ DATA_OBJS := ./ap.o			\
 		./ring.o		\
 		./ring_buf.o		\
 		./set.o			\
+		./set-list.o			\
 		./table.o		\
 		./xp.o			\
 		./array.o		\
