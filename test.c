@@ -1470,7 +1470,7 @@ static int binary_cmp(void *priv, void *arg)
 
 static void test_binary_tree(void)
 {
-#define BINARY_ITEM_LEN	1024
+#define BINARY_ITEM_LEN	10240000
 	BTree_T tree = NULL;
 	BNode_T node = NULL;
 	int priv = 0;
