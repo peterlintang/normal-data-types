@@ -1381,7 +1381,7 @@ static int myprint(void *priv, void *arg)
 
 static void test_interval_tree(void)
 {
-#define INTERVAL_TREE_ITEM	10240000
+#define INTERVAL_TREE_ITEM	10240
 	In_Tree tree = NULL;
 	In_Node node = NULL;
 	int low = 0;
@@ -1438,12 +1438,111 @@ static void test_interval_tree(void)
 							*/
 							
 			MODULE_FUN_NAME(InTree, delete)(tree, node);
-//			MODULE_FUN_NAME(InTree, inorder_walk)(tree, tree->root, myprint, NULL);	// 每删除一个元素跑一次是为了验证区间树维护正常
+			MODULE_FUN_NAME(InTree, inorder_walk)(tree, tree->root, myprint, NULL);	// 每删除一个元素跑一次是为了验证区间树维护正常
 		}
 	}
 	fprintf(stdout, "third\n");
 	MODULE_FUN_NAME(InTree, inorder_walk)(tree, tree->root, myprint, NULL);
 	MODULE_FUN_NAME(InTree, free)(&tree);
+}
+
+
+
+#include "b-tree.h"
+
+static int inorder_walk(void *priv, void *arg)
+{
+	int num = (int)priv;
+
+	fprintf(stdout, "%d\n", num);
+	return 0;
+}
+
+static int binary_cmp(void *priv, void *arg)
+{
+	int num1 = (int)priv;
+	int num2 = (int)arg;
+
+	if (num1 > num2) return 1;
+	else if (num1 < num2) return -1;
+	else return 0;
+}
+
+static void test_binary_tree(void)
+{
+#define BINARY_ITEM_LEN	1024
+	BTree_T tree = NULL;
+	BNode_T node = NULL;
+	int priv = 0;
+
+	tree = MODULE_FUN_NAME(BTree, new)(binary_cmp);
+
+	for (int i = 0; i < BINARY_ITEM_LEN; i++)
+	{
+		priv = random() % BINARY_ITEM_LEN + 1;
+		node = MODULE_FUN_NAME(BTree, NodeNew)((void *)priv);
+		if (node)
+		{
+//			fprintf(stdout, "i: %d insert: %d\n", i, priv);
+			MODULE_FUN_NAME(BTree, insert)(tree, node);
+		}
+		else
+		{
+			fprintf(stdout, "i: %d, no mem\n", i);
+		}
+	}
+
+	MODULE_FUN_NAME(BTree, inorder_walk)(tree, inorder_walk, NULL);
+
+	node = MODULE_FUN_NAME(BTree, minimum)(tree, NULL);
+	fprintf(stdout, "minimum: %d\n", (int)MODULE_FUN_NAME(BTree, NodeGetPriv)(node));
+	node = MODULE_FUN_NAME(BTree, successor)(tree, node);
+	if (node)
+		fprintf(stdout, "successor: %d\n", (int)MODULE_FUN_NAME(BTree, NodeGetPriv)(node));
+	node = MODULE_FUN_NAME(BTree, predecessor)(tree, node);
+	if (node)
+		fprintf(stdout, "predecessor: %d\n", (int)MODULE_FUN_NAME(BTree, NodeGetPriv)(node));
+
+	node = MODULE_FUN_NAME(BTree, maximum)(tree, NULL);
+	fprintf(stdout, "maximum: %d\n", (int)MODULE_FUN_NAME(BTree, NodeGetPriv)(node));
+	node = MODULE_FUN_NAME(BTree, predecessor)(tree, node);
+	if (node)
+		fprintf(stdout, "predecessor: %d\n", (int)MODULE_FUN_NAME(BTree, NodeGetPriv)(node));
+	node = MODULE_FUN_NAME(BTree, successor)(tree, node);
+	if (node)
+		fprintf(stdout, "successor: %d\n", (int)MODULE_FUN_NAME(BTree, NodeGetPriv)(node));
+
+	int count = 0;
+
+	for (int i = 0; i < BINARY_ITEM_LEN; i++)
+	{
+		priv = random() % BINARY_ITEM_LEN + 1;
+		node = MODULE_FUN_NAME(BTree, search)(tree, (void *)priv);
+		if (node)
+		{
+			count++;
+			fprintf(stdout, "i: %d, delete node: %d, %d\n", i, priv, (int)MODULE_FUN_NAME(BTree, NodeGetPriv)(node));
+			MODULE_FUN_NAME(BTree, delete)(tree, node);
+			MODULE_FUN_NAME(BTree, NodeFree)(&node);
+		}
+		else
+		{
+			fprintf(stdout, "i: %d, no found: %d\n", i, priv);
+		}
+	}
+
+	fprintf(stdout, "count: %d\n", count);
+
+	while ((node = MODULE_FUN_NAME(BTree, minimum)(tree, NULL)) != NULL)
+	{
+		count++;
+		fprintf(stdout, "deleting: %d\n", (int)MODULE_FUN_NAME(BTree, NodeGetPriv)(node));
+		MODULE_FUN_NAME(BTree, delete)(tree, node);
+		MODULE_FUN_NAME(BTree, NodeFree)(&node);
+	}
+	fprintf(stdout, "count: %d\n", count);
+
+	MODULE_FUN_NAME(BTree, free)(&tree);
 }
 
 #include "list.h"
@@ -1895,7 +1994,7 @@ struct test_routine my_test_routines[] =
 //		{test_rb, "rb_tree"},				// ko
 //		{test_fib, "fib"},					// ko
 //		{test_os_rank, "os_rank"},					// 
-		{test_interval_tree, "interval_tree"},
+//		{test_interval_tree, "interval_tree"},	// ko
 //		{test_list, "list"},					// ko
 //		{test_queue, "queue"},					// ko
 //		{test_stack, "stack"},					// ko
@@ -1905,7 +2004,7 @@ struct test_routine my_test_routines[] =
 //		{test_mp, "mp"},
 //		{test_text, "text"},
 //		{test_str, "string"},
-//		{test_b_tree, "b_tree"},
+		{test_binary_tree, "binary_tree"},
 //		{test_db, "db"},
 //		{test_sbit, "sbit"},					// ko 其他地方验证过ok
 //		{test_ring_buf, "ring_buf"},			// ko 其他地方验证过ok

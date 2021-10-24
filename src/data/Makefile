@@ -38,6 +38,7 @@ DATA_SRCS := ./ap.c			\
 		./text.c		\
 		./stree.c	\
 		./rb_tree.c	\
+		./b-tree.c	\
 		./interval_tree.c	\
 		./fib-heap.c	\
 		./os_rank.c	\
@@ -73,6 +74,7 @@ DATA_OBJS := ./ap.o			\
 		./text.o			\
 		./stree.o	\
 		./rb_tree.o	\
+		./b-tree.o	\
 		./interval_tree.o	\
 		./fib-heap.o	\
 		./os_rank.o	\
