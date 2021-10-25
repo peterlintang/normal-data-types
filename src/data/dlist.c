@@ -270,7 +270,8 @@ NODE MODULE_FUN_NAME(ListD, get)(T list, int index)
 		return NULL;
 	}
 
-	for (node = MODULE_FUN_NAME(ListD, head); index > 0; index--)
+	node = MODULE_FUN_NAME(ListD, head)(list);
+	for (; index > 0; index--)
 	{
 		node = MODULE_FUN_NAME(ListD, next)(node);
 	}
@@ -284,7 +285,7 @@ NODE MODULE_FUN_NAME(ListD, search)(T list, int (*cmp)(void *priv, void *arg), v
 
 	NODE node = NULL;
 
-	node = MODULE_FUN_NAME(ListD, head);
+	node = MODULE_FUN_NAME(ListD, head)(list);
 	for (int i = 0; i < list->count; i++)
 	{
 		if (cmp(node->priv, arg) == 0)
