@@ -170,7 +170,7 @@ void *MODULE_FUN_NAME(SetL, get)(T set, int index)
 
 	ListDNode_T node = NULL;
 
-	if (index < 0 || index >= MODULE_FUN_NAME(ListD, count))
+	if (index < 0 || index >= MODULE_FUN_NAME(SetL, count)(set))
 	{
 		return NULL;
 	}
@@ -180,24 +180,138 @@ void *MODULE_FUN_NAME(SetL, get)(T set, int index)
 }
 
 /********************集合高级操作*******************/
+
+static void copy(T set, T s)
+{
+	int count = 0;
+	void *priv = NULL;
+
+	if (s == NULL)
+	{
+		return ;
+	}
+
+	count = MODULE_FUN_NAME(SetL, count)(s);
+	for (int i = 0; i < count; i++)
+	{
+		priv = MODULE_FUN_NAME(SetL, get)(s, i);
+		MODULE_FUN_NAME(SetL, add)(set, priv);
+	}
+}
+
 /*
  * 新的集合为s U t，失败NULL
  * 集合s与t的并集
  */
 T MODULE_FUN_NAME(SetL, union)(T s, T t)
 {
+	assert(s != NULL || t != NULL);
+
 	T set = NULL;
+
+	assert(s->cmp == t->cmp);
+
+	if (s == NULL)
+	{
+		assert(t);
+
+		set = MODULE_FUN_NAME(SetL, new)(t->cmp);
+		if (set == NULL)
+		{
+			return NULL;
+		}
+
+		copy(set, t);
+
+		return set;
+	}
+	else if (t == NULL)
+	{
+		set = MODULE_FUN_NAME(SetL, new)(s->cmp);
+		if (set == NULL)
+		{
+			return NULL;
+		}
+
+		copy(set, s);
+
+		return set;
+	}
+	else
+	{
+		set = MODULE_FUN_NAME(SetL, new)(s->cmp);
+		if (set == NULL)
+		{
+			return NULL;
+		}
+
+		copy(set, t);
+
+		int count = MODULE_FUN_NAME(SetL, count)(s);
+		void *priv = NULL;
+		for (int i = 0; i < count; i++)
+		{
+			priv = MODULE_FUN_NAME(SetL, get)(s, i);
+			if (MODULE_FUN_NAME(SetL, isMember)(set, priv) == 0)
+			{
+				MODULE_FUN_NAME(SetL, add)(set, priv);
+			}
+		}
+	}
+
 	return set;
 }
 
 /*
  * 新的集合为s * t，失败NULL
- * 集合s与t的集
+ * 集合s与t的交集
  */
 T MODULE_FUN_NAME(SetL, inter)(T s, T t)
 {
+	assert(s != NULL || t != NULL);
+
 	T set = NULL;
-	return set;
+	int count = 0;
+
+	assert(s->cmp == t->cmp);
+
+	if (s == NULL)
+	{
+		set = MODULE_FUN_NAME(SetL, new)(t->cmp);
+		return set;
+	}
+	else if (t == NULL)
+	{
+		set = MODULE_FUN_NAME(SetL, new)(s->cmp);
+		return set;
+	}
+	else if (MODULE_FUN_NAME(SetL, count)(s) < MODULE_FUN_NAME(SetL, count)(t))
+	{
+		return MODULE_FUN_NAME(SetL, inter)(t, s);
+	}
+	else
+	{
+		set = MODULE_FUN_NAME(SetL, new)(s->cmp);
+		if (set == NULL)
+		{
+			return set;
+		}
+
+		int count = MODULE_FUN_NAME(SetL, count)(t);
+		void *priv = NULL;
+
+		for (int i = 0; i < count; i++)
+		{
+			priv = MODULE_FUN_NAME(SetL, get)(t, i);
+			if (MODULE_FUN_NAME(SetL, isMember)(s, priv))
+			{
+				MODULE_FUN_NAME(SetL, add)(set, priv);
+			}
+		}
+
+		return set;
+	}
+
 }
 
 /*
@@ -206,8 +320,59 @@ T MODULE_FUN_NAME(SetL, inter)(T s, T t)
  */
 T MODULE_FUN_NAME(SetL, diff)(T s, T t)
 {
+	assert(s != NULL || t != NULL);
+
 	T set = NULL;
-	return set;
+	int count = 0;
+
+	assert(s->cmp == t->cmp);
+
+	if (s == NULL)
+	{
+		set = MODULE_FUN_NAME(SetL, new)(t->cmp);
+		copy(set, t);
+		return set;
+	}
+	else if (t == NULL)
+	{
+		set = MODULE_FUN_NAME(SetL, new)(s->cmp);
+		copy(set, s);
+		return set;
+	}
+	else
+	{
+		set = MODULE_FUN_NAME(SetL, new)(s->cmp);
+		if (set == NULL)
+		{
+			return set;
+		}
+
+		int count = 0;
+		void *priv = NULL;
+
+		count = MODULE_FUN_NAME(SetL, count)(t);
+		for (int i = 0; i < count; i++)
+		{
+			priv = MODULE_FUN_NAME(SetL, get)(t, i);
+			if (MODULE_FUN_NAME(SetL, isMember)(s, priv) == 0)
+			{
+				MODULE_FUN_NAME(SetL, add)(set, priv);
+			}
+		}
+
+		count = MODULE_FUN_NAME(SetL, count)(s);
+		for (int i = 0; i < count; i++)
+		{
+			priv = MODULE_FUN_NAME(SetL, get)(s, i);
+			if (MODULE_FUN_NAME(SetL, isMember)(t, priv) == 0)
+			{
+				MODULE_FUN_NAME(SetL, add)(set, priv);
+			}
+		}
+
+		return set;
+	}
+
 }
 
 /*
@@ -216,8 +381,48 @@ T MODULE_FUN_NAME(SetL, diff)(T s, T t)
  */
 T MODULE_FUN_NAME(SetL, minus)(T s, T t)
 {
+	assert(s != NULL || t != NULL);
+
 	T set = NULL;
-	return set;
+
+	if (s == NULL)
+	{
+		set = MODULE_FUN_NAME(SetL, new)(t->cmp);
+		return set;
+	}
+	else if (t == NULL)
+	{
+		set = MODULE_FUN_NAME(SetL, new)(s->cmp);
+		if (set == NULL)
+		{
+			return NULL;
+		}
+
+		copy(set, s);
+		return set;
+	}
+	else
+	{
+		set = MODULE_FUN_NAME(SetL, new)(s->cmp);
+		if (set == NULL)
+		{
+			return NULL;
+		}
+
+		int count = MODULE_FUN_NAME(SetL, count)(s);
+		void *priv = NULL;
+
+		for (int i = 0; i < count; i++)
+		{
+			priv = MODULE_FUN_NAME(SetL, get)(s, i);
+			if (MODULE_FUN_NAME(SetL, isMember)(t, priv) == 0)
+			{
+				MODULE_FUN_NAME(SetL, add)(set, priv);
+			}
+		}
+
+		return set;
+	}
 }
 
 

@@ -75,7 +75,7 @@ T MODULE_FUN_NAME(SetL, union)(T s, T t);
 
 /*
  * 新的集合为s * t，失败NULL
- * 集合s与t的集
+ * 集合s与t的交集
  */
 T MODULE_FUN_NAME(SetL, inter)(T s, T t);
 
