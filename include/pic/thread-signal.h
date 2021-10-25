@@ -47,7 +47,7 @@ int MODULE_FUN_NAME(Thread, unblockSignals)(sigset_t *newset, sigset_t *oldset);
  * args: @signo: signal number to send
  * 		 @tid: the thread id to send signal @signo
  */
-int thread_send_signal(int signo, pthread_t tid);
+int MODULE_FUN_NAME(Thread, sendSignal)(int signo, pthread_t tid);
 
 
 #endif // CI_THREAD_SIGNALS_H__
