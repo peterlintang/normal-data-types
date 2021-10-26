@@ -32,19 +32,32 @@ GraphA_T GA_create(
 	int node_len = 0;
 	int edge_len = 0;
 	int ret = 0;
+	void *node = NULL;
+	void *edge = NULL;
 
+	assert(filename);
+	assert(get_graph);
+	assert(get_edge);
+	assert(get_node);
 
 	fp = fopen(filename, "r");
 
 	g = get_graph(fp);
+	if (g == NULL)
+	{
+		fclose(fp);
+		return NULL;
+	}
 
-	fprintf(stdout, "nodes: %d, edges: %d\n", 
+	fprintf(stdout, "%s: nodes: %d, edges: %d\n", 
+				__func__,
 				node_len = MODULE_FUN_NAME(GraphA, VnodesLength)(g), 
 				edge_len = MODULE_FUN_NAME(GraphA, EdgesLength)(g));
 
 	for (int i = 0; i < node_len; i++)
 	{
-		ret = get_node(fp, g);
+		node = MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
+		ret = get_node(fp, g, node);
 		if (ret != 0)
 		{
 			fprintf(stderr, "get: %i node failed: %d\n", i, ret);
@@ -53,7 +66,8 @@ GraphA_T GA_create(
 
 	for (int i = 0; i < edge_len; i++)
 	{
-		ret = get_edge(fp, g);
+		edge = MODULE_FUN_NAME(GraphA, EdgeGet)(g, i);
+		ret = get_edge(fp, g, edge);
 		if (ret != 0)
 		{
 			fprintf(stderr, "get: %i node failed: %d\n", i, ret);
