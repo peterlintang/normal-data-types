@@ -140,6 +140,7 @@ int MODULE_FUN_NAME(SetL, isMember)(T set, void *priv)
 	ListDNode_T node = NULL;
 
 	node = MODULE_FUN_NAME(ListD, search)(set->l, set->cmp, priv);
+//	fprintf(stdout, "%s: node: %p, priv: %d\n", __func__, node, (int)priv);
 	if (node)
 	{
 		return 1;
@@ -177,6 +178,27 @@ void *MODULE_FUN_NAME(SetL, get)(T set, int index)
 
 	node = MODULE_FUN_NAME(ListD, get)(set->l, index);
 	return node->priv;
+}
+
+void MODULE_FUN_NAME(SetL, map)(T set, int (*map)(void *priv, void *arg), void *arg)
+{
+	assert(set);
+
+	void *priv = NULL;
+	int count = MODULE_FUN_NAME(SetL, count)(set);
+
+	for (int i = 0; i < count; i++)
+	{
+		priv = MODULE_FUN_NAME(SetL, get)(set, i);
+		if (map)
+		{
+			if (map(priv, arg) != 0)
+			{
+				break;
+			}
+		}
+	}
+
 }
 
 /********************集合高级操作*******************/

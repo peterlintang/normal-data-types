@@ -66,6 +66,14 @@ int MODULE_FUN_NAME(SetL, count)(T set);
  */
 void *MODULE_FUN_NAME(SetL, get)(T set, int index);
 
+/*
+ * 遍历set中的元素,对每个元素调用map，成功返回0，失败-1，并立即停止遍历
+ * map:	调用函数
+ * arg: 用户参数
+ */
+void MODULE_FUN_NAME(SetL, map)(T set, int (*map)(void *priv, void *arg), void *arg);
+
+
 /********************集合高级操作*******************/
 /*
  * 新的集合为s U t，失败NULL
