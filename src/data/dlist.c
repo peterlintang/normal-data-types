@@ -283,10 +283,11 @@ NODE MODULE_FUN_NAME(ListD, search)(T list, int (*cmp)(void *priv, void *arg), v
 {
 	assert(list && cmp);
 
+	int i;
 	NODE node = NULL;
 
 	node = MODULE_FUN_NAME(ListD, head)(list);
-	for (int i = 0; i < list->count; i++)
+	for (i = 0; i < list->count; i++)
 	{
 		if (cmp(node->priv, arg) == 0)
 		{
@@ -295,7 +296,17 @@ NODE MODULE_FUN_NAME(ListD, search)(T list, int (*cmp)(void *priv, void *arg), v
 		node = MODULE_FUN_NAME(ListD, next)(node);
 	}
 
-	return node;
+	/*
+	 * 链表为循环链表
+	 */
+	if (i < list->count)
+	{
+		return node;
+	}
+	else
+	{
+		return NULL;
+	}
 }
 
 /*
