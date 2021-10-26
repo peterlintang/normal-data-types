@@ -478,6 +478,128 @@ static void test_set(void)
 }
 
 
+#include "set-list.h"
+
+static int set_list_cmp(void *priv, void *arg)
+{
+	int num1 = (int)priv;
+	int num2 = (int)arg;
+
+//	fprintf(stdout, "%s: %d,%d\n", __func__, num1, num2);
+	if (num1 > num2) return 1;
+	else if (num1 < num2) return -1;
+	else return 0;
+}
+
+static int set_list_print(void *priv, void *arg)
+{
+	fprintf(stdout, "%d\n", (int)priv);
+	return 0;
+}
+
+static void test_set_list(void)
+{
+#define SETL_ITEM_LEN	10240
+	int ret = 0;
+	void *priv = NULL;
+	SetL_T set1 = NULL;
+	SetL_T set2 = NULL;
+	SetL_T set3 = NULL;
+	int num = 0;
+	int remove_count = 0;
+
+	set1 = MODULE_FUN_NAME(SetL, new)(set_list_cmp);
+	set2 = MODULE_FUN_NAME(SetL, new)(set_list_cmp);
+
+	for (int i = 0; i < SETL_ITEM_LEN; i++)
+	{
+		num = random() % SETL_ITEM_LEN + 1;
+//		ret = MODULE_FUN_NAME(SetL, add)(set1, (void *)(2 * i + 1));
+		ret = MODULE_FUN_NAME(SetL, add)(set1, (void *)(num));
+//		fprintf(stdout, "add %d to set1\n", num);
+		if (ret != 0)
+		{
+//			fprintf(stdout, "set1 add: %d failed %d\n", 2 * i + 1, ret);
+		}
+
+		MODULE_FUN_NAME(SetL, add)(set2, (void *)(2 * i + 2));
+		if (ret != 0)
+		{
+//			fprintf(stdout, "set1 add: %d failed %d\n", 2 * i + 2, ret);
+		}
+	}
+
+	for (int i = 0; i < SETL_ITEM_LEN; i++)
+	{
+		priv = MODULE_FUN_NAME(SetL, get)(set1, i);
+//		fprintf(stdout, "get: %d, %d\n", i, (int)priv);
+	}
+	priv = MODULE_FUN_NAME(SetL, get)(set1, SETL_ITEM_LEN);
+	fprintf(stdout, "get: %d, %d\n", SETL_ITEM_LEN, (int)priv);
+
+	for (int i = 0; i < SETL_ITEM_LEN; i++)
+	{
+		num = random() % SETL_ITEM_LEN + 1;
+		if (MODULE_FUN_NAME(SetL, isMember)(set1, (void *)num))
+		{
+//			fprintf(stdout, "%d is member\n", num);
+		}
+		priv = MODULE_FUN_NAME(SetL, search)(set1, (void *)num);
+//		fprintf(stdout, "search: %d, %d\n", num, (int)(priv));
+		if (priv != NULL)
+		{
+//			fprintf(stdout, "deleting %d\n", (int)(priv));
+			priv = MODULE_FUN_NAME(SetL, remove)(set1, priv);
+			if (priv == NULL)
+			{
+//				fprintf(stdout, "remove failed\n");
+			}
+			else
+			{
+				remove_count++;
+			}
+		}
+	}
+
+	fprintf(stdout, "set1: %d, remove_count: %d\n", MODULE_FUN_NAME(SetL, count)(set1), remove_count);
+	MODULE_FUN_NAME(SetL, map)(set1, set_list_print, NULL);
+
+	for (int i = 0; i < SETL_ITEM_LEN; i++)
+	{
+		priv = MODULE_FUN_NAME(SetL, get)(set1, i);
+		if (priv)
+		{
+//			fprintf(stdout, "get: %d success: %d\n", i, (int)(priv));
+		}
+		else
+		{
+//			fprintf(stdout, "get: %d failed: %d\n", i, (int)(priv));
+		}
+	}
+
+	fprintf(stdout, "set1: %d, remove_count: %d\n", MODULE_FUN_NAME(SetL, count)(set1), remove_count);
+	MODULE_FUN_NAME(SetL, map)(set1, set_list_print, NULL);
+	fprintf(stdout, "set2: %d\n", MODULE_FUN_NAME(SetL, count)(set2));
+	MODULE_FUN_NAME(SetL, map)(set2, set_list_print, NULL);
+
+	fprintf(stdout, "set3: test\n");
+	set3 = MODULE_FUN_NAME(SetL, union)(set1, set2);
+	fprintf(stdout, "set3: %d\n", MODULE_FUN_NAME(SetL, count)(set3));
+
+	set3 = MODULE_FUN_NAME(SetL, inter)(set1, set2);
+	fprintf(stdout, "set3: %d\n", MODULE_FUN_NAME(SetL, count)(set3));
+
+	set3 = MODULE_FUN_NAME(SetL, diff)(set1, set2);
+	fprintf(stdout, "set3: %d\n", MODULE_FUN_NAME(SetL, count)(set3));
+
+	set3 = MODULE_FUN_NAME(SetL, minus)(set1, set2);
+	fprintf(stdout, "set3: %d\n", MODULE_FUN_NAME(SetL, count)(set3));
+
+
+	MODULE_FUN_NAME(SetL, free)(&set1);
+	MODULE_FUN_NAME(SetL, free)(&set2);
+	MODULE_FUN_NAME(SetL, free)(&set3);
+}
 
 #include "table.h"
 
@@ -1986,6 +2108,7 @@ struct test_routine my_test_routines[] =
 //		{test_threadPool, "threadPool"},	// ko
 //		{test_array, "array"},				// ko
 //		{test_set, "set"},					// ko
+		{test_set_list, "set-list"},					// ko
 //		{test_table, "table"},				// ko
 //		{test_seq, "seq"},					// ko
 //		{test_ring, "ring"},				// kko
