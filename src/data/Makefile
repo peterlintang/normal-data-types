@@ -30,7 +30,6 @@ DATA_SRCS := ./ap.c			\
 		./sentinel-linked-list.c		\
 		./list.c		\
 		./arena.c		\
-		./thread_pool.c		\
 		./queue.c		\
 		./queue_link.c		\
 		./queue_array.c		\
@@ -66,7 +65,6 @@ DATA_OBJS := ./ap.o			\
 		./sentinel-linked-list.o		\
 		./list.o		\
 		./arena.o		\
-		./thread_pool.o		\
 		./queue.o		\
 		./queue_link.o		\
 		./queue_array.o		\
