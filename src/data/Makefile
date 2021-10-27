@@ -37,15 +37,13 @@ DATA_SRCS := ./ap.c			\
 		./stack_link.c		\
 		./stack_array.c		\
 		./text.c		\
-		./stree.c	\
 		./rb_tree.c	\
 		./b-tree.c	\
 		./interval_tree.c	\
 		./fib-heap.c	\
 		./os_rank.c	\
 		./gve.c	\
-		./gve_array.c	\
-		./simple_tree.c
+		./gve_array.c	
 
 
 DATA_OBJS := ./ap.o			\
@@ -74,15 +72,13 @@ DATA_OBJS := ./ap.o			\
 		./stack_link.o		\
 		./stack_array.o		\
 		./text.o			\
-		./stree.o	\
 		./rb_tree.o	\
 		./b-tree.o	\
 		./interval_tree.o	\
 		./fib-heap.o	\
 		./os_rank.o	\
 		./gve.o	\
-		./gve_array.o	\
-		./simple_tree.o
+		./gve_array.o	
 
 
 all: $(LIBS)
