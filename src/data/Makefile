@@ -45,7 +45,6 @@ DATA_SRCS := ./ap.c			\
 		./os_rank.c	\
 		./gve.c	\
 		./gve_array.c	\
-		./gve-normal.c	\
 		./simple_tree.c
 
 
@@ -83,7 +82,6 @@ DATA_OBJS := ./ap.o			\
 		./os_rank.o	\
 		./gve.o	\
 		./gve_array.o	\
-		./gve-normal.o	\
 		./simple_tree.o
 
 

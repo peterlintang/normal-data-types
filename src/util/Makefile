@@ -11,9 +11,11 @@ LIBCOMMUNICATE:=libutil.a
 
 LIBS:=$(LIBCOMMUNICATE)
 
-COMMUNICATE_SRCS := ./components.c 
+COMMUNICATE_SRCS := ./components.c 	\
+					./gve-normal.c
 
-COMMUNICATE_OBJS := ./components.o 
+COMMUNICATE_OBJS := ./components.o 	\
+					./gve-normal.o
 
 all: $(LIBS)
 
