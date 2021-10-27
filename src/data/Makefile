@@ -20,6 +20,7 @@ DATA_SRCS := ./ap.c			\
 		./table.c		\
 		./xp.c			\
 		./array.c		\
+		./atom.c		\
 		./bit.c			\
 		./sbit.c			\
 		./mp.c			\
@@ -55,6 +56,7 @@ DATA_OBJS := ./ap.o			\
 		./table.o		\
 		./xp.o			\
 		./array.o		\
+		./atom.o		\
 		./bit.o			\
 		./sbit.o			\
 		./mp.o			\
