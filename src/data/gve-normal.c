@@ -49,10 +49,9 @@ GraphA_T GA_create(
 		return NULL;
 	}
 
-	fprintf(stdout, "%s: nodes: %d, edges: %d\n", 
-				__func__,
-				node_len = MODULE_FUN_NAME(GraphA, VnodesLength)(g), 
-				edge_len = MODULE_FUN_NAME(GraphA, EdgesLength)(g));
+
+	node_len = MODULE_FUN_NAME(GraphA, VnodesLength)(g); 
+	edge_len = MODULE_FUN_NAME(GraphA, EdgesLength)(g);
 
 	for (int i = 0; i < node_len; i++)
 	{
@@ -75,6 +74,11 @@ GraphA_T GA_create(
 	}
 
 	fclose(fp);
+	fprintf(stdout, "%s: nodes: %d, edges: %d, g: %p\n", 
+				__func__,
+				node_len = MODULE_FUN_NAME(GraphA, VnodesLength)(g), 
+				edge_len = MODULE_FUN_NAME(GraphA, EdgesLength)(g),
+				g);
 
 	return g;
 }	
