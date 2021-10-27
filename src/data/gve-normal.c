@@ -15,6 +15,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "gve-normal.h"
 
@@ -22,8 +23,8 @@
 GraphA_T GA_create(
 			char *filename,
 			void *(*get_graph)(FILE *fp),
-			int (*get_edge)(FILE *fp, void *g), 
-			int (*get_node)(FILE *fp, void *g)
+			int (*get_edge)(FILE *fp, void *g, void *edge), 
+			int (*get_node)(FILE *fp, void *g, void *node)
 			)
 {
 	FILE *fp = NULL;
@@ -33,7 +34,6 @@ GraphA_T GA_create(
 	int edge_len = 0;
 	int ret = 0;
 	void *node = NULL;
-	void *edge = NULL;
 
 	assert(filename);
 	assert(get_graph);
@@ -96,7 +96,7 @@ void GA_E_print(int (*print)(void *edge, void *arg), void *edge, void *arg)
 	print(edge, arg);
 }
 
-void GA_print(struct G *g, int (*v_print)(void *, void *), int (*e_print)(void *, void *arg), void *v_arg, void *e_arg)
+void GA_print(GraphA_T g, int (*v_print)(void *, void *), int (*e_print)(void *, void *arg), void *v_arg, void *e_arg)
 {
 	int len = 0;
 	void *priv = NULL;
