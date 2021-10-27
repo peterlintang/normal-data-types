@@ -1,6 +1,7 @@
 
 DIRS := data \
 		pic	\
+		util \
 		inifile
 all:
 	@for i in $(DIRS); do ( cd $$i; $(MAKE) all ); \

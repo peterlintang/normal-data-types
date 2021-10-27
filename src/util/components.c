@@ -9,6 +9,7 @@
 
 #include "dlist.h"
 #include "gve_array.h"
+#include "gve-normal.h"
 #include "set-list.h"
 #include "components.h"
 
@@ -19,8 +20,8 @@ static void *get_graphA(FILE *fp)
 	int node_item = 0;
 	int edge_item = 0;
 
-	scanf(fp, "%d", &node_item);
-	scanf(fp, "%d", &edge_item);
+	fscanf(fp, "%d", &node_item);
+	fscanf(fp, "%d", &edge_item);
 	fprintf(stdout, "%s: node: %d, edge: %d\n", __func__, node_item, edge_item);
 
 	g = MODULE_FUN_NAME(GraphA, create)(sizeof(struct node), node_item, sizeof(struct edge_ext), edge_item, NULL);
@@ -34,7 +35,7 @@ static int get_node(FILE *fp, void *g_p, void *n_p)
 	struct node *node = (struct node *)n_p;
 	GraphA_T g = (GraphA_T)g_p;
 
-	scanf(fp, "%d", &v);
+	fscanf(fp, "%d", &v);
 
 	node->v = v;
 
@@ -61,13 +62,13 @@ static int get_edge(FILE *fp, void *g_p, void *e_p)
 	GraphA_T g = (GraphA_T)g_p;
 	EdgeA_T edge = (EdgeA_T)e_p;
 
-	scanf(fp, "%d,%d,%d", &v, &u, &value);
+	fscanf(fp, "%d,%d,%d", &v, &u, &value);
 
 	n_v = MODULE_FUN_NAME(GraphA, VnodeSearch)(g, cmp, (void *)v);
 	n_u = MODULE_FUN_NAME(GraphA, VnodeSearch)(g, cmp, (void *)u);
 	if (n_v == NULL || n_u == NULL)
 	{
-		fprintf(stdout, "search %d, %d failed %p, %p\n", n_v, n_u);
+		fprintf(stdout, "search %d, %d failed %p, %p\n", v, u, n_v, n_u);
 		return -1;
 	}
 
@@ -77,7 +78,7 @@ static int get_edge(FILE *fp, void *g_p, void *e_p)
 	return 0;
 }
 
-GraphA_T components_create_graph(char *fliename)
+GraphA_T components_create_graph(char *filename)
 {
 	assert(filename);
 
@@ -88,6 +89,98 @@ GraphA_T components_create_graph(char *fliename)
 	return g;
 }
 
+/**********************************************************/
+static int set_cmp(void *priv, void *arg)
+{
+	if (priv == arg) return 0;
+	else return 1;
+}
+
+static SetL_T new_set(void *node)
+{
+	int ret = 0;
+	SetL_T set = NULL;
+
+	set = MODULE_FUN_NAME(SetL, new)(set_cmp);
+	if (set == NULL)
+	{
+		return NULL;
+	}
+
+	ret = MODULE_FUN_NAME(SetL, add)(set, node);
+	if (ret != 0)
+	{
+		MODULE_FUN_NAME(SetL, free)(&set);
+		return NULL;
+	}
+
+	return set;
+}
+
+static int insert_set_to_sets(ListD_T sets, SetL_T set)
+{
+	ListDNode_T node = NULL;
+
+	node = MODULE_FUN_NAME(ListDNode, new)((void *)set);
+	if (node == NULL)
+	{
+		return -1;
+	}
+
+	MODULE_FUN_NAME(ListD, insert)(sets, (void *)node);
+	return 0;
+}
+
+SetL_T set_find(ListD_T sets, void *p)
+{
+	int count = 0;
+	ListDNode_T cur = NULL;
+
+	for (int i = 0; i < count; i++)
+	{
+		cur = MODULE_FUN_NAME(ListD, get)(sets, i);
+		if (MODULE_FUN_NAME(SetL, isMember)((SetL_T)(cur->priv), p))
+			return (SetL_T)(cur->priv);
+	}
+
+	return NULL;
+}
+
+static int listd_cmp(void *priv, void *arg)
+{
+	if (priv == arg)
+		return 0;
+	else
+		return 1;
+}
+
+static int set_union(ListD_T sets, SetL_T set_v, SetL_T set_u)
+{
+	SetL_T set = NULL;
+	ListDNode_T v = NULL;
+	ListDNode_T u = NULL;
+	ListDNode_T node = NULL;
+
+	set = MODULE_FUN_NAME(SetL, union)(set_v, set_u);
+
+	v = MODULE_FUN_NAME(ListD, search)(sets, listd_cmp, set_v);
+	u = MODULE_FUN_NAME(ListD, search)(sets, listd_cmp, set_u);
+
+	MODULE_FUN_NAME(ListD, remove)(sets, v);
+	MODULE_FUN_NAME(ListD, remove)(sets, u);
+
+	node = MODULE_FUN_NAME(ListDNode, new)(set);
+	MODULE_FUN_NAME(ListD, insert)(sets, node);
+
+	MODULE_FUN_NAME(ListDNode, free)(&v);
+	MODULE_FUN_NAME(ListDNode, free)(&u);
+
+	MODULE_FUN_NAME(SetL, free)(&set_v);
+	MODULE_FUN_NAME(SetL, free)(&set_u);
+
+	return 0;
+}
+
 /*
  * 计算图g的连通分量,图最后的连通分量保存在链表sets中，
  * 链表中每一个元素代表一个连通分量
@@ -96,29 +189,49 @@ GraphA_T components_create_graph(char *fliename)
  */
 void components_connected(ListD_T sets, GraphA_T g)
 {
-	for (int i = 0; i < g->vs_num; i++)
+	SetL_T set = NULL;
+	SetL_T set_v = NULL;
+	SetL_T set_u = NULL;
+	int node_count = 0;
+	int edge_count = 0;
+	EdgeA_T edge = NULL;
+	void *node = NULL;
+	void *v = NULL;
+	void *u = NULL;
+
+	node_count = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
+	for (int i = 0; i < node_count; i++)
 	{
-		set_make(sets, g->vs[i].v);
+		node = MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
+
+		set = new_set(node);
+
+		insert_set_to_sets(sets, set);
 	}
 
-	for (int i = 0; i < g->es_num; i++)
+	edge_count = MODULE_FUN_NAME(GraphA, EdgesLength)(g);
+	for (int i = 0; i < edge_count; i++)
 	{
-		if (set_find(sets, g->es[i].u) != set_find(sets, g->es[i].v))
+		edge = MODULE_FUN_NAME(GraphA, EdgeGet)(g, i);
+		MODULE_FUN_NAME(GraphA, EdgeGetVnodes)(edge, &v, &u);
+		set_v = set_find(sets, v);
+		set_u = set_find(sets, u);
+		if (set_v == set_u)
 		{
-			set_union(sets, g->es[i].u, g->es[i].v);
+			set_union(sets, set_v, set_u);
 		}
 	}
 }
 
-int components_same(struct sets *sets, int x, int y)
+int components_same(ListD_T sets, void *x, void *y)
 {
-	int x_r = 0;
-	int y_r = 0;
+	SetL_T x_set = NULL;
+	SetL_T y_set = NULL;
 
-	x_r = set_find(sets, x);
-	y_r = set_find(sets, y);
+	x_set = set_find(sets, x);
+	y_set = set_find(sets, y);
 
-	if ((x_r != SET_ERROR) && (x_r == y_r))
+	if (x_set == y_set)
 		return 1;
 	else
 		return 0;
