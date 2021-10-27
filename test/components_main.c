@@ -11,22 +11,35 @@ static void apply(void **priv, void *arg)
 	SetL_T set = (SetL_T)(*priv);
 
 	count = MODULE_FUN_NAME(SetL, count)(set);
+	fprintf(stdout, "%s: set: %p, count: %d\n", __func__, set, count);
 	for (int i = 0; i< count; i++)
 	{
 		p = (struct node *)MODULE_FUN_NAME(SetL, get)(set, i);
-		fprintf(stdout, "i: %d, value: %d\n", i, p->v);
+		fprintf(stdout, "i: %d, v: %p, value: %d\n", i, p, p->v);
 	}
 }
 
 static int v_print(void *priv, void *arg)
 {
 	struct node *node = (struct node *)priv;
-	fprintf(stdout, "%s: v: %d\n", __func__, node->v);
+	fprintf(stdout, "%s: node: %p, v: %d\n", __func__, node, node->v);
 	return 0;
 }
 
 static int e_print(void *priv, void *arg)
 {
+	struct node *v = NULL;
+	struct node *u = NULL;
+	struct edge_ext *ext = NULL;
+	EdgeA_T edge = (EdgeA_T)priv;
+	MODULE_FUN_NAME(GraphA, EdgeGetVnodes)(edge, &v, &u);
+	ext = (struct edge_ext *)MODULE_FUN_NAME(GraphA, EdgeGetPriv)(edge);
+	fprintf(stdout, "%s: edge: %p, v: %p, u: %p, value: %d\n", 
+					__func__,
+					edge, 
+					v,
+					u,
+					ext->value);
 	return 0;
 }
 
@@ -38,10 +51,12 @@ int main(int argc, char *argv[])
 	if (argc != 2) return 0;
 
 	g = components_create_graph(argv[1]);
-	sets = MODULE_FUN_NAME(ListD, new)();
+	fprintf(stdout, "%s: g: %p\n", __func__, g);
 
-	fprintf(stdout, "%s: %p, %p\n", __func__, sets, g);
 	GA_print(g, v_print, e_print, NULL, NULL);
+
+	sets = MODULE_FUN_NAME(ListD, new)();
+	fprintf(stdout, "%s: %p, %p\n", __func__, sets, g);
 
 	components_connected(sets, g);
 
