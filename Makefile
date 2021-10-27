@@ -1,5 +1,5 @@
 
-INC:=-I./include -I./include/data
+INC:=-I./include -I./include/data -I./include/util
 
 GCC:=gcc
 
@@ -7,7 +7,7 @@ FLAGS:=-c
 
 AR:=ar
 
-LIBDATATYPE:=./src/data/libdatatype.a
+LIBDATATYPE:=./src/data/libdatatype.a ./src/util/libutil.a
 
 
 all: libs
