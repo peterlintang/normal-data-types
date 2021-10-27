@@ -1,0 +1,107 @@
+diff --git a/src/data/gve-normal.c b/src/data/gve-normal.c
+index 45d45ff..f1b2bd7 100644
+--- a/src/data/gve-normal.c
++++ b/src/data/gve-normal.c
+@@ -56,24 +56,30 @@ GraphA_T GA_create(
+ 
+ 	for (int i = 0; i < node_len; i++)
+ 	{
++		fprintf(stdout, "getting node: %d\n", i);
+ 		node = MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
+ 		ret = get_node(fp, g, node);
+ 		if (ret != 0)
+ 		{
+ 			fprintf(stderr, "get: %i node failed: %d\n", i, ret);
+ 		}
++		fprintf(stdout, "get node: %d, done\n", i);
+ 	}
+ 
+ 	for (int i = 0; i < edge_len; i++)
+ 	{
++		fprintf(stdout, "getting edge: %d\n", i);
+ 		edge = MODULE_FUN_NAME(GraphA, EdgeGet)(g, i);
+ 		ret = get_edge(fp, g, edge);
+ 		if (ret != 0)
+ 		{
+ 			fprintf(stderr, "get: %i node failed: %d\n", i, ret);
+ 		}
++		fprintf(stdout, "get edge: %d, done\n", i);
+ 	}
+ 
++	fprintf(stdout, "get all nodes edges done\n");
++
+ 	fclose(fp);
+ 
+ 	return g;
+diff --git a/src/data/gve_array.c b/src/data/gve_array.c
+index cc5b8b7..3b71604 100644
+--- a/src/data/gve_array.c
++++ b/src/data/gve_array.c
+@@ -177,6 +177,7 @@ void *MODULE_FUN_NAME(GraphA, VnodePut)(G g, int i, void *v)
+ int MODULE_FUN_NAME(GraphA, VnodesLength)(G g)
+ {
+ 	assert(g);
++	fprintf(stdout, "%s: g: %p\n", __func__, g);
+ 	return MODULE_FUN_NAME(Array, length)(g->vs);
+ }
+ 
+diff --git a/src/util/components.c b/src/util/components.c
+index ffdc314..09cfbe9 100644
+--- a/src/util/components.c
++++ b/src/util/components.c
+@@ -26,6 +26,7 @@ static void *get_graphA(FILE *fp)
+ 
+ 	g = MODULE_FUN_NAME(GraphA, create)(sizeof(struct node), node_item, sizeof(struct edge_ext), edge_item, NULL);
+ 
++	fprintf(stdout, "%s: g: %p\n", __func__, g);
+ 	return g;
+ }
+ 
+@@ -38,6 +39,7 @@ static int get_node(FILE *fp, void *g_p, void *n_p)
+ 	fscanf(fp, "%d", &v);
+ 
+ 	node->v = v;
++	fprintf(stdout, "%s: node: %d\n", __func__, v);
+ 
+ 	return 0;
+ }
+@@ -64,6 +66,8 @@ static int get_edge(FILE *fp, void *g_p, void *e_p)
+ 
+ 	fscanf(fp, "%d,%d,%d", &v, &u, &value);
+ 
++	fprintf(stdout, "%s: edge: %d, %d, %d\n", __func__, v, u, value);
++
+ 	n_v = MODULE_FUN_NAME(GraphA, VnodeSearch)(g, cmp, (void *)v);
+ 	n_u = MODULE_FUN_NAME(GraphA, VnodeSearch)(g, cmp, (void *)u);
+ 	if (n_v == NULL || n_u == NULL)
+@@ -199,9 +203,12 @@ void components_connected(ListD_T sets, GraphA_T g)
+ 	void *v = NULL;
+ 	void *u = NULL;
+ 
++	fprintf(stdout, "%s: start\n", __func__);
+ 	node_count = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
++	fprintf(stdout, "%s: node: %d\n", __func__, node_count);
+ 	for (int i = 0; i < node_count; i++)
+ 	{
++		fprintf(stdout, "%s: node i: %d\n", __func__, i);
+ 		node = MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
+ 
+ 		set = new_set(node);
+@@ -212,6 +219,7 @@ void components_connected(ListD_T sets, GraphA_T g)
+ 	edge_count = MODULE_FUN_NAME(GraphA, EdgesLength)(g);
+ 	for (int i = 0; i < edge_count; i++)
+ 	{
++		fprintf(stdout, "%s: edge i: %d\n", __func__, i);
+ 		edge = MODULE_FUN_NAME(GraphA, EdgeGet)(g, i);
+ 		MODULE_FUN_NAME(GraphA, EdgeGetVnodes)(edge, &v, &u);
+ 		set_v = set_find(sets, v);
+diff --git a/test/Makefile b/test/Makefile
+index 4886c16..af703d0 100644
+--- a/test/Makefile
++++ b/test/Makefile
+@@ -6,4 +6,5 @@ all:
+ 	gcc -g sem_test.c -o sem-test -I../include -I../include/pic ../src/pic/libcommunicate.a -lrt -lpthread
+ 	gcc -g sem_sysv_test.c -o sem-sysv_test -I../include -I../include/pic ../src/pic/libcommunicate.a -lrt -lpthread
+ 	gcc -g process-lock-test.c -o process-lock-test -I../include -I../include/pic ../src/pic/libcommunicate.a -lrt -lpthread
++	gcc -g components_main.c -o components -I../include -I../include/util -I../include/data ../src/data/libdatatype.a ../src/util/libutil.a ../src/data/libdatatype.a -lrt -lpthread
+ clean:
