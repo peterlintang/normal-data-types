@@ -16,6 +16,7 @@ struct edge_ext {
 	int value;
 };
 
+GraphA_T components_create_graph(char *filename);
 
 /*
  * 计算图g的连通分量,图最后的连通分量保存在链表sets中，

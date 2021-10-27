@@ -14,7 +14,7 @@
 #include "components.h"
 
 
-static void *get_graphA(FILE *fp)
+static GraphA_T get_graphA(FILE *fp)
 {
 	GraphA_T g = NULL;
 	int node_item = 0;
@@ -22,9 +22,10 @@ static void *get_graphA(FILE *fp)
 
 	fscanf(fp, "%d", &node_item);
 	fscanf(fp, "%d", &edge_item);
-	fprintf(stdout, "%s: node: %d, edge: %d\n", __func__, node_item, edge_item);
+//	fprintf(stdout, "%s: node: %d, edge: %d\n", __func__, node_item, edge_item);
 
 	g = MODULE_FUN_NAME(GraphA, create)(sizeof(struct node), node_item, sizeof(struct edge_ext), edge_item, NULL);
+//	fprintf(stdout, "%s: node: %d, edge: %d, g: %p\n", __func__, node_item, edge_item, g);
 
 	return g;
 }
@@ -39,6 +40,8 @@ static int get_node(FILE *fp, void *g_p, void *n_p)
 
 	node->v = v;
 
+//	fprintf(stdout, "%s: node: %p, v: %d\n", __func__, node, node->v);
+
 	return 0;
 }
 
@@ -47,6 +50,7 @@ static int cmp(void *arg, void *priv)
 	struct node *node = (struct node *)arg;
 	int num = (int)priv;
 
+//	fprintf(stdout, "%s: node: %p, v: %d, num: %d\n", __func__, node, node->v, num);
 	if (num == node->v) return 0;
 	else return 1;
 }
@@ -72,6 +76,10 @@ static int get_edge(FILE *fp, void *g_p, void *e_p)
 		return -1;
 	}
 
+//	fprintf(stdout, "%s: edge: %p, value: %d, n_v: %p, v: %d, n_u: %p, v: %d\n", __func__, 
+//					edge, value,
+//					n_v, n_v->v, n_u, n_u->v);
+
 	MODULE_FUN_NAME(GraphA, EdgeSetVnodes)(edge, (void *)n_v, (void *)n_u, NULL, NULL);
 	ext = (struct edge_ext *)MODULE_FUN_NAME(GraphA, EdgeGetPriv)((void *)edge);
 	ext->value = value;
@@ -85,6 +93,7 @@ GraphA_T components_create_graph(char *filename)
 	GraphA_T g = NULL;
 
 	g = GA_create(filename, get_graphA, get_edge, get_node);
+//	fprintf(stdout, "%s: g: %p\n", __func__, g);
 
 	return g;
 }
@@ -92,6 +101,7 @@ GraphA_T components_create_graph(char *filename)
 /**********************************************************/
 static int set_cmp(void *priv, void *arg)
 {
+//	fprintf(stdout, "%s: priv: %p, arg: %p\n", __func__, priv, arg);
 	if (priv == arg) return 0;
 	else return 1;
 }
@@ -131,14 +141,17 @@ static int insert_set_to_sets(ListD_T sets, SetL_T set)
 	return 0;
 }
 
-SetL_T set_find(ListD_T sets, void *p)
+SetL_T set_find(ListD_T sets, struct node *p)
 {
 	int count = 0;
 	ListDNode_T cur = NULL;
 
+	count = MODULE_FUN_NAME(ListD, count)(sets);
 	for (int i = 0; i < count; i++)
 	{
 		cur = MODULE_FUN_NAME(ListD, get)(sets, i);
+//		fprintf(stdout, "%s: i: %d, cur: %p, priv: %p, p: %p\n",
+//						__func__, i, cur, cur->priv, p);
 		if (MODULE_FUN_NAME(SetL, isMember)((SetL_T)(cur->priv), p))
 			return (SetL_T)(cur->priv);
 	}
@@ -160,6 +173,8 @@ static int set_union(ListD_T sets, SetL_T set_v, SetL_T set_u)
 	ListDNode_T v = NULL;
 	ListDNode_T u = NULL;
 	ListDNode_T node = NULL;
+
+//	fprintf(stdout, "%s: union set_v: %p, set_u: %p\n", __func__, set_v, set_u);
 
 	set = MODULE_FUN_NAME(SetL, union)(set_v, set_u);
 
@@ -194,6 +209,8 @@ void components_connected(ListD_T sets, GraphA_T g)
 	SetL_T set_u = NULL;
 	int node_count = 0;
 	int edge_count = 0;
+	int ret = 0;
+	struct edge_ext *ext = NULL;
 	EdgeA_T edge = NULL;
 	void *node = NULL;
 	void *v = NULL;
@@ -206,17 +223,28 @@ void components_connected(ListD_T sets, GraphA_T g)
 
 		set = new_set(node);
 
-		insert_set_to_sets(sets, set);
+		ret = insert_set_to_sets(sets, set);
+		if (ret != 0)
+		{
+			fprintf(stdout, "%s: i: %d, set: %p, ret: %d\n", 
+							__func__, i, set, ret);
+		}
+	//	fprintf(stdout, "%s: i: %d, set: %p, ret: %d\n", 
+	//					__func__, i, set, ret);
 	}
 
+//	fprintf(stdout, "%s ********************\n", __func__);
 	edge_count = MODULE_FUN_NAME(GraphA, EdgesLength)(g);
 	for (int i = 0; i < edge_count; i++)
 	{
 		edge = MODULE_FUN_NAME(GraphA, EdgeGet)(g, i);
 		MODULE_FUN_NAME(GraphA, EdgeGetVnodes)(edge, &v, &u);
+		ext = MODULE_FUN_NAME(GraphA, EdgeGetPriv)(edge);
 		set_v = set_find(sets, v);
 		set_u = set_find(sets, u);
-		if (set_v == set_u)
+//		fprintf(stdout, "%s i: %d, edge: %p, v: %p, set_v: %p, u: %p, set_u: %p, value: %d\n", 
+//						__func__, i, edge, v, set_v, u, set_u, ext->value);
+		if (set_v != set_u)
 		{
 			set_union(sets, set_v, set_u);
 		}
