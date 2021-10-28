@@ -11,7 +11,7 @@ static int partition(void *a[], int (*cmp)(void *, void *), int p, int r)
 	int i;
 	int j;
 	void *x = a[r];
-	void *tmp;
+	void *tmp = NULL;
 	
 	j = p - 1;
 	for (i = p; i < r; i++)
@@ -37,8 +37,8 @@ static int partition2(void *a[], int (*cmp)(void *, void *), int p, int r)
 {
 	int i;
 	int j;
-	void *tmp;
-	void *part_key;
+	void *tmp = NULL;
+	void *part_key = NULL;
 
 	part_key = a[p];
 	i = p;
@@ -102,7 +102,7 @@ static int random_key(int p, int r)
 static int random_partition(void *a[], int (*cmp)(void *, void *), int p, int r)
 {
 	int j;
-	void *tmp;
+	void *tmp = NULL;
 
 	j = random_key(p, r);
 	tmp = a[j];
