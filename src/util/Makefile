@@ -18,6 +18,7 @@ COMMUNICATE_SRCS := ./components.c 	\
 					./quark.c	\
 					./quicksort.c	\
 					./insert-sort.c	\
+					./merge-sort.c	\
 					./thread_pool.c
 
 COMMUNICATE_OBJS := ./components.o 	\
@@ -27,6 +28,7 @@ COMMUNICATE_OBJS := ./components.o 	\
 					./quark.o	\
 					./quicksort.o	\
 					./insert-sort.o	\
+					./merge-sort.o	\
 					./thread_pool.o
 
 all: $(LIBS)
