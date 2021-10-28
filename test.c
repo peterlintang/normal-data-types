@@ -2108,7 +2108,7 @@ struct test_routine my_test_routines[] =
 //		{test_threadPool, "threadPool"},	// ko
 //		{test_array, "array"},				// ko
 //		{test_set, "set"},					// ko
-		{test_set_list, "set-list"},					// ko
+//		{test_set_list, "set-list"},					// ko
 //		{test_table, "table"},				// ko
 //		{test_seq, "seq"},					// ko
 //		{test_ring, "ring"},				// kko
