@@ -1,20 +1,21 @@
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
+#include <stdlib.h>	// for srand
+#include <sys/time.h> // for time
+
+#include "quicksort.h"
 
 /* O(r-p+1) */
-int partition(int a[], int p, int r)
+static int partition(void *a[], int (*cmp)(void *, void *), int p, int r)
 {
 	int i;
-	int x = a[r];
-	int tmp;
 	int j;
+	void *x = a[r];
+	void *tmp;
 	
 	j = p - 1;
 	for (i = p; i < r; i++)
 	{
-		if (a[i] <= x)
+		if (cmp(a[i], x) <= 0)
 		{
 			j++;
 			tmp = a[i];
@@ -31,13 +32,12 @@ int partition(int a[], int p, int r)
 	return j;
 }
 
-/* for 7.1-2 di er wen */
-int partition2(int a[], int p, int r)
+static int partition2(void *a[], int (*cmp)(void *, void *), int p, int r)
 {
 	int i;
 	int j;
-	int tmp;
-	int part_key;
+	void *tmp;
+	void *part_key;
 
 	part_key = a[p];
 	i = p;
@@ -45,13 +45,12 @@ int partition2(int a[], int p, int r)
 
 	while (1)
 	{
-		do { i++; } while (a[i] < part_key && i <= r);
-		do { j--; } while (a[j] > part_key); // bu yong jia xia biao pan duan, yin wei part_key ke zuo shao bin 
+		do { i++; } while ((cmp(a[i], part_key) < 0) && i <= r);
+		do { j--; } while (cmp(a[j], part_key) > 0); // bu yong jia xia biao pan duan, yin wei part_key ke zuo shao bin 
 		if (i > j) break;
 		tmp = a[i];
 		a[i] = a[j];
 		a[j] = tmp;
-//		fprintf(stdout, "i: %d, j: %d\n", i, j);
 	}
 
 	tmp = a[j];
@@ -64,17 +63,15 @@ int partition2(int a[], int p, int r)
 /*
  * T(r-p+1)=T(q-1-p+1)+T(r-(q+1)+1)+O(r-p+1)
  */
-int quicksort(int a[], int p, int r)
+int quicksort(void *a[], int (*cmp)(void *, void *), int p, int r)
 {
 	int q;
 
 	if (p < r)
 	{
-		q = partition2(a, p, r);
-//		fprintf(stdout, "%s: index: %d\n", __func__, q); // for 7.1-2 xi ti di yi wen
-//		think about 7.1-2 di er wen
-		quicksort(a, p, q - 1);
-		quicksort(a, q + 1, r);
+		q = partition2(a, cmp, p, r);
+		quicksort(a, cmp, p, q - 1);
+		quicksort(a, cmp, q + 1, r);
 	}
 
 	return 0;
@@ -98,52 +95,71 @@ static int random_key(int p, int r)
 	return seed;
 }
 
-static int random_partition(int a[], int p, int r)
+static int random_partition(void *a[], int (*cmp)(void *, void *), int p, int r)
 {
 	int j;
-	int tmp;
+	void *tmp;
 
 	j = random_key(p, r);
 	tmp = a[j];
 	a[j] = a[r];
 	a[r] = tmp;
 
-	partition(a, p, r);
+	return partition(a, cmp, p, r);
 }
 
-int random_quicksort(int a[], int p, int r)
+int random_quicksort(void *a[], int (*cmp)(void *, void *), int p, int r)
 {
 	int q;
 
 	if (p < r)
 	{
-		q = random_partition(a, p, r);
-		random_quicksort(a, p, q - 1);
-		random_quicksort(a, q + 1, r);
+		q = random_partition(a, cmp, p, r);
+		random_quicksort(a, cmp, p, q - 1);
+		random_quicksort(a, cmp, q + 1, r);
 	}
+
+	return 0;
+}
+
+#if 0
+static int cmp(void *x, void *y)
+{
+	int i_x = (int)x;
+	int i_y = (int)y;
+
+	if (i_x > i_y) return 1;
+	else if (i_x < i_y) return -1;
+	else return 0;
 }
 
 int main(int argc, char *argv[])
 {
 #define ARRAY_SIZE(a)	(sizeof(a) / sizeof(a[0]))
-	int a[] = { 3, 4, 8, 5, 6, 7, 9, 2, 12, 18, 29, 30, 13, 15, 87, 76, 56, 36 };
+	void *a[] = { 
+			(void *)3, (void *)4, (void *)8, (void *)5, 
+			(void *)6, (void *)7, (void *)9, (void *)2, 
+			(void *)12, (void *)18, (void *)29, (void *)30, 
+			(void *)13, (void *)15, (void *)87, (void *)76, (void *)56, (void *)36 };
 //	int a[] = { 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 };
 
 	fprintf(stdout, "before sort...:%d\n", ARRAY_SIZE(a));
 	for (int i = 0; i < ARRAY_SIZE(a); i++)
 	{
-		fprintf(stdout, "%d\n", a[i]);
+		fprintf(stdout, "%p\n", a[i]);
 	}
 
-	quicksort(a, 0, ARRAY_SIZE(a) - 1);
-//	random_quicksort(a, 0, ARRAY_SIZE(a) - 1);
-	fprintf(stdout, "after sort...\n");
+//	quicksort(a, cmp, 0, ARRAY_SIZE(a) - 1);
+	random_quicksort(a, cmp, 0, ARRAY_SIZE(a) - 1);
+	fprintf(stdout, "after sort...hello\n");
 	for (int i = 0; i < ARRAY_SIZE(a); i++)
 	{
-		fprintf(stdout, "%d\n", a[i]);
+		fprintf(stdout, "%p\n", a[i]);
 	}
 
 	return 0;
 }
+
+#endif 
 
 
