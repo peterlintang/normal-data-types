@@ -2,17 +2,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "insert-sort.h"
 
-int insert_sort(int in[], int p, int r)
+
+int insert_sort(void *in[], int (*cmp)(void *, void *), int p, int r)
 {
 	int i;
 	int j;
-	int tmp;
+	void *tmp = NULL;
 
 	for (i = p + 1; i <= r; i++)
 	{
 		j = i;
-		while ((j > 0) && (in[j] < in[j - 1]))
+		while ((j > 0) && (cmp(in[j], in[j - 1]) < 0))
 		{
 			tmp = in[j];
 			in[j] = in[j - 1];
@@ -21,21 +23,37 @@ int insert_sort(int in[], int p, int r)
 		}
 	}
 
+	return 0;
 }
 
+
+#if 0
+
+static int cmp(void *x, void *y)
+{
+	int x_i = (int )x;
+	int y_i = (int )y;
+
+	if (x_i > y_i) return 1;
+	else if (x_i < y_i) return -1;
+	else return 0;
+}
 
 int main(int argc, char *argv[])
 {
 	int i;
 	int length = 1024;
-	int *in = NULL;
+	void **in = NULL;
 
-	length = atoi(argv[1]);
-	in = (int *)calloc(length, sizeof(int));
+	if (argc == 2)
+		length = atoi(argv[1]);
+
+	in = (void **)calloc(length, sizeof(void *));
 
 	for (i = 0; i < length; i++)
 	{
-		in[i] = 10 * (length - i);
+//		in[i] = (void *)(10 * i + 1);
+		in[i] = (void *)(random() % length + 1);
 	}
 
 	/*
@@ -48,17 +66,13 @@ int main(int argc, char *argv[])
 	fprintf(stdout, "\n");
 	*/
 
-	insert_sort(in, 0, length - 1);
+	insert_sort(in, cmp, 0, length - 1);
 
-	/*
+	
 	for (i = 0; i < length ; i++)
 	{
-		fprintf(stdout, "%d ", in[i]);
-		if ((i + 1) % 10 == 0)
-			fprintf(stdout, "\n");
+		fprintf(stdout, "%p\n", in[i]);
 	}
-	fprintf(stdout, "\n");
-	*/
 
 	free(in);
 
@@ -66,5 +80,6 @@ int main(int argc, char *argv[])
 }
 
 
+#endif 
 
 
