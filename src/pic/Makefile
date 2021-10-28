@@ -1,5 +1,5 @@
 
-INC:=-I../../include -I../../include/pic
+INC:=-I../../include -I../../include/pic -I../../include/util
 
 GCC:=gcc
 

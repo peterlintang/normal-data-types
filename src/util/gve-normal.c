@@ -22,7 +22,7 @@
 
 GraphA_T GA_create(
 			char *filename,
-			void *(*get_graph)(FILE *fp),
+			GraphA_T (*get_graph)(FILE *fp),
 			int (*get_edge)(FILE *fp, void *g, void *edge), 
 			int (*get_node)(FILE *fp, void *g, void *node)
 			)
