@@ -13,10 +13,12 @@ LIBS:=$(LIBCOMMUNICATE)
 
 COMMUNICATE_SRCS := ./components.c 	\
 					./gve-normal.c	\
+					./err.c	\
 					./thread_pool.c
 
 COMMUNICATE_OBJS := ./components.o 	\
 					./gve-normal.o	\
+					./err.o	\
 					./thread_pool.o
 
 all: $(LIBS)
