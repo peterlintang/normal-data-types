@@ -5,7 +5,7 @@
  *  父子进程 同 步, 用 信号 实现 
  *  used by parent & child process mainly
  */
-#include "apue.h"
+#include "tell_wait_signal.h"
 
 static volatile sig_atomic_t	sigflag;        /* set nonzero by sig handler, will be set to zero by compiler ? */
 static sigset_t			newmask;        /* for new sig mask */
@@ -17,7 +17,7 @@ static void sig_usr(int signo)
 	sigflag	= 1;
 }
 
-void TELL_WAIT(void)
+void TELL_WAIT_S(void)
 {
 	if (signal(SIGUSR1, sig_usr) == SIG_ERR)
 		err_sys("signal (SIGUSR1) error");
@@ -33,17 +33,17 @@ void TELL_WAIT(void)
 		err_sys("SIG_BLOCK error");
 }
 
-void TELL_PARENT(pid_t pid)
+void TELL_PARENT_S(pid_t pid)
 {
 	kill(pid, SIGUSR2);
 }
 
-void TELL_CHILD(pid_t pid)
+void TELL_CHILD_S(pid_t pid)
 {
 	kill(pid, SIGUSR1);
 }
 
-void WAIT_PARENT(void)
+void WAIT_PARENT_S(void)
 {
 	while (sigflag == 0) 
 		sigsuspend(&zeromask);
@@ -54,7 +54,7 @@ void WAIT_PARENT(void)
 		err_sys("SIG_SETMASK error");
 }
 
-void WAIT_CHILD(void)
+void WAIT_CHILD_S(void)
 {
 	while (sigflag == 0)
 		sigsuspend(&zeromask);
