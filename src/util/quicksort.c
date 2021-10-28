@@ -1,4 +1,5 @@
 
+#include <stdio.h>
 #include <stdlib.h>	// for srand
 #include <sys/time.h> // for time
 
@@ -77,6 +78,9 @@ int quicksort(void *a[], int (*cmp)(void *, void *), int p, int r)
 	return 0;
 }
 
+/*
+ *  数据量大时耗时间
+ */
 static int random_key(int p, int r)
 {
 	struct timeval tv;
