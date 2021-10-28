@@ -2,7 +2,7 @@
 
 /*
  *  process sync implemented by signal
- *  进程 同 步, 用 信号 实现 
+ *  父子进程 同 步, 用 信号 实现 
  *  used by parent & child process mainly
  */
 #include "apue.h"

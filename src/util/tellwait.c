@@ -1,3 +1,6 @@
+/*
+ * 父子进程同步原语
+ */
 #include "apue.h"
 
 static int pfd1[2], pfd2[2];
