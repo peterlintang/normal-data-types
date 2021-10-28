@@ -1,7 +1,15 @@
-#include "apue.h"
-#include <errno.h>
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <stdarg.h>
+#include <errno.h>
 #include <syslog.h>
+
+#include "log.h"
+
+#define MAXLINE	1024
 
 static void log_doit(int, int, const char *, va_list);
 
@@ -106,6 +114,6 @@ log_doit(int errnoflag, int priority, const char *fmt, va_list ap)
 	}
 	else
 	{
-		syslog(priority, buf);
+		syslog(priority, "%s", buf);
 	}
 }
