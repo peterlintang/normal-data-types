@@ -9,6 +9,7 @@
 #include <string.h>
 #include <signal.h>
 #include <pthread.h>
+#include <sys/time.h>
 
 #include "quark.h"
 
