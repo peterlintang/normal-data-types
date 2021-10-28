@@ -5,6 +5,9 @@
 #ifndef CI_TELL_WAIT_P_H
 #define CI_TELL_WAIT_P_H
 
+#include <sys/types.h>
+#include <unistd.h>
+
 
 void TELL_WAIT_P(void);
 

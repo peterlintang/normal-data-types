@@ -8,6 +8,9 @@
 #ifndef TELL_WAIT_SIGNAL_H
 #define TELL_WAIT_SIGNAL_H
 
+#include <sys/types.h>
+#include <unistd.h>
+
 void TELL_WAIT_S(void);
 
 void TELL_PARENT_S(pid_t pid);

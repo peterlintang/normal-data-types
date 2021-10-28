@@ -2,6 +2,7 @@
  * 父子进程同步原语
  */
 #include "tellwaitp.h"
+#include "err.h"
 
 static int pfd1[2], pfd2[2];
 

@@ -5,7 +5,9 @@
  *  父子进程 同 步, 用 信号 实现 
  *  used by parent & child process mainly
  */
-#include "tell_wait_signal.h"
+#include <signal.h>
+#include "tell_wait_sig.h"
+#include "err.h"
 
 static volatile sig_atomic_t	sigflag;        /* set nonzero by sig handler, will be set to zero by compiler ? */
 static sigset_t			newmask;        /* for new sig mask */

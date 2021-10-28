@@ -17,6 +17,8 @@ COMMUNICATE_SRCS := ./udsock-server.c \
 		./named-sem.c	\
 		./share-mem.c	\
 		./sem-sysv.c	\
+		./tellwaitp.c	\
+		./tell_wait_sig.c	\
 		./mq-process.c	\
 		./process-lock.c	\
 		./named-fifo.c
@@ -28,6 +30,8 @@ COMMUNICATE_OBJS := ./udsock-server.o \
 		./named-sem.o	\
 		./share-mem.o	\
 		./sem-sysv.o	\
+		./tellwaitp.o	\
+		./tell_wait_sig.o	\
 		./mq-process.o	\
 		./process-lock.o	\
 		./named-fifo.o
