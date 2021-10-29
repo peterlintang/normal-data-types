@@ -3,15 +3,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static int randomized_partition(int a[], int p, int r)
+#include "randomized-select.h"
+
+static int randomized_partition(void *a[], int (*cmp)(void *, void *), int p, int r)
 {
 	struct timeval tv;
-	int x = a[r];
 	int i;
 	int j;
 	int k;
-	int tmp;
 	int index;
+	void *tmp = NULL;;
+	void *x = a[r];
 
 	gettimeofday(&tv, NULL);
 	srand(tv.tv_sec * 1000 + tv.tv_usec);
@@ -31,7 +33,7 @@ static int randomized_partition(int a[], int p, int r)
 	j = k = p - 1;
 	for (i = p; i < r; i++)
 	{
-		if (a[i] < x)
+		if (cmp(a[i], x) < 0)
 		{
 			j++;
 			tmp = a[i];
@@ -51,7 +53,7 @@ static int randomized_partition(int a[], int p, int r)
 /*
  * choose the @i index of elements in array between p and r
  */
-int randomized_select(int a[], int p, int r, int i)
+void *randomized_select(void *a[], int (*cmp)(void *, void *), int p, int r, int i)
 {
 	int q;
 	static int count = 1;
@@ -60,11 +62,11 @@ int randomized_select(int a[], int p, int r, int i)
 //fprintf(stdout, "count: %d, p: %d, r: %d, i: %d\n", count, p, r, i);
 	if (p < r)
 	{
-		q = randomized_partition(a, p, r);
+		q = randomized_partition(a, cmp, p, r);
 		if (i < q)
-			return randomized_select(a, p, q - 1, i);
+			return randomized_select(a, cmp, p, q - 1, i);
 		else if (i > q)
-			return randomized_select(a, q + 1, r, i);
+			return randomized_select(a, cmp, q + 1, r, i);
 
 		return a[q];
 	}
@@ -72,8 +74,21 @@ int randomized_select(int a[], int p, int r, int i)
 	{
 		if (p == r && r == i)
 			return a[p];
-		return -1;
+		return NULL;
 	}
+}
+
+
+#if 0
+
+static int cmp(void *x, void *y)
+{
+	int x_i = (int)x;
+	int y_i = (int)y;
+
+	if (x_i > y_i) return 1;
+	else if (x_i < y_i) return -1;
+	else return 0;
 }
 
 /*
@@ -82,16 +97,25 @@ int randomized_select(int a[], int p, int r, int i)
 int main(int argc, char *argv[])
 {
 #define ARRAY_SIZE(a)	(sizeof(a) / sizeof(a[0]))
-	int a[] = { 8, 9, 0, 7, 5, 4, 3, 2, 6, 1, 12, 13, 15, 19, 18, 20};
+	void *a[] = { 
+		(void *)8, (void *)9, (void *)0, (void *)7, 
+		(void *)5, (void *)4, (void *)3, (void *)2, 
+		(void *)6, (void *)1, (void *)12, (void *)13, 
+		(void *)15, (void *)19, (void *)18, (void *)20
+		};
 	int index = 8;
-	int result;
+	void *result = NULL;
 
 	index = atoi(argv[1]);
-	result = randomized_select(a, 0, ARRAY_SIZE(a) - 1, index);
+	result = randomized_select(a, cmp, 0, ARRAY_SIZE(a) - 1, index);
 	for (int i = 0; i < ARRAY_SIZE(a); i++)
-		fprintf(stdout, "i: %d, %d\n", i, a[i]);
+		fprintf(stdout, "i: %d, %p\n", i, a[i]);
 
-	fprintf(stdout, "index: %d, value: %d\n", index, result);
+	fprintf(stdout, "index: %d, value: %p\n", index, result);
 
 	return 0;
 }
+
+#endif 
+
+

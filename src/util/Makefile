@@ -20,6 +20,7 @@ COMMUNICATE_SRCS := ./components.c 	\
 					./quicksort.c	\
 					./insert-sort.c	\
 					./merge-sort.c	\
+					./randomized-select.c	\
 					./thread_pool.c
 
 COMMUNICATE_OBJS := ./components.o 	\
@@ -31,6 +32,7 @@ COMMUNICATE_OBJS := ./components.o 	\
 					./quicksort.o	\
 					./insert-sort.o	\
 					./merge-sort.o	\
+					./randomized-select.o	\
 					./thread_pool.o
 
 all: $(LIBS)
