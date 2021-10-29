@@ -134,8 +134,8 @@ int tail_quicksort(void *a[], int (*cmp)(void *, void *), int p, int r)
 
 	while (p < r)
 	{
-		q = partition(a, p, r);
-		tail_quicksort(a, p, q - 1);
+		q = partition(a, cmp, p, r);
+		tail_quicksort(a, cmp, p, q - 1);
 		p = q + 1;
 	}
 
