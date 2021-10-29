@@ -126,6 +126,23 @@ int random_quicksort(void *a[], int (*cmp)(void *, void *), int p, int r)
 	return 0;
 }
 
+/*
+ */
+int tail_quicksort(void *a[], int (*cmp)(void *, void *), int p, int r)
+{
+	int q = 0;
+
+	while (p < r)
+	{
+		q = partition(a, p, r);
+		tail_quicksort(a, p, q - 1);
+		p = q + 1;
+	}
+
+	return 0;
+}
+
+
 #if 0
 static int cmp(void *x, void *y)
 {

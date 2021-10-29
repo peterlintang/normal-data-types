@@ -24,6 +24,9 @@ int quicksort(void *a[], int (*cmp)(void *, void *), int p, int r);
  */
 int random_quicksort(void *a[], int (*cmp)(void *, void *), int p, int r);
 
+/*
+ */
+int tail_quicksort(void *a[], int (*cmp)(void *, void *), int p, int r);
 
 #endif // end of CI_QUICK_SORT_H
 
