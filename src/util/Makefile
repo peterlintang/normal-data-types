@@ -15,6 +15,7 @@ COMMUNICATE_SRCS := ./components.c 	\
 					./gve-normal.c	\
 					./err.c	\
 					./log.c	\
+					./minmax.c	\
 					./quark.c	\
 					./quicksort.c	\
 					./insert-sort.c	\
@@ -25,6 +26,7 @@ COMMUNICATE_OBJS := ./components.o 	\
 					./gve-normal.o	\
 					./err.o	\
 					./log.o	\
+					./minmax.o	\
 					./quark.o	\
 					./quicksort.o	\
 					./insert-sort.o	\
