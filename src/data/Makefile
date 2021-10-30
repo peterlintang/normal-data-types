@@ -44,6 +44,7 @@ DATA_SRCS := ./ap.c			\
 		./os_rank.c	\
 		./gve.c	\
 		./max-heapify.c	\
+		./min-heapify.c	\
 		./gve_array.c	
 
 
@@ -80,6 +81,7 @@ DATA_OBJS := ./ap.o			\
 		./os_rank.o	\
 		./gve.o	\
 		./max-heapify.o	\
+		./min-heapify.o	\
 		./gve_array.o	
 
 
