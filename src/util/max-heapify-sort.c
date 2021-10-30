@@ -87,6 +87,7 @@ int main(int argc, char *argv[])
 		fprintf(stdout, "a[%d] = %p\n", i, a[i]);
 	}
 
+	free(a);
 
 	return 0;
 }
