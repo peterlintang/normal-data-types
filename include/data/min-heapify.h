@@ -23,7 +23,7 @@ void MODULE_FUN_NAME(MinHeap, free)(T *hp, int free_array);
  */
 void *MODULE_FUN_NAME(MinHeap, max)(T h);
 
-void *MODULE_FUN_NAME(MinHeap, extract_max)(T h);
+void *MODULE_FUN_NAME(MinHeap, extract_min)(T h);
 
 int MODULE_FUN_NAME(MinHeap, decrease_key)(T h, int i, void *new_key);
 
