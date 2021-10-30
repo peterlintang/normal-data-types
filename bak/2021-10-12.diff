@@ -1,0 +1,324 @@
+diff --git a/include/data/queue.h b/include/data/queue.h
+index 23f5178..7caaac8 100644
+--- a/include/data/queue.h
++++ b/include/data/queue.h
+@@ -3,23 +3,58 @@
+ /*
+  * 10-1 
+  * implement the queue described by this sector
++ * queue中有一个位置需要空出来作为标志，是否为满，空
+  */
+-#ifndef MY_QUEUE_H_
+-#define MY_QUEUE_H_
++#ifndef CI_QUEUE_H__
++#define CI_QUEUE_H__
+ 
+-#define QUEUE_SIZE	1024
++#include "module.h"
+ 
+-struct Queue {
+-	void *q[QUEUE_SIZE];
+-	int head;
+-	int tail;
+-};
++#define T Queue_T
+ 
+-int queue_empty(struct Queue *q);
+-int queue_full(struct Queue *q);
+-int queue_en(struct Queue *q, void *x);
+-int queue_de(struct Queue *q, void **p);
++typedef struct T *T;
+ 
+-#endif	// end of MY_QUEUE_H_
++
++/*
++ * 创建一个队列,返回队列指针，失败返回空指针
++ * size: 队列大小
++ */
++T MODULE_FUN_NAME(Queue, new)(int size);
++
++/*
++ * 销毁一个队列,
++ * qp:	指向队列的指针
++ */
++void MODULE_FUN_NAME(Queue, free)(T *qp);
++
++/*
++ * 判断队列是否为空，是返回1，不是返回0,
++ * qp:	指向队列的指针
++ */
++int MODULE_FUN_NAME(Queue, isEmpty)(T q);
++
++/*
++ * 判断队列是否满，是返回1，不是返回0,
++ * qp:	指向队列的指针
++ */
++int MODULE_FUN_NAME(Queue, isFull)(T q);
++
++/*
++ * 往队列压元素x，成功返回0，失败返回-1
++ * qp:	指向队列的指针
++ * x:	待压送数据
++ */
++int MODULE_FUN_NAME(Queue, en)(T q, void *x);
++
++/*
++ * 从队列压元素对头，成功返回0，失败返回-1
++ * qp:	指向队列的指针
++ * p:	取回的数据存放的地方
++ */
++int MODULE_FUN_NAME(Queue, de)(T q, void **p);
++
++#undef T
++
++#endif	// end of MY_QUEUE_H__
+ 
+ 
+diff --git a/src/data/Makefile b/src/data/Makefile
+index f78f84e..77fcb5c 100644
+--- a/src/data/Makefile
++++ b/src/data/Makefile
+@@ -29,6 +29,7 @@ DATA_SRCS := ./ap.c			\
+ 		./list.c		\
+ 		./arena.c		\
+ 		./thread_pool.c		\
++		./queue.c		\
+ 		./queue_link.c		\
+ 		./queue_array.c		\
+ 		./stack_link.c		\
+@@ -59,6 +60,7 @@ DATA_OBJS := ./ap.o			\
+ 		./list.o		\
+ 		./arena.o		\
+ 		./thread_pool.o		\
++		./queue.o		\
+ 		./queue_link.o		\
+ 		./queue_array.o		\
+ 		./stack_link.o		\
+diff --git a/src/data/queue.c b/src/data/queue.c
+index ed25d58..35b2768 100644
+--- a/src/data/queue.c
++++ b/src/data/queue.c
+@@ -1,17 +1,72 @@
+ 
+-#include <stdio.h>
++/*
++ * 10-1 
++ * implement the queue described by this sector
++ */
++
+ #include <stdlib.h>
+ #include <assert.h>
+ 
+ #include "queue.h"
+ 
++
++#define T Queue_T
++
++struct Queue_T {
++	int head;
++	int tail;
++	int size;
++	void **array;
++};
++
+ /*
+- * 10-1 
+- * implement the queue described by this sector
++ * 创建一个队列,返回队列指针，失败返回空指针
++ * size: 队列大小
+  */
++T MODULE_FUN_NAME(Queue, new)(int size)
++{
++	T q = NULL;
++
++	assert(size > 0);
++
++	q = (T)calloc(1, sizeof(*q));
++	if (q)
++	{
++		q->array = (void **)calloc(1, size * sizeof(void *));
++		if (q->array == NULL)
++		{
++			free(q);
++			q = NULL;
++		}
++		else
++		{
++			q->size = size;
++		}
++	}
+ 
++	return q;
++}
+ 
+-int queue_empty(struct Queue *q)
++/*
++ * 销毁一个队列,
++ * qp:	指向队列的指针
++ */
++void MODULE_FUN_NAME(Queue, free)(T *qp)
++{
++	assert(qp && (*qp));
++
++//	if ((*qp)->head != (*qp)->tail)
++			// not empty
++
++	free(*qp);
++	*qp = NULL;
++}
++
++/*
++ * 判断队列是否为空，是返回1，不是返回0,
++ * qp:	指向队列的指针
++ */
++int MODULE_FUN_NAME(Queue, isEmpty)(T q)
+ {
+ 	assert(q);
+ 
+@@ -21,50 +76,61 @@ int queue_empty(struct Queue *q)
+ 		return 0;
+ }
+ 
+-int queue_full(struct Queue *q)
++/*
++ * 判断队列是否满，是返回1，不是返回0,
++ * qp:	指向队列的指针
++ */
++int MODULE_FUN_NAME(Queue, isFull)(T q)
+ {
+ 	assert(q);
+ 
+-	if (((q->tail + 1) % QUEUE_SIZE) == q->head)
++	if (((q->tail + 1) % q->size) == q->head)
+ 		return 1;
+ 	else
+ 		return 0;
+ }
+ 
+-int queue_en(struct Queue *q, void *x)
++/*
++ * 往队列压元素x，成功返回0，失败返回-1
++ * qp:	指向队列的指针
++ * x:	待压送数据
++ */
++int MODULE_FUN_NAME(Queue, en)(T q, void *x)
+ {
+ 	assert(q);
+-	assert(x);
+ 
+-	if (queue_full(q))
++	if (MODULE_FUN_NAME(Queue, isFull)(q))
+ 	{
+-		fprintf(stderr, "queue full\n");
+ 		return -1;
+ 	}
+ 
+-	q->q[q->tail] = x;
+-	if (q->tail == QUEUE_SIZE)
+-		q->tail = (q->tail + 1) % QUEUE_SIZE;
++	q->array[q->tail] = x;
++	if (q->tail == q->size)
++		q->tail = (q->tail + 1) % q->size;
+ 	else
+ 		q->tail = q->tail + 1;
+ 
+ 	return 0;
+ }
+ 
+-int queue_de(struct Queue *q, void **p)
++/*
++ * 从队列压元素对头，成功返回0，失败返回-1
++ * qp:	指向队列的指针
++ * p:	取回的数据存放的地方
++ */
++int MODULE_FUN_NAME(Queue, de)(T q, void **p)
+ {
+ 	assert(q);
+ 	assert(p);
+ 
+-	if (queue_empty(q))
++	if (MODULE_FUN_NAME(Queue, isEmpty)(q))
+ 	{
+-		fprintf(stderr, "queue empty\n");
+ 		return -1;
+ 	}
+ 
+-	*p = q->q[q->head];
+-	if (q->head == QUEUE_SIZE)
+-		q->head = (q->head + 1) % QUEUE_SIZE;
++	*p = q->array[q->head];
++	if (q->head == q->size)
++		q->head = (q->head + 1) % q->size;
+ 	else
+ 		q->head = q->head + 1;
+ 
+@@ -107,5 +173,3 @@ int main(int argc, char *argv[])
+  */
+ 
+ 
+-
+-
+diff --git a/test.c b/test.c
+index 57cf44e..d331414 100644
+--- a/test.c
++++ b/test.c
+@@ -1338,7 +1338,7 @@ static void list_map(void **arg, void *priv)
+ 
+ static void test_list(void)
+ {
+-#define LIST_ITEM_LEN	10240000
++#define LIST_ITEM_LEN	102400000
+ 
+ 	List_T list = NULL;
+ 	List_T list2 = NULL;
+@@ -1386,6 +1386,40 @@ static void test_list(void)
+ 	MODULE_FUN_NAME(List, free)(&list);
+ }
+ 
++#include "queue.h"
++
++static void test_queue(void)
++{
++#define QUEUE_ITEM_LEN	10240000
++	Queue_T q = NULL;
++	int ret = 0;
++	int *value = NULL;
++
++	q = MODULE_FUN_NAME(Queue, new)(QUEUE_ITEM_LEN + 1);
++
++	for (int i = 0; i <	QUEUE_ITEM_LEN; i++)
++	{
++		ret = MODULE_FUN_NAME(Queue, en)(q, (void *)i);
++		if (ret != 0)
++		{
++			fprintf(stdout, "put i: %d to queue failed\n", i);
++		}
++	}
++	for (int i = 0; i < QUEUE_ITEM_LEN; i++)
++	{
++		ret = MODULE_FUN_NAME(Queue, de)(q, (void **)&value);
++		if (ret != 0)
++		{
++			fprintf(stdout, "get i: %d from queue failed\n", i);
++		}
++		if ((int)value != i)
++		{
++			fprintf(stdout, "i: %d, value: %d\n", i, (int)value);
++		}
++	}
++
++	MODULE_FUN_NAME(Queue, free)(&q);
++}
+ 
+ 
+ struct test_routine {
+@@ -1415,7 +1449,8 @@ struct test_routine my_test_routines[] =
+ //		{test_rb, "rb_tree"},				// ko
+ //		{test_fib, "fib"},					// ko
+ //		{test_os_rank, "os_rank"},					// ko
+-		{test_list, "list"},					// ko
++//		{test_list, "list"},					// ko
++		{test_queue, "queue"},					// ko
+ 		{NULL,NULL},
+ };
+ 
