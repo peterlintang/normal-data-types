@@ -22,6 +22,7 @@ COMMUNICATE_SRCS := ./components.c 	\
 					./merge-sort.c	\
 					./randomized-select.c	\
 					./max-heapify-sort.c	\
+					./min-heapify-sort.c	\
 					./thread_pool.c
 
 COMMUNICATE_OBJS := ./components.o 	\
@@ -35,6 +36,7 @@ COMMUNICATE_OBJS := ./components.o 	\
 					./merge-sort.o	\
 					./randomized-select.o	\
 					./max-heapify-sort.o	\
+					./min-heapify-sort.o	\
 					./thread_pool.o
 
 all: $(LIBS)
