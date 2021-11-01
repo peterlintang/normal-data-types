@@ -18,54 +18,51 @@
 
 #include "module.h"
 
-#define T SharedMem_T
-typedef struct T *T;
 
 
 /*
  * name: MODULE_FUN_NAME(SharedMem, create)
  * description: create a system v shared memory
- * return value: return 
- * args: @length: total number of elements in array
+ * return value: return 0 success, -1 failed
+ * pathname: name of shared mem
+ * id: id of shared mem
+ * size: size of shared mem
+ * flag: for create or open if exist
  */
-T MODULE_FUN_NAME(SharedMem, create)(const char *pathname, int id,
-				int size, int flag,
-				const void *shmaddr, int flag2);
+int MODULE_FUN_NAME(SharedMem, create)(const char *pathname, int id,
+				int size, int flag);
 /*
  * name: MODULE_FUN_NAME(SharedMem, destroy)
  * description: destroy a system v shared memory
  * return value: return void
  * args: @shmpp: pointer's pointer to shared mem
  */
-void MODULE_FUN_NAME(SharedMem, destroy)(T *shmpp);
+int MODULE_FUN_NAME(SharedMem, destroy)(const char *pathname, int id);
 
+void *MODULE_FUN_NAME(SharedMem, open)(const char *pathname, int id, const void *addr, int flag);
+
+int MODULE_FUN_NAME(SharedMem, close)(void *ptr);
 
 /*
  * name: MODULE_FUN_NAME(SharedMem, read)
  * description: read data from a system v shared memory
- * return value: return 
- * args: @shm: pointer to shared mem
+ * return value: return  len of bytes read
+ * args: @ptr: pointer from read data 
  * 		 @buf: buf for stored data
  * 		 @len: length of buf
  */
-int MODULE_FUN_NAME(SharedMem, read)(T shm, char *buf, int len);
+int MODULE_FUN_NAME(SharedMem, read)(void *ptr, char *buf, int len);
 
 /*
  * name: MODULE_FUN_NAME(SharedMem, write)
  * description: write data to a system v shared memory
- * return value: return 
- * args: @shm: pointer to shared mem
+ * return value: return len of bytes write
+ * args: @shm: pointer to write data 
  * 		 @buf: data to write
  * 		 @len: length of buf
  */
-int MODULE_FUN_NAME(SharedMem, write)(T shm, char *buf, int len);
+int MODULE_FUN_NAME(SharedMem, write)(void *ptr, char *buf, int len);
 
-/*
-void *address_at(const void *shmaddr, int flags);
-int address_dt(void *shmaddr);
-*/
-
-#undef T
 
 #endif 	// CI_SHARED_MEM_H__
 
