@@ -119,6 +119,8 @@ int main(int argc, char *argv[])
 
 	int count = atoi(argv[1]);
 
+	MODULE_FUN_NAME(SharedMem, destroy)(SHARE_MEM_PATH, SHARE_MEM_ID);
+
 	ret = MODULE_FUN_NAME(SharedMem, create)(SHARE_MEM_PATH, SHARE_MEM_ID, SHARE_MEM_SIZE, flags);
 	if (ret != 0)
 	{
@@ -150,7 +152,6 @@ int main(int argc, char *argv[])
 	quit_flag = 1;
 
 	pthread_mutex_destroy(&buffer_lock);
-	MODULE_FUN_NAME(Ringbuf, destroy)(&r_buf);
 
 	MODULE_FUN_NAME(SharedMem, close)(ptr);
 out:
