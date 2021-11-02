@@ -50,14 +50,11 @@ T MODULE_FUN_NAME(Ringbuf, init)(unsigned char *ptr, unsigned int len)
 
 	T r = NULL;
 
-	r = (T)calloc(1, sizeof(*r));
-	if (r)
-	{
-		r->buf_max = len;
-		r->read_index = 0;
-		r->write_index = 0;
-		r->buf = ptr;
-	}
+	r = (T)ptr;
+	r->buf_max = len - sizeof(*r);
+	r->read_index = 0;
+	r->write_index = 0;
+	r->buf = ptr + sizeof(*r);
 
 	return r;
 }

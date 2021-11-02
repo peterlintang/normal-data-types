@@ -19,6 +19,7 @@ typedef struct T *T;
 /*
  * 以ptr为存储空间初始化一个ringbuf，ptr长度为len
  * 成功返回一个ringbuf的指针,失败null
+ * 调用此接口，不用调用destroy释放ringbuf内容,由提供ptr的作者释放
  * ptr: ringbuf的空间，
  * len: ptr的长度
  */
