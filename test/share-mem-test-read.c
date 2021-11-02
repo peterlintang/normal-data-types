@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <unistd.h>
 
 #include "share-mem.h"
 
@@ -18,35 +17,21 @@ int main(int argc, char *argv[])
 	char *ptr = NULL;
 	char tmp = '2';
 
-	/*
-	MODULE_FUN_NAME(SharedMem, destroy)(SHARE_MEM_PATH, SHARE_MEM_ID);
-	*/
-
-	ret = MODULE_FUN_NAME(SharedMem, create)(SHARE_MEM_PATH, SHARE_MEM_ID, SHARE_MEM_SIZE, flags);
-	if (ret != 0)
-	{
-		fprintf(stdout, "create shared mem failed: ret: %d\n", ret);
-		return 0;
-	}
-
 	ptr = (char *)MODULE_FUN_NAME(SharedMem, open)(SHARE_MEM_PATH, SHARE_MEM_ID, NULL, flags);
 	if (ptr == NULL)
 	{
 		fprintf(stdout, "failed to open share mem\n");
-		goto out;
+		return 0;
 	}
 
 	for (int i = 0; i < SHARE_MEM_SIZE; i++)
 	{
-		MODULE_FUN_NAME(SharedMem, write)(ptr + i, &tmp, 1);
+		MODULE_FUN_NAME(SharedMem, read)(ptr + i, &tmp, 1);
 		fprintf(stdout, "%c\n", tmp);
 	}
 
-	sleep(15);
-	MODULE_FUN_NAME(SharedMem, close)(ptr);
 
-out:
-	MODULE_FUN_NAME(SharedMem, destroy)(SHARE_MEM_PATH, SHARE_MEM_ID);
+	MODULE_FUN_NAME(SharedMem, close)(ptr);
 
 	return 0;
 }
