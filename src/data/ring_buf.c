@@ -38,6 +38,29 @@ static int ring_buf_print(T r, int len, char *s)
 	return 0;
 }
 
+/*
+ * 以ptr为存储空间初始化一个ringbuf，ptr长度为len
+ * 成功返回一个ringbuf的指针,失败null
+ * ptr: ringbuf的空间，
+ * len: ptr的长度
+ */
+T MODULE_FUN_NAME(Ringbuf, init)(unsigned char *ptr, unsigned int len)
+{
+	assert(ptr && len > 0);
+
+	T r = NULL;
+
+	r = (T)calloc(1, sizeof(*r));
+	if (r)
+	{
+		r->buf_max = len;
+		r->read_index = 0;
+		r->write_index = 0;
+		r->buf = ptr;
+	}
+
+	return r;
+}
 
 T MODULE_FUN_NAME(Ringbuf, create)(unsigned int num)
 {

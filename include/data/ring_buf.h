@@ -16,7 +16,13 @@
 typedef struct T *T;
 
 
-
+/*
+ * 以ptr为存储空间初始化一个ringbuf，ptr长度为len
+ * 成功返回一个ringbuf的指针,失败null
+ * ptr: ringbuf的空间，
+ * len: ptr的长度
+ */
+T MODULE_FUN_NAME(Ringbuf, init)(unsigned char *ptr, unsigned int len);
 
 T MODULE_FUN_NAME(Ringbuf, create)(unsigned int num);
 
