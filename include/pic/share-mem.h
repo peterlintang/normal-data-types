@@ -39,8 +39,19 @@ int MODULE_FUN_NAME(SharedMem, create)(const char *pathname, int id,
  */
 int MODULE_FUN_NAME(SharedMem, destroy)(const char *pathname, int id);
 
+/*
+ * 打开一个共享内存，有pathname，id指定，addr是建议隐射到的空间地址，flag是打开标志
+ * pathname: 
+ * id:
+ * addr:
+ * len:
+ */
 void *MODULE_FUN_NAME(SharedMem, open)(const char *pathname, int id, const void *addr, int flag);
 
+/*
+ * 关闭一个共享内存空间地址,从进程地址空间中解除隐射
+ * ptr: 待解除地址
+ */
 int MODULE_FUN_NAME(SharedMem, close)(void *ptr);
 
 /*
