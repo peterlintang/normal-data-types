@@ -30,7 +30,7 @@ typedef struct T *T;
 
 /*
  * name: MODULE_FUN_NAME(ProcessCond, create)
- * description: create a memory shared lock and cond
+ * description: create a memory shared cond
  * return value: 
  * args: @: 
  */
@@ -38,7 +38,7 @@ T MODULE_FUN_NAME(ProcessCond, create)(void *ptr, int size);
 
 /*
  * name: MODULE_FUN_NAME(ProcessCond, destroy)
- * description: destroy a memory shared lock and cond
+ * description: destroy a memory shared cond
  * return value: 
  * args: @: 
  */

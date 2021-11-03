@@ -3,7 +3,6 @@
  * filename:	process-lock.c
  * description: implement the interfaces of 
  *              processes shared memory lock
- *              and condition
  * author:		john lin
  * date:		2020-02-27
  * version:		0.0.1
@@ -33,7 +32,7 @@ struct T {
 
 /*
  * name: MODULE_FUN_NAME(ProcessLock, create)
- * description: create a memory shared lock and cond
+ * description: create a memory shared lock 
  * return value: 
  * args: @: 
  */
@@ -41,7 +40,7 @@ T MODULE_FUN_NAME(ProcessLock, create)(void *ptr, int size);
 
 /*
  * name: MODULE_FUN_NAME(ProcessLock, destroy)
- * description: destroy a memory shared lock and cond
+ * description: destroy a memory shared lock 
  * return value: 
  * args: @: 
  */
