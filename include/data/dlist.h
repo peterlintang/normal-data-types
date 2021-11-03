@@ -182,7 +182,7 @@ void MODULE_FUN_NAME(ListD, map)(T list,
  * args: @list: the pointer to list
  * 		@end: indicate end of array
  */
-void **MODULE_FUN_NAME(T, toArray)(
+void **MODULE_FUN_NAME(ListD, toArray)(
 				T list, void *end);
 
 
