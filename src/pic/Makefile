@@ -21,6 +21,7 @@ COMMUNICATE_SRCS := ./udsock-server.c \
 		./tell_wait_sig.c	\
 		./mq-process.c	\
 		./process-lock.c	\
+		./process-cond.c	\
 		./named-fifo.c
 
 
@@ -34,6 +35,7 @@ COMMUNICATE_OBJS := ./udsock-server.o \
 		./tell_wait_sig.o	\
 		./mq-process.o	\
 		./process-lock.o	\
+		./process-cond.o	\
 		./named-fifo.o
 
 all: $(LIBS)
