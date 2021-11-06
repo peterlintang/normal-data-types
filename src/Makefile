@@ -1,6 +1,7 @@
 
 DIRS := data \
 		pic	\
+		algorithm \
 		util \
 		inifile
 all:
