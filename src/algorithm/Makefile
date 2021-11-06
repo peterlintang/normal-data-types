@@ -20,8 +20,7 @@ COMMUNICATE_SRCS := \
 					./randomized-select.c \
 					./max-heapify-sort.c \
 					./min-heapify-sort.c \
-					./components.c \
-					./dfs.c
+					./components.c 
 
 COMMUNICATE_OBJS := \
 					./gve-normal.o \
@@ -32,8 +31,7 @@ COMMUNICATE_OBJS := \
 					./randomized-select.o \
 					./max-heapify-sort.o \
 					./min-heapify-sort.o \
-					./components.o \
-					./dfs.o
+					./components.o 
 
 all: $(LIBS)
 
