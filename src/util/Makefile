@@ -13,6 +13,7 @@ LIBS:=$(LIBCOMMUNICATE)
 
 COMMUNICATE_SRCS := ./db.c \
 					./initserver.c	\
+					./connect_retry.c	\
 					./err.c	\
 					./log.c	\
 					./quark.c	\
@@ -20,6 +21,7 @@ COMMUNICATE_SRCS := ./db.c \
 
 COMMUNICATE_OBJS := ./db.o \
 					./initserver.o	\
+					./connect_retry.o	\
 					./err.o	\
 					./log.o	\
 					./quark.o	\

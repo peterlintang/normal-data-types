@@ -1,5 +1,9 @@
-#include "apue.h"
+
+#include <unistd.h>
+#include <sys/types.h>
 #include <sys/socket.h>
+
+#include "connect_retry.h"
 
 #define MAXSLEEP 128
 
@@ -25,3 +29,4 @@ connect_retry(int sockfd, const struct sockaddr *addr, socklen_t alen)
 	}
 	return (-1);
 }
+
