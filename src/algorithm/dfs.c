@@ -1,15 +1,23 @@
 
+/*
+ * 实现深度优先图遍历
+ * 有向图无详图都可以
+ * date: 2021-11-07
+ * author: lin
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 
 #include "sentinel-linked-list.h"
 #include "gve_array.h"
+#include "gve-normal.h"
+#include "dfs.h"
 
-#define WHITE	0
-#define GRAY	1
-#define BLACK	2
+#define NODE dfs_node_t
+#define EDGE_EXT dfs_edge_ext_t
 
+/*
 struct node_t {
 	int index;
 	int color;
@@ -22,15 +30,141 @@ struct node_t {
 struct edge_ext_t {
 	int value;
 };
+*/
 
+
+
+
+static int cmp(void *arg, void *priv)
+{
+	NODE node = (NODE )arg;
+	int *p = (int *)priv;
+
+	if (*p == node->index) return 0;
+	else return 1;
+}
+
+/*
+ * 根据文件内容创建dfs图
+ */
+static GraphA_T dfs_get_graphA(FILE *fp)
+{
+	GraphA_T g = NULL;
+	int node_item = 0;
+	int edge_item = 0;
+
+	fscanf(fp, "%d", &node_item);
+	fscanf(fp, "%d", &edge_item);
+
+	g = MODULE_FUN_NAME(GraphA, create)(sizeof(struct NODE), node_item, sizeof(struct EDGE_EXT), edge_item, NULL);
+
+	return g;
+}
+
+static int dfs_get_node(FILE *fp, void *g_p, void *n_p)
+{
+	int v = 0;
+	NODE node = (NODE )n_p;
+	GraphA_T g = (GraphA_T)g_p;
+
+	fscanf(fp, "%d", &v);
+
+	node->index = v;
+	node->l = MODULE_FUN_NAME(SenDlink, create)();
+
+	return 0;
+}
+
+static int dfs_get_edge(FILE *fp, void *g_p, void *e_p)
+{
+	int v = 0;
+	int u = 0;
+	int value = 0;
+	NODE n_v = NULL;
+	NODE n_u = NULL;
+	EDGE_EXT ext = NULL;
+	GraphA_T g = (GraphA_T)g_p;
+	EdgeA_T edge = (EdgeA_T)e_p;
+
+	fscanf(fp, "%d,%d,%d", &v, &u, &value);
+
+	n_v = (NODE)MODULE_FUN_NAME(GraphA, VnodeSearch)(g, cmp, (void *)&v);
+	n_u = (NODE)MODULE_FUN_NAME(GraphA, VnodeSearch)(g, cmp, (void *)&u);
+	if (n_v == NULL || n_u == NULL)
+	{
+		fprintf(stdout, "search %d, %d failed %p, %p\n", v, u, n_v, n_u);
+		return -1;
+	}
+
+	MODULE_FUN_NAME(GraphA, EdgeSetVnodes)(edge, (void *)n_v, (void *)n_u, NULL, NULL);
+
+	ext = (EDGE_EXT)MODULE_FUN_NAME(GraphA, EdgeGetPriv)((void *)edge);
+	ext->value = value;
+
+	MODULE_FUN_NAME(SenDlink, insert)(n_v->l, (void *)edge);
+
+	return 0;
+}
+
+GraphA_T dfs_create_graph(char *filename)
+{
+	assert(filename);
+
+	GraphA_T g = NULL;
+
+	g = GA_create(filename, dfs_get_graphA, dfs_get_edge, dfs_get_node);
+
+	return g;
+}
+
+/********************dfs print************************/
+void dfs_V_print(NODE v)
+{
+	NODE u = NULL;
+	int len = 0;
+	EdgeA_T edge = NULL;
+	NODE unused = NULL;
+
+	assert(v);
+	fprintf(stdout, "v: %d, color: %d, p: %p, d: %d, f: %d, es: %d\n",
+					v->index, v->color, v->prev, v->d, v->f, MODULE_FUN_NAME(SenDlink, count)(v->l));
+	len = MODULE_FUN_NAME(SenDlink, count)(v->l);
+	for (int i = 0; i < len; i++)
+	{
+		edge = (EdgeA_T)MODULE_FUN_NAME(SenDlink, get)(v->l, i);
+		MODULE_FUN_NAME(GraphA, EdgeGetVnodes)(edge, (void **)&unused, (void **)&u);
+		fprintf(stdout, "v: %d, color: %d, p: %p, d: %d, f: %d\n",
+					u->index, u->color, u->prev, u->d, u->f);
+	}
+
+}
+
+void dfs_G_print(GraphA_T g)
+{
+	int len = 0;
+	NODE node = NULL;
+
+	assert(g);
+
+	len = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
+	for (int i = 0; i < len; i++)
+	{
+		node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
+		fprintf(stdout, "\n");
+		dfs_V_print(node);
+		fprintf(stdout, "\n");
+	}
+}
+
+/*****************dfs**********************/
 static int time = 0;
 
-static int dfs_visit(GraphA_T g, struct node_t *u)
+static int dfs_visit(GraphA_T g, NODE u)
 {
 	int len = 0;
 	EdgeA_T edge = NULL;
-	struct node_t *v = NULL;
-	struct node_t *unused = NULL;
+	NODE v = NULL;
+	NODE unused = NULL;
 
 
 	time = time + 1;
@@ -62,12 +196,12 @@ static int dfs_visit(GraphA_T g, struct node_t *u)
 int dfs(GraphA_T g)
 {
 	int len = 0;
-	struct node_t *u = NULL;
+	NODE u = NULL;
 
 	len = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
 	for (int i = 0; i < len; i++)
 	{
-		u = (struct node_t *)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
+		u = (NODE )MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		u->color = WHITE;
 		u->prev = NULL;
 	}
@@ -76,7 +210,7 @@ int dfs(GraphA_T g)
 
 	for (int i = 0; i < len; i++)
 	{
-		u = (struct node_t *)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
+		u = (NODE )MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		if (u->color == WHITE)
 		{
 			dfs_visit(g, u);
@@ -86,100 +220,7 @@ int dfs(GraphA_T g)
 	return 0;
 }
 
-
-static int cmp(void *arg, void *priv)
-{
-	struct node_t *node = (struct node_t *)arg;
-	int *p = (int *)priv;
-
-	if (*p == node->index) return 0;
-	else return 1;
-}
-
-GraphA_T G_create(void)
-{
-	int node_len = 0;
-	int edge_len = 0;
-	int node_index = 0;
-	int edge_v = 0;
-	int edge_u = 0;
-	int edge_value = 0;
-	GraphA_T g = NULL;
-	EdgeA_T edge = NULL;
-	struct node_t *node = NULL;
-	struct node_t *v = NULL;
-	struct node_t *u = NULL;
-	struct edge_ext_t *edge_ext = NULL;
-
-	scanf("%d", &node_len);
-	scanf("%d", &edge_len);
-
-	fprintf(stdout, "nodes: %d, edges: %d\n", node_len, edge_len);
-
-	g = MODULE_FUN_NAME(GraphA, create)(sizeof(struct node_t), node_len, sizeof(struct edge_ext_t), edge_len, NULL);
-
-	for (int i = 0; i < node_len; i++)
-	{
-		scanf("%d", &node_index);
-		node = (struct node_t *)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
-		node->index = node_index;
-		node->l = MODULE_FUN_NAME(SenDlink, create)();
-	}
-
-	for (int i = 0; i < edge_len; i++)
-	{
-		scanf("%d,%d", &edge_v, &edge_u);
-		v = (struct node_t *)MODULE_FUN_NAME(GraphA, VnodeSearch)(g, cmp, (void *)&edge_v);
-		u = (struct node_t *)MODULE_FUN_NAME(GraphA, VnodeSearch)(g, cmp, (void *)&edge_u);
-		edge = (EdgeA_T)MODULE_FUN_NAME(GraphA, EdgeGet)(g, i);
-		MODULE_FUN_NAME(GraphA, EdgeSetVnodes)(edge, (void *)v, (void *)u, NULL, NULL);
-		edge_ext = (struct edge_ext_t *)MODULE_FUN_NAME(GraphA, EdgeGetPriv)((void *)edge);
-		edge_ext->value = (i + 1);
-		MODULE_FUN_NAME(SenDlink, insert)(v->l, (void *)edge);
-	}
-
-	return g;
-}	
-
-
-void V_print(struct node_t *v)
-{
-	struct node_t *u = NULL;
-	int len = 0;
-	EdgeA_T edge = NULL;
-	struct node_t *unused = NULL;
-
-	assert(v);
-	fprintf(stdout, "v: %d, color: %d, p: %p, d: %d, f: %d, es: %d\n",
-					v->index, v->color, v->prev, v->d, v->f, MODULE_FUN_NAME(SenDlink, count)(v->l));
-	len = MODULE_FUN_NAME(SenDlink, count)(v->l);
-	for (int i = 0; i < len; i++)
-	{
-		edge = (EdgeA_T)MODULE_FUN_NAME(SenDlink, get)(v->l, i);
-		MODULE_FUN_NAME(GraphA, EdgeGetVnodes)(edge, (void **)&unused, (void **)&u);
-		fprintf(stdout, "v: %d, color: %d, p: %p, d: %d, f: %d\n",
-					u->index, u->color, u->prev, u->d, u->f);
-	}
-
-}
-
-void G_print(struct G *g)
-{
-	int len = 0;
-	struct node_t *node = NULL;
-
-	assert(g);
-
-	len = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
-	for (int i = 0; i < len; i++)
-	{
-		node = (struct node_t *)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
-		fprintf(stdout, "\n");
-		V_print(node);
-		fprintf(stdout, "\n");
-	}
-}
-
+/*
 int main(int argc, char *argv[])
 {
 	int ret = 0;
@@ -191,6 +232,5 @@ int main(int argc, char *argv[])
 
 	return ret;
 }
-
-
+*/
 
