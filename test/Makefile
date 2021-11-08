@@ -13,4 +13,5 @@ all:
 	gcc -g ring_buf_test.c -o ring_buf_test -I../include -I../include/pic -I../include/data ../src/data/libdatatype.a ../src/pic/libcommunicate.a -lrt -lpthread
 	gcc -g ring_buf_sharemem_test.c -o ring_buf_sharemem_test -I../include -I../include/pic -I../include/data ../src/data/libdatatype.a ../src/pic/libcommunicate.a -lrt -lpthread
 	gcc -g dfs-test.c -o dfs-test -I../include -I../include/pic -I../include/data -I../include/algorithm ../src/algorithm/libalgorithm.a ../src/data/libdatatype.a ../src/pic/libcommunicate.a -lrt -lpthread
+	gcc -g bfs-test.c -o bfs-test -I../include -I../include/pic -I../include/data -I../include/algorithm ../src/algorithm/libalgorithm.a ../src/data/libdatatype.a ../src/pic/libcommunicate.a -lrt -lpthread
 clean:

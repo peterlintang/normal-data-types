@@ -18,6 +18,7 @@ COMMUNICATE_SRCS := \
 					./quicksort.c \
 					./minmax.c \
 					./dfs.c \
+					./bfs.c \
 					./randomized-select.c \
 					./max-heapify-sort.c \
 					./min-heapify-sort.c \
@@ -30,6 +31,7 @@ COMMUNICATE_OBJS := \
 					./quicksort.o \
 					./minmax.o \
 					./dfs.o \
+					./bfs.o \
 					./randomized-select.o \
 					./max-heapify-sort.o \
 					./min-heapify-sort.o \
