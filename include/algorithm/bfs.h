@@ -42,7 +42,7 @@ struct EDGE_EXT {
  * g: 图数据结构
  * k: index为k的节点作为开始节点
  */
-int bfs(GraphA_T g, int k);
+int bfs(GraphA_T g, int k, int (*cb)(void *arg, void *priv), void *arg);
 
 /*
  * 打印终点为k的节点的前缀路径

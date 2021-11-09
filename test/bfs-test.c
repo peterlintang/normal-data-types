@@ -16,6 +16,13 @@
 #include "gve-normal.h"
 #include "bfs.h"
 
+static int process_node(void *arg, void *priv)
+{
+	bfs_node_t node = (bfs_node_t)priv;
+
+	fprintf(stdout, "%s: %d\n", __func__, node->index);
+	return 0;
+}
 
 int main(int argc, char *argv[])
 {
@@ -23,7 +30,7 @@ int main(int argc, char *argv[])
 	GraphA_T g = NULL;
 
 	g = bfs_create_graph(argv[1]);
-	bfs(g, 1);
+	bfs(g, 1, process_node, NULL);
 	G_tree_print(g, 3);
 
 	return ret;

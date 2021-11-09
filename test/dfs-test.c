@@ -10,6 +10,13 @@
 #include "gve-normal.h"
 #include "dfs.h"
 
+static int process_node(void *arg, void *priv)
+{
+	dfs_node_t node = (dfs_node_t)priv;
+
+	fprintf(stdout, "%s: %d\n", __func__, node->index);
+	return 0;
+}
 
 int main(int argc, char *argv[])
 {
@@ -17,7 +24,7 @@ int main(int argc, char *argv[])
 	GraphA_T g = NULL;
 
 	g = dfs_create_graph(argv[1]);
-	dfs(g);
+	dfs(g, process_node, NULL);
 	dfs_G_print(g);
 
 	return ret;

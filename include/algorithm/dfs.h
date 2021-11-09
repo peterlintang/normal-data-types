@@ -39,7 +39,7 @@ struct EDGE_EXT {
 /*
  * you xiang & wu xiang tu jun ke
  */
-int dfs(GraphA_T g);
+int dfs(GraphA_T g, int (*cb)(void *arg, void *priv), void *arg);
 
 GraphA_T dfs_create_graph(char *filename);
 

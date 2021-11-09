@@ -159,7 +159,7 @@ void dfs_G_print(GraphA_T g)
 /*****************dfs**********************/
 static int time = 0;
 
-static int dfs_visit(GraphA_T g, NODE u)
+static int dfs_visit(GraphA_T g, NODE u, int (*cb)(void *arg, void *node), void *arg)
 {
 	int len = 0;
 	EdgeA_T edge = NULL;
@@ -179,7 +179,7 @@ static int dfs_visit(GraphA_T g, NODE u)
 		if (v->color == WHITE)
 		{
 			v->prev = u;
-			dfs_visit(g, v);
+			dfs_visit(g, v, cb, arg);
 		}
 	}
 
@@ -187,13 +187,18 @@ static int dfs_visit(GraphA_T g, NODE u)
 	time = time + 1;
 	u->f = time;
 
+	if (cb)
+	{
+		cb(arg, (void *)u);
+	}
+
 	return 0;
 }
 
 /*
  * you xiang & wu xiang tu jun ke
  */
-int dfs(GraphA_T g)
+int dfs(GraphA_T g, int (*cb)(void *arg, void *node), void *arg)
 {
 	int len = 0;
 	NODE u = NULL;
@@ -213,7 +218,7 @@ int dfs(GraphA_T g)
 		u = (NODE )MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		if (u->color == WHITE)
 		{
-			dfs_visit(g, u);
+			dfs_visit(g, u, cb, arg);
 		}
 	}
 

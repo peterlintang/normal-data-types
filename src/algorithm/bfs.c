@@ -43,7 +43,7 @@ struct EDGE_EXT {
  * g: 图数据结构
  * k: 使用k节点作为开始遍历节点, index == k的节点
  */
-int bfs(GraphA_T g, int k)
+int bfs(GraphA_T g, int k, int (*cb)(void *arg, void *priv), void *arg)
 {
 	int count = 0;
 	NODE u = NULL;
@@ -103,6 +103,11 @@ int bfs(GraphA_T g, int k)
 			}
 		}
 		u->color = BLACK;
+
+		if (cb)
+		{
+			cb(arg, (void *)u);
+		}
 	}
 
 	return 0;
