@@ -26,8 +26,9 @@ typedef void (*MODULE_FUN_NAME(ThreadPool, Cb_T))(void *p);
  * description: create a thread pool
  * return value: return the pointer to thread pool
  * args: size: thread pool size
+ * stack_size: thread stack size
  */
-T MODULE_FUN_NAME(ThreadPool, new)(int size);
+T MODULE_FUN_NAME(ThreadPool, new)(int size, int stack_size);
 
 /*
  * name: MODULE_FUN_NAME(ThreadPool, free)

@@ -19,6 +19,10 @@
 
 #include "thread_pool.h"
 
+#ifndef PTHREAD_STACK_MIN
+#define PTHREAD_STACK_MIN 16384
+#endif 
+
 /* threads defines */
 #define THREADS_MAX	20000
 #define COND_ATTR_T	pthread_condattr_t
@@ -52,6 +56,7 @@ struct TASK {
 
 struct T {
 	int size;		// record how many threads in this pool
+	int stack_size;
 
 	MUTEX_T	mutex;	// protect task queue
 	COND_T	cond;	// protect task queue
@@ -72,7 +77,7 @@ static void *thread_cycle(void *pirv);
  * return value: return the pointer to thread pool
  * args: size: thread pool size
  */
-T MODULE_FUN_NAME(ThreadPool, new)(int size)
+T MODULE_FUN_NAME(ThreadPool, new)(int size, int stack_size)
 {
 	T p = NULL;
 
@@ -84,6 +89,13 @@ T MODULE_FUN_NAME(ThreadPool, new)(int size)
 	{
 		return NULL;
 	}
+
+	if (stack_size < PTHREAD_STACK_MIN)
+	{
+		stack_size = PTHREAD_STACK_MIN;
+	}
+
+	p->stack_size = stack_size;
 
 	p->size = size;
 	p->queue = MODULE_FUN_NAME(QueueL, new)(0);
@@ -140,6 +152,13 @@ int MODULE_FUN_NAME(ThreadPool, init)(T p)
 		return ret;
 
 	ret = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+	if (0 != ret)
+	{
+		pthread_attr_destroy(&attr);
+		return ret;
+	}
+
+	ret = pthread_attr_setstacksize(&attr, p->stack_size);
 	if (0 != ret)
 	{
 		pthread_attr_destroy(&attr);
