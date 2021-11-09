@@ -21,7 +21,9 @@ static int process_node(void *arg, void *priv)
 static int map(void *priv, void *arg)
 {
 	dfs_node_t node = (dfs_node_t)priv;
-	fprintf(stdout, "%s: node: %d\n", __func__, node->index);
+	fprintf(stdout, "%s: node: %d, d: %d, f: %d\n", 
+					__func__, node->index,
+					node->d, node->f);
 	return 0;
 }
 
@@ -38,12 +40,13 @@ int main(int argc, char *argv[])
 	dfs(g, process_node, NULL);
 	dfs_G_print(g);
 	fprintf(stdout, "\n\n");
-	dfs_G_print_special(g, l);
+	dfs_G_trees_produce(g, l);
 
 	count = MODULE_FUN_NAME(SenDlink, count)(l);
 	for (int i = 0; i < count; i++)
 	{
 		set = (SetL_T)MODULE_FUN_NAME(SenDlink, get)(l, i);
+		fprintf(stdout, "i: %d\n", i);
 		MODULE_FUN_NAME(SetL, map)(set, map, NULL);
 	}
 
