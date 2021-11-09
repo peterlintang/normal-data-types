@@ -60,7 +60,7 @@ void _request_pause(quark_t *this);
 void *_quark_core(void *arg);
 
 /* quark interfaces */
-quark_t *_new_quark(quark_func_t func, void *data);
+quark_t *_new_quark(quark_func_t func, void *data, int stack_size);
 void _kill_quark(quark_t *quark, int signo);
 int _spin_quark(quark_t *quark);
 void _setname_quark(quark_t *quark, char *name);

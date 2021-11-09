@@ -60,9 +60,14 @@ void *_quark_core(void *arg)
  * the caller should ensure that @func & @data
  * are effective
  */ 
-quark_t *_new_quark(quark_func_t func, void *data)
+quark_t *_new_quark(quark_func_t func, void *data, int stack_size)
 {
 	quark_t *quark = calloc(1, sizeof(quark_t));
+
+	if (stack_size < PTHREAD_STACK_MIN)
+	{
+		stack_size = QUARK_DEFAULT_STACK_SIZE;
+	}
 
 	if (quark) {
 		quark->parent = pthread_self();
@@ -74,7 +79,7 @@ quark_t *_new_quark(quark_func_t func, void *data)
 
 		pthread_attr_init(&quark->attr);
 		if (pthread_attr_setstacksize(&quark->attr, 
-			QUARK_DEFAULT_STACK_SIZE) != 0) {
+			stack_size) != 0) {
 			//DEBUGP(DERR, "_new_quark", 
 			//	"unable to set the stack size to %d\n", 
 			//	QUARK_DEFAULT_STACK_SIZE);
