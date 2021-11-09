@@ -156,6 +156,63 @@ void dfs_G_print(GraphA_T g)
 	}
 }
 
+/*********************************************************/
+void dfs_V_tree_produce(GraphA_T g, NODE v, SetL_T set)
+{
+	int count = 0;
+	NODE node = NULL;
+
+	fprintf(stdout, "index: %d, d: %d, f: %d\n", v->index, v->d, v->f);
+
+	MODULE_FUN_NAME(SetL, add)(set, (void *)v);
+
+	count = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
+	for (int i = 0; i < count; i++)
+	{
+		node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
+		if ((node->d > v->d) && (node->f < v->f))
+		{
+			MODULE_FUN_NAME(SetL, add)(set, (void *)node);
+		}
+	}
+}
+
+static int set_cmp(void *key, void *arg)
+{
+	NODE v = (NODE )key;
+	NODE u = (NODE )arg;
+
+	if (v->index == u->index)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+void dfs_G_trees_produce(GraphA_T g, SenDlink_T l)
+{
+	int len = 0;
+	NODE node = NULL;
+
+	assert(g);
+
+	len = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
+	for (int i = 0; i < len; i++)
+	{
+		node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
+		if (node->prev == NULL)
+		{
+			SetL_T set = NULL;
+			set = MODULE_FUN_NAME(SetL, new)(set_cmp);
+			dfs_V_print_special(g, node, set);
+			MODULE_FUN_NAME(SenDlink, insert)(l, (void *)set);
+		}
+	}
+}
+
 /*****************dfs**********************/
 static int time = 0;
 
