@@ -2105,7 +2105,7 @@ struct test_routine my_test_routines[] =
 //		{test_stack_array, "stack_array"},	// ko
 //		{test_ap, "ap"},					// kko
 //		{test_arena, "arena"},				// ko
-		{test_threadPool, "threadPool"},	// ko
+//		{test_threadPool, "threadPool"},	// ko
 //		{test_array, "array"},				// ko
 //		{test_set, "set"},					// ko
 //		{test_set_list, "set-list"},					// ko
