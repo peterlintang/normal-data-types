@@ -21,7 +21,7 @@ GraphA_T components_create_graph(char *filename);
 /*
  * 计算图g的连通分量,图最后的连通分量保存在链表sets中，
  * 链表中每一个元素代表一个连通分量
- * g: 有节点信息，边信息的图
+ * g: 有节点信息，边信息的图(无向图)
  * sets: 空链表
  */
 void components_connected(ListD_T sets, GraphA_T g);
