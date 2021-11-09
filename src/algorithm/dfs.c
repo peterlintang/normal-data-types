@@ -207,7 +207,7 @@ void dfs_G_trees_produce(GraphA_T g, SenDlink_T l)
 		{
 			SetL_T set = NULL;
 			set = MODULE_FUN_NAME(SetL, new)(set_cmp);
-			dfs_V_print_special(g, node, set);
+			dfs_V_tree_produce(g, node, set);
 			MODULE_FUN_NAME(SenDlink, insert)(l, (void *)set);
 		}
 	}
