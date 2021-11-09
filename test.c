@@ -297,7 +297,7 @@ static void test_threadPool(void)
 	int ret = 0;
 	ThreadPool_T p = NULL;
 
-	p = MODULE_FUN_NAME(ThreadPool, new)(10);
+	p = MODULE_FUN_NAME(ThreadPool, new)(10, 0);
 	ret = MODULE_FUN_NAME(ThreadPool, init)(p);
 	fprintf(stdout, "%s: init: %d\n", __func__, ret);
 	for (i = 0; i < THREADPOOL_ITEM_LEN; i++)
@@ -2105,7 +2105,7 @@ struct test_routine my_test_routines[] =
 //		{test_stack_array, "stack_array"},	// ko
 //		{test_ap, "ap"},					// kko
 //		{test_arena, "arena"},				// ko
-//		{test_threadPool, "threadPool"},	// ko
+		{test_threadPool, "threadPool"},	// ko
 //		{test_array, "array"},				// ko
 //		{test_set, "set"},					// ko
 //		{test_set_list, "set-list"},					// ko
