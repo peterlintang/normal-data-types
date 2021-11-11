@@ -23,6 +23,7 @@ COMMUNICATE_SRCS := \
 					./randomized-select.c \
 					./max-heapify-sort.c \
 					./min-heapify-sort.c \
+					./counting-sort.c \
 					./components.c 
 
 COMMUNICATE_OBJS := \
@@ -37,6 +38,7 @@ COMMUNICATE_OBJS := \
 					./randomized-select.o \
 					./max-heapify-sort.o \
 					./min-heapify-sort.o \
+					./counting-sort.o \
 					./components.o 
 
 all: $(LIBS)

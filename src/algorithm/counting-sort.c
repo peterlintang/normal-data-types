@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "counting-sort.h"
+
 
 /*
  * assume that all elements' value in a is between 0 to k
@@ -122,6 +124,8 @@ int counting_sort4(int a[], int size, int k)
 	return 0;
 }
 
+
+#if 0
 int main(int argc, char *argv[])
 {
 #define ARRAY_SIZE(a)	(sizeof(a) / sizeof(a[0]))
@@ -145,5 +149,6 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+#endif
 
 
