@@ -12,7 +12,6 @@ LIBCOMMUNICATE:=libutil.a
 LIBS:=$(LIBCOMMUNICATE)
 
 COMMUNICATE_SRCS := ./db.c \
-					./initserver.c	\
 					./netutil.c	\
 					./err.c	\
 					./log.c	\
@@ -20,7 +19,6 @@ COMMUNICATE_SRCS := ./db.c \
 					./thread_pool.c
 
 COMMUNICATE_OBJS := ./db.o \
-					./initserver.o	\
 					./netutil.o	\
 					./err.o	\
 					./log.o	\
