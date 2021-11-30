@@ -11,31 +11,12 @@
 
 #include "module.h"
 #include "sentinel-linked-list.h"
-
-#define WHITE	0
-#define GRAY	1
-#define BLACK	2
+#include "ve.h"
 
 #define INFINITE (-7777777)
 
-#define NODE bfs_node_t
-#define EDGE_EXT bfs_edge_ext_t
-
-typedef struct NODE *NODE;
-typedef struct EDGE_EXT *EDGE_EXT;
-
-struct NODE {
-	int index;
-	int color;
-	int d;
-	int f;
-	NODE prev;
-	SenDlink_T l;
-};
-
-struct EDGE_EXT {
-	int value;
-};
+#define NODE gve_node_t
+#define EDGE_EXT gve_edge_ext_t
 
 /*
  * you xiang & wu xiang tu jun ke

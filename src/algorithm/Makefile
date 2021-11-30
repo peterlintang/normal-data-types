@@ -17,6 +17,7 @@ COMMUNICATE_SRCS := \
 					./merge-sort.c \
 					./quicksort.c \
 					./minmax.c \
+					./ve.c \
 					./dfs.c \
 					./bfs.c \
 					./topological-sort.c \
@@ -32,6 +33,7 @@ COMMUNICATE_OBJS := \
 					./merge-sort.o \
 					./quicksort.o \
 					./minmax.o \
+					./ve.o \
 					./dfs.o \
 					./bfs.o \
 					./topological-sort.o \
