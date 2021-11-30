@@ -7,16 +7,8 @@
 #include "dlist.h"
 #include "gve_array.h"
 #include "set-list.h"
+#include "ve.h"
 
-struct node {
-	int v;
-};
-
-struct edge_ext {
-	int value;
-};
-
-GraphA_T components_create_graph(char *filename);
 
 /*
  * 计算图g的连通分量,图最后的连通分量保存在链表sets中，

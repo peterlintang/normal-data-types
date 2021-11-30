@@ -9,6 +9,8 @@
 #ifndef VE_H__
 #define VE_H__
 
+#include "sentinel-linked-list.h"
+
 #define WHITE	0
 #define GRAY	1
 #define BLACK	2
