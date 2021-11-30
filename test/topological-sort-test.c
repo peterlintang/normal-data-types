@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 
 
 	l = MODULE_FUN_NAME(SenDlink, create)();
-	g = dfs_create_graph(argv[1]);
+	g = gve_create_graph(argv[1]);
 
 	topological_sort(g, l);
 

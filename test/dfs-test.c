@@ -12,7 +12,7 @@
 
 static int process_node(void *arg, void *priv)
 {
-	dfs_node_t node = (dfs_node_t)priv;
+	gve_node_t node = (gve_node_t)priv;
 
 	fprintf(stdout, "%s: %d, %p\n", __func__, node->index, node);
 	return 0;
@@ -20,7 +20,7 @@ static int process_node(void *arg, void *priv)
 
 static int map(void *priv, void *arg)
 {
-	dfs_node_t node = (dfs_node_t)priv;
+	gve_node_t node = (gve_node_t)priv;
 	fprintf(stdout, "%s: node: %d, d: %d, f: %d\n", 
 					__func__, node->index,
 					node->d, node->f);
@@ -36,9 +36,9 @@ int main(int argc, char *argv[])
 	SetL_T set = NULL;
 
 	l = MODULE_FUN_NAME(SenDlink, create)();
-	g = dfs_create_graph(argv[1]);
+	g = gve_create_graph(argv[1]);
 	dfs(g, process_node, NULL);
-	dfs_G_print(g);
+	gve_G_print(g);
 	fprintf(stdout, "\n\n");
 	dfs_G_trees_produce(g, l);
 
