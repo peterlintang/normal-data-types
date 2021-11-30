@@ -37,7 +37,7 @@ int topological_sort(GraphA_T g, SenDlink_T l)
 void topological_sort_print(SenDlink_T l)
 {
 	int count = 0;
-	dfs_node_t v = NULL;
+	gve_node_t v = NULL;
 
 	assert(l);
 
@@ -45,7 +45,7 @@ void topological_sort_print(SenDlink_T l)
 
 	for (int i = 0; i < count; i++)
 	{
-		v = (dfs_node_t)MODULE_FUN_NAME(SenDlink, get)(l, i);
+		v = (gve_node_t)MODULE_FUN_NAME(SenDlink, get)(l, i);
 		fprintf(stdout, "%d ", v->index);
 	}
 	fprintf(stdout, "\n");
