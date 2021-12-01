@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 
 	for (int i = 0; i < len; i++)
 	{
-		fprintf(stdout, "%p\n", a[i]);
+		fprintf(stdout, "%d: %p\n", i, a[i]);
 	}
 
 	return 0;

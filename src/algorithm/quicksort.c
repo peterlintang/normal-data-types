@@ -34,7 +34,6 @@ static int partition(void *a[], int (*cmp)(void *, void *), int p, int r)
 }
 
 /*
- * 有问题,会导致数组访问溢出
  */
 static int partition2(void *a[], int (*cmp)(void *, void *), int p, int r)
 {
@@ -49,9 +48,9 @@ static int partition2(void *a[], int (*cmp)(void *, void *), int p, int r)
 
 	while (1)
 	{
-		do { i++; } while ((cmp(a[i], part_key) < 0) && i <= r);
+		do { i++; } while ((cmp(a[i], part_key) < 0) && i < r);
 		do { j--; } while (cmp(a[j], part_key) > 0); // bu yong jia xia biao pan duan, yin wei part_key ke zuo shao bin 
-		if (i > j) break;
+		if (i >= j) break;
 		tmp = a[i];
 		a[i] = a[j];
 		a[j] = tmp;
@@ -73,7 +72,7 @@ int quicksort(void *a[], int (*cmp)(void *, void *), int p, int r)
 
 	if (p < r)
 	{
-		q = partition(a, cmp, p, r);
+		q = partition2(a, cmp, p, r);
 		quicksort(a, cmp, p, q - 1);
 		quicksort(a, cmp, q + 1, r);
 	}
