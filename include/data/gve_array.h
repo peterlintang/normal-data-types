@@ -117,6 +117,11 @@ G MODULE_FUN_NAME(GraphA, create)(int node_size, int node_len, int edge_ext_size
  */
 void MODULE_FUN_NAME(GraphA, free)(G *gp);
 
+/*
+ * 复制图g生成一个新的图
+ */
+G MODULE_FUN_NAME(GraphA, copy)(G g);
+
 
 
 

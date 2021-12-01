@@ -252,4 +252,33 @@ void MODULE_FUN_NAME(GraphA, free)(G *gp)
 	*gp = NULL;
 }
 
+G MODULE_FUN_NAME(GraphA, copy)(G g)
+{
+	G copy = NULL;
+
+	assert(g);
+
+	copy = (G)calloc(1, sizeof(*copy)); 
+	if (copy)
+	{
+		copy->priv = g->priv;
+		copy->vs = MODULE_FUN_NAME(Array, copy)(g->vs, g->vs->length);
+		if (copy->vs == NULL)
+		{
+			free(copy);
+			return NULL;
+		}
+
+		copy->es = MODULE_FUN_NAME(Array, copy)(g->es, g->es->length);
+		if (copy->es == NULL)
+		{
+			MODULE_FUN_NAME(Array, free)(&(copy->vs));
+			free(copy);
+			return NULL;
+		}
+	}
+
+	return copy;
+}
+
 
