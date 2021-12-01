@@ -17,6 +17,8 @@
 #define NODE gve_node_t
 #define EDGE_EXT gve_edge_ext_t
 
+int dfs_visit(GraphA_T g, NODE u, int (*cb)(void *arg, void *priv), void *arg);
+
 /*
  * you xiang & wu xiang tu jun ke
  */

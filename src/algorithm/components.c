@@ -8,16 +8,19 @@
 #include <assert.h>
 
 #include "dlist.h"
+#include "sentinel-linked-list.h"
 #include "gve_array.h"
 #include "gve-normal.h"
 #include "set-list.h"
 #include "components.h"
+#include "quicksort.h"
+#include "dfs.h"
 
 #define NODE gve_node_t
 #define EDGE_EXT gve_edge_ext_t
 
 /**********************************************************/
-static int set_cmp(void *priv, void *arg)
+static int _set_cmp(void *priv, void *arg)
 {
 //	fprintf(stdout, "%s: priv: %p, arg: %p\n", __func__, priv, arg);
 	if (priv == arg) return 0;
@@ -29,7 +32,7 @@ static SetL_T new_set(void *node)
 	int ret = 0;
 	SetL_T set = NULL;
 
-	set = MODULE_FUN_NAME(SetL, new)(set_cmp);
+	set = MODULE_FUN_NAME(SetL, new)(_set_cmp);
 	if (set == NULL)
 	{
 		return NULL;
@@ -253,13 +256,131 @@ GraphA_T convert_graphA_edges(GraphA_T g)
 	return copy;
 }
 
+static int node_cmp(void *arg1, void *arg2)
+{
+	NODE v = (NODE)arg1;
+	NODE u = (NODE)arg2;
+
+//	fprintf(stdout, "%s: v: %d, %d, u: %d, %d\n", __func__, v->index, v->f, u->index, u->f);
+	if (v->f > u->f) return 1;
+	else if (v->f < u->f) return -1;
+	else return 0;
+}
+
+static int set_cmp(void *key, void *arg)
+{
+	NODE v = (NODE)key;
+	NODE u = (NODE)arg;
+
+	if (v->index == u->index)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+static int graphA_cmp(void *arg, void *priv)
+{
+	NODE node = (NODE)arg;
+	int index = (int)priv;
+
+	if (node->index == index)
+	{
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
 /*
  * 计算图g的强连通分量
  * g 有向图
  * sets 连通分量集合
  */
-void strongly_components_connected(ListD_T sets, GraphA_T g)
+int strongly_components_connected(SenDlink_T sets, GraphA_T g)
 {
+	assert(g && sets);
+
+	GraphA_T convert = NULL;
+	NODE node = NULL;
+	SenDlink_T l = NULL;
+	void **array = NULL;
+	int node_count = 0;
+
+	dfs(g, NULL, NULL);
+
+	convert = convert_graphA_edges(g);
+
+	node_count = MODULE_FUN_NAME(GraphA, VnodesLength)(convert);
+	array = (void **)calloc(node_count, sizeof(void *));
+
+	for (int i = 0; i < node_count; i++)
+	{
+		node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(convert, i);
+		node->color = WHITE;
+		node->prev = NULL;
+		array[i] = (void *)node;
+	}
+
+	/*
+	for (int i = 0; i < node_count; i++)
+	{
+		fprintf(stdout, "%s: i: %d, p: %p\n", __func__, i, array[i]);
+	}
+	*/
+
+	quicksort(array, node_cmp, 0, node_count - 1);
+
+	for (int i = node_count - 1; i >= 0; i--)
+	{
+		node = (NODE)(array[i]);
+		if (node->color == WHITE)
+		{
+			dfs_visit(convert, node, NULL, NULL);
+		}
+	}
+
+	l = MODULE_FUN_NAME(SenDlink, create)();
+	dfs_G_trees_produce(convert, l);
+
+	int count = MODULE_FUN_NAME(SenDlink, count)(l);
+	for (int i = 0; i < count; i++)
+	{
+		SetL_T set = (SetL_T)MODULE_FUN_NAME(SenDlink, get)(l, i);
+
+		int set_count = MODULE_FUN_NAME(SetL, count)(set);
+		SetL_T new = MODULE_FUN_NAME(SetL, new)(set_cmp);
+		NODE v = NULL;
+
+		for (int j = 0; j < set_count; j++)
+		{
+			node = (NODE)MODULE_FUN_NAME(SetL, get)(set, j);
+			v = (NODE)MODULE_FUN_NAME(GraphA, VnodeSearch)(g, graphA_cmp, (void *)(node->index));
+			if (v == NULL)
+			{
+				fprintf(stdout, "%s: cant find %d in graph\n", __func__, node->index);
+			}
+			else
+			{
+				MODULE_FUN_NAME(SetL, add)(new, v);
+			}
+		}
+
+		MODULE_FUN_NAME(SenDlink, insert)(sets, new);
+
+		MODULE_FUN_NAME(SetL, free)(&set);
+	}
+
+	free(array);
+	MODULE_FUN_NAME(SenDlink, destroy)(&l);
+	MODULE_FUN_NAME(GraphA, free)(&convert);
+
+	return 0;
 }
 
 

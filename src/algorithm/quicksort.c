@@ -33,6 +33,9 @@ static int partition(void *a[], int (*cmp)(void *, void *), int p, int r)
 	return j;
 }
 
+/*
+ * 有问题,会导致数组访问溢出
+ */
 static int partition2(void *a[], int (*cmp)(void *, void *), int p, int r)
 {
 	int i;
@@ -70,7 +73,7 @@ int quicksort(void *a[], int (*cmp)(void *, void *), int p, int r)
 
 	if (p < r)
 	{
-		q = partition2(a, cmp, p, r);
+		q = partition(a, cmp, p, r);
 		quicksort(a, cmp, p, q - 1);
 		quicksort(a, cmp, q + 1, r);
 	}

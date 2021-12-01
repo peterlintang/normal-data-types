@@ -39,7 +39,7 @@ GraphA_T convert_graphA_edges(GraphA_T g);
  * g 有向图
  * sets 连通分量集合
  */
-void strongly_components_connected(ListD_T sets, GraphA_T g);
+int strongly_components_connected(SenDlink_T sets, GraphA_T g);
 
 #endif // end of COMPONENTS_H__
 

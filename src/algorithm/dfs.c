@@ -78,7 +78,7 @@ void dfs_G_trees_produce(GraphA_T g, SenDlink_T l)
 /*****************dfs**********************/
 static int time = 0;
 
-static int dfs_visit(GraphA_T g, NODE u, int (*cb)(void *arg, void *node), void *arg)
+int dfs_visit(GraphA_T g, NODE u, int (*cb)(void *arg, void *node), void *arg)
 {
 	int len = 0;
 	EdgeA_T edge = NULL;

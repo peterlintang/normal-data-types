@@ -15,4 +15,5 @@ all:
 	gcc -g dfs-test.c -o dfs-test -I../include -I../include/pic -I../include/data -I../include/algorithm ../src/algorithm/libalgorithm.a ../src/data/libdatatype.a ../src/pic/libcommunicate.a -lrt -lpthread
 	gcc -g bfs-test.c -o bfs-test -I../include -I../include/pic -I../include/data -I../include/algorithm ../src/algorithm/libalgorithm.a ../src/data/libdatatype.a ../src/pic/libcommunicate.a -lrt -lpthread
 	gcc -g topological-sort-test.c -o topological-sort-test -I../include -I../include/pic -I../include/data -I../include/algorithm ../src/algorithm/libalgorithm.a ../src/data/libdatatype.a ../src/pic/libcommunicate.a -lrt -lpthread
+	gcc -g strongly-components-test.c -o strongly-components-test -I../include -I../include/pic -I../include/data -I../include/algorithm ../src/algorithm/libalgorithm.a ../src/data/libdatatype.a ../src/pic/libcommunicate.a -lrt -lpthread
 clean:
