@@ -46,6 +46,7 @@ static int e_print(void *priv, void *arg)
 int main(int argc, char *argv[])
 {
 	GraphA_T g = NULL;
+	GraphA_T convert = NULL;
 	ListD_T sets = NULL;
 
 	if (argc != 2) return 0;
@@ -54,6 +55,10 @@ int main(int argc, char *argv[])
 	fprintf(stdout, "%s: g: %p\n", __func__, g);
 
 	GA_print(g, v_print, e_print, NULL, NULL);
+
+	convert = convert_graphA_edges(g);
+	fprintf(stdout, "%s: g convert\n", __func__);
+	GA_print(convert, v_print, e_print, NULL, NULL);
 
 	sets = MODULE_FUN_NAME(ListD, new)();
 	fprintf(stdout, "%s: %p, %p\n", __func__, sets, g);
