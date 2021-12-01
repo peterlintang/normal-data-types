@@ -59,7 +59,7 @@ static int insert_set_to_sets(ListD_T sets, SetL_T set)
 	return 0;
 }
 
-SetL_T set_find(ListD_T sets, struct node *p)
+SetL_T set_find(ListD_T sets, NODE p)
 {
 	int count = 0;
 	ListDNode_T cur = NULL;
@@ -182,4 +182,84 @@ int components_same(ListD_T sets, void *x, void *y)
 	else
 		return 0;
 }
+
+/*
+ * 反置图g的边
+ * 即原来有边u->v变成v->u
+ */
+GraphA_T convert_graphA_edges(GraphA_T g)
+{
+	GraphA_T copy = NULL;
+
+	assert(g);
+
+	copy = MODULE_FUN_NAME(GraphA, copy)(g);
+	if (copy)
+	{
+		int node_count = 0;
+		int edge_count = 0;
+		NODE node = NULL;
+		EdgeA_T edge = NULL;
+		NODE v = NULL;
+		NODE u = NULL;
+		NODE v_c = NULL;
+		NODE u_c = NULL;
+
+		node_count = MODULE_FUN_NAME(GraphA, VnodesLength)(copy);
+		edge_count = MODULE_FUN_NAME(GraphA, EdgesLength)(copy);
+
+		for (int i = 0; i < node_count; i++)
+		{
+			node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(copy, i);
+			node->l = MODULE_FUN_NAME(SenDlink, create)();
+			if (node->l == NULL)
+			{
+				fprintf(stdout, "%s: i: %d failed to create link list\n", __func__, i);
+			}
+		}
+
+		for (int i = 0; i < edge_count; i++)
+		{
+			edge = MODULE_FUN_NAME(GraphA, EdgeGet)(copy, i);
+			MODULE_FUN_NAME(GraphA, EdgeGetVnodes)(edge, (void **)&v, (void **)&u);
+
+			v_c = NULL;
+			u_c = NULL;
+
+			for (int j = 0; j < node_count; j++)
+			{
+				node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(copy, j);
+				if (node->index == v->index)
+				{
+					v_c = node;
+				}
+				if (node->index == u->index)
+				{
+					u_c = node;
+				}
+				if (v_c && u_c)
+				{
+					break;
+				}
+			}
+
+//			fprintf(stdout, "%s: u: %d, v: %d, u_c: %d, v_c: %d\n", __func__, u->index, v->index, u_c->index, v_c->index);
+
+			MODULE_FUN_NAME(GraphA, EdgeSetVnodes)(edge, (void *)u_c, (void *)v_c, NULL, NULL);
+			MODULE_FUN_NAME(SenDlink, insert)(u_c->l, (void *)edge);
+		}
+	}
+
+	return copy;
+}
+
+/*
+ * 计算图g的强连通分量
+ * g 有向图
+ * sets 连通分量集合
+ */
+void strongly_components_connected(ListD_T sets, GraphA_T g)
+{
+}
+
 
