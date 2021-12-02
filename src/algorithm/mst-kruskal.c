@@ -13,7 +13,7 @@
 #include "sentinel-linked-list.h"
 #include "set-list.h"
 #include "quicksort.h"
-#include "generic-mst.h"
+#include "mst-kruskal.h"
 
 #define NODE gve_node_t
 #define EDGE_EXT gve_edge_ext_t

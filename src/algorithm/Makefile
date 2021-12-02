@@ -20,7 +20,7 @@ COMMUNICATE_SRCS := \
 					./ve.c \
 					./dfs.c \
 					./bfs.c \
-					./generic-mst.c \
+					./mst-kruskal.c \
 					./topological-sort.c \
 					./randomized-select.c \
 					./max-heapify-sort.c \
@@ -37,7 +37,7 @@ COMMUNICATE_OBJS := \
 					./ve.o \
 					./dfs.o \
 					./bfs.o \
-					./generic-mst.o \
+					./mst-kruskal.o \
 					./topological-sort.o \
 					./randomized-select.o \
 					./max-heapify-sort.o \

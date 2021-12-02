@@ -4,8 +4,8 @@
  * 连通无向图
  */
 
-#ifndef GENERIC_MST_H__
-#define GENERIC_MST_H__
+#ifndef MST_KRUSKAL_H__
+#define MST_KRUSKAL_H__
 
 #include "gve_array.h"
 #include "gve-normal.h"
@@ -22,7 +22,7 @@
  * */
 int mst_kruskal(SenDlink_T edges, GraphA_T g);
 
-#endif // end of GENERIC_MST_H__
+#endif // end of MST_KRUSKAL_H__
 
 
 

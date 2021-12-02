@@ -8,7 +8,7 @@
 #include "sentinel-linked-list.h"
 #include "gve_array.h"
 #include "gve-normal.h"
-#include "generic-mst.h"
+#include "mst-kruskal.h"
 
 
 int main(int argc, char *argv[])
