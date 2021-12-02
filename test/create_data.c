@@ -6,12 +6,15 @@
 
 #define NODE_LEN	1024
 #define EDGE_LEN	1024
+#define EDGE_VALUE_MAX	1024
 #define FILE_NAME	"data.txt"
 
 int main(int argc, char *argv[])
 {
 	int node_len = NODE_LEN;
 	int edge_len = EDGE_LEN;
+	int edge_value_max = EDGE_VALUE_MAX;
+	int edge_value = 0;
 	int node_value = 0;
 	int edge_value1 = 0;
 	int edge_value2 = 0;
@@ -19,11 +22,12 @@ int main(int argc, char *argv[])
 	char *filename = FILE_NAME;
 	FILE *file = NULL;
 
-	if (argc == 4)
+	if (argc == 5)
 	{
 		node_len = atoi(argv[1]);
 		edge_len = atoi(argv[2]);
-		filename = argv[3];
+		edge_value_max = atoi(argv[3]);
+		filename = argv[4];
 	}
 	fprintf(stdout, "nodes: %d, edges: %d, file: %s\n", node_len, edge_len, filename);
 
@@ -50,11 +54,12 @@ int main(int argc, char *argv[])
 	{
 		edge_value1 = random() % node_len + 1;
 		edge_value2 = random() % node_len + 1;
+		edge_value  = random() % edge_value_max + 1;
 		if (edge_value1 != edge_value2)
 		{
 			i++;
 			memset(str, 0, 64);
-			snprintf(str, 64, "%d,%d\n", edge_value1, edge_value2);
+			snprintf(str, 64, "%d,%d,%d\n", edge_value1, edge_value2, edge_value);
 			fwrite(str, strlen(str), 1, file);
 		}
 	}

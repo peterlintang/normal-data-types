@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 	SenDlink_T l = NULL;
 
 	l = MODULE_FUN_NAME(SenDlink, create)();
-	g = gve_create_graph("./111.txt");
+	g = gve_create_graph(argv[1]);
 	gve_G_print(g);
 	fprintf(stdout, "\n\nhello\n\n");
 	mst_kruskal(l, g);
