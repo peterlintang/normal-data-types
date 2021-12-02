@@ -1,89 +1,145 @@
 
+/*
+ * 最小生成树
+ * 连通无向图
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 
-#include "../charpter-22/gve.h"
-#include "../charpter-21/set-list.h"
+#include "gve_array.h"
+#include "gve-normal.h"
+#include "ve.h"
+#include "sentinel-linked-list.h"
+#include "set-list.h"
+#include "quicksort.h"
+#include "generic-mst.h"
 
-struct weight_e {
-	int u;
-	int v;
-	int w;
-};
+#define NODE gve_node_t
+#define EDGE_EXT gve_edge_ext_t
 
-static int sort_weight_e(struct weight_e *wes, int wes_num)
+
+static int set_cmp(void *priv, void *arg)
 {
-	struct weight_e w;
-	int i;
-	int j;
-
-	for (i = 1; i < wes_num; i++)
+	if (priv == arg)
 	{
-		w.u = wes[i].u;
-		w.v = wes[i].v;
-		w.w = wes[i].w;
-		for (j = i; j > 0; j--)
-		{
-			if (w.w < wes[j - 1].w)
-			{
-				wes[j].w = wes[j - 1].w;
-				wes[j].u = wes[j - 1].u;
-				wes[j].v = wes[j - 1].v;
-			}
-			else
-			{
-				break;
-			}
-		}
-		wes[j].w = w.w;
-		wes[j].u = w.u;
-		wes[j].v = w.v;
+		return 0;
 	}
-
-	return 0;
+	else
+	{
+		return -1;
+	}
 }
 
+static int edge_cmp(void *arg1, void *arg2)
+{
+	EdgeA_T edge1 = NULL;
+	EDGE_EXT edge_ext1 = NULL;
+	EdgeA_T edge2 = NULL;
+	EDGE_EXT edge_ext2 = NULL;
+
+	edge1 = (EdgeA_T)arg1;
+	edge2 = (EdgeA_T)arg2;
+
+	edge_ext1 = (EDGE_EXT)MODULE_FUN_NAME(GraphA, EdgeGetPriv)(edge1);
+	edge_ext2 = (EDGE_EXT)MODULE_FUN_NAME(GraphA, EdgeGetPriv)(edge2);
+
+	if (edge_ext1->value > edge_ext2->value) return 1;
+	else if (edge_ext1->value < edge_ext2->value) return -1;
+	else return 0;
+}
+
+static int sendlink_search(void *priv, void *arg)
+{
+	SetL_T set = (SetL_T)priv;
+	NODE node = (NODE)arg;
+	int count = 0;
+
+	count = MODULE_FUN_NAME(SetL, count)(set);
+	for (int i = 0; i < count; i++)
+	{
+		NODE member = MODULE_FUN_NAME(SetL, get)(set, i);
+		if (member == node)
+			return 0;
+	}
+
+	return -1;
+}
 
 /*
  *
  *  algorith for charpter 23-2
  * */
-int mst_kruskal(struct sets *sets, 
-				struct G *g, 
-				struct weight_e *wes, int wes_num,
-				struct G *mst_g)
+int mst_kruskal(SenDlink_T edges, GraphA_T g)
 {
-	assert(sets);
 	assert(g);
-	assert(mst_g);
-	assert(wes);
+	assert(edges);
 
-	for (int i = 0; i < g->vs_num; i++)
+	SenDlink_T sets = NULL;
+	NODE node = NULL;
+	NODE v = NULL;
+	NODE u = NULL;
+	EdgeA_T edge = NULL;
+	EDGE_EXT edge_ext = NULL;
+	int node_count = 0;
+	int edge_count = 0;
+	void **array = NULL;
+
+	sets = MODULE_FUN_NAME(SenDlink, create)();
+	node_count = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
+	for (int i = 0; i < node_count; i++)
 	{
-		set_make(sets, g->vs[i]->v);
+		SetL_T set = NULL;
+
+		set = MODULE_FUN_NAME(SetL, new)(set_cmp);
+		node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
+		MODULE_FUN_NAME(SetL, add)(set, (void *)node);
+		MODULE_FUN_NAME(SenDlink, insert)(sets, (void *)set);
 	}
 
-	sort_weight_e(wes, wes_num);
-
-	for (int i = 0; i < wes_num; i++)
+	edge_count = MODULE_FUN_NAME(GraphA, EdgesLength)(g);
+	array = (void **)calloc(edge_count, sizeof(void *));
+	for (int i = 0; i < edge_count; i++)
 	{
-		if (set_find(sets, wes[i].u) != set_find(sets, wes[i].v))
+		array[i] = (void *)MODULE_FUN_NAME(GraphA, EdgeGet)(g, i);
+	}
+	quicksort(array, edge_cmp, 0, edge_count - 1);
+
+	for (int i = 0; i < edge_count; i++)
+	{
+		SetL_T set_v = NULL;
+		SetL_T set_u = NULL;
+		SetL_T new_set = NULL;
+
+		edge = (EdgeA_T)MODULE_FUN_NAME(GraphA, EdgeGet)(g, i);
+		MODULE_FUN_NAME(GraphA, EdgeGetVnodes)(edge, (void **)&v, (void **)&u);
+		MODULE_FUN_NAME(SenDlink, search)(sets, sendlink_search, v, (void **)(&set_v));
+		MODULE_FUN_NAME(SenDlink, search)(sets, sendlink_search, u, (void **)(&set_u));
+		if (set_v != set_u)
 		{
-			E_create(mst_g->vs[wes[i].u - 1], mst_g->vs[wes[i].v - 1]);
-			set_union(sets, wes[i].u, wes[i].v);
-			/*
-			fprintf(stdout, "edge: %d-%d\n", wes[i].u, wes[i].v);
-			fprintf(stdout, "edge: %d-%d\n", 
-							(mst_g->vs[wes[i].u - 1])->v, 
-							(mst_g->vs[wes[i].v - 1])->v);
-			*/
+			MODULE_FUN_NAME(SenDlink, insert)(edges, (void *)edge);
+			new_set = MODULE_FUN_NAME(SetL, union)(set_v, set_u);
+			MODULE_FUN_NAME(SenDlink, delete)(sets, set_cmp, (void *)set_v);
+			MODULE_FUN_NAME(SenDlink, delete)(sets, set_cmp, (void *)set_u);
+			MODULE_FUN_NAME(SetL, free)(&set_v);
+			MODULE_FUN_NAME(SetL, free)(&set_u);
+			MODULE_FUN_NAME(SenDlink, insert)(sets, new_set);
 		}
 	}
+
+	free(array);
+	int count = MODULE_FUN_NAME(SenDlink, count)(sets);
+	for (int i = 0; i < count; i++)
+	{
+		SetL_T set = (SetL_T)MODULE_FUN_NAME(SenDlink, get)(sets, i);
+		MODULE_FUN_NAME(SetL, free)(&set);
+	}
+	MODULE_FUN_NAME(SenDlink, destroy)(&sets);
 
 	return 0;
 }
 
+#if 0
 /*
  *
  *  algorith for charpter 23-3
@@ -95,48 +151,6 @@ int mst_prim(struct sets *sets,
 {
 
 	return 0;
-}
-
-static int mst_get_edge_weights(struct weight_e **wes, int *wes_num)
-{
-	int u = 0;
-	int v = 0;
-	int w = 0;
-	struct weight_e *w_p = NULL;
-
-	assert(wes);
-	assert(wes_num);
-
-	scanf("%d", wes_num);
-
-	w_p = (struct weight_e *)calloc(*wes_num, sizeof(struct weight_e));
-	if (w_p == NULL)
-	{
-		fprintf(stderr, "%s: no mem\n", __func__);
-		exit(0);
-	}
-
-	for(int i = 0; i < *wes_num; i++)
-	{
-		scanf("%d,%d,%d", &u, &v, &w);
-		w_p[i].u = u;
-		w_p[i].v = v;
-		w_p[i].w = w;
-	}
-
-	*wes = w_p;
-
-	return 0;
-}
-
-static void print_weight_edges(struct weight_e *wes, int num)
-{
-	for (int i = 0; i < num; i++)
-	{
-		fprintf(stdout, "%s:(%d: %d %d %d)\n",
-						__func__, i, 
-						wes[i].u, wes[i].v, wes[i].w);
-	}
 }
 
 /*
@@ -177,6 +191,7 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+#endif
 
 
 
