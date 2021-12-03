@@ -1,10 +1,10 @@
 
 /*
- * 数组实现最大堆结构
+ * 数组实现最小堆结构
  */
 
-#ifndef CI_MAX_HEAPIFY_H
-#define CI_MAX_HEAPIFY_H
+#ifndef CI_MIN_HEAPIFY_H
+#define CI_MIN_HEAPIFY_H
 
 #include "module.h"
 
@@ -12,16 +12,16 @@
 typedef struct T *T;
 
 /*
- *use array to build max heap
+ *use array to build min heap
  */
 T MODULE_FUN_NAME(MinHeap, new)(void *a[], int size, int (*cmp)(void *, void *), int (*decrease)(void **, void *));
 
 void MODULE_FUN_NAME(MinHeap, free)(T *hp, int free_array);
 
 /*
- * interfaces for max heap
+ * interfaces for min heap
  */
-void *MODULE_FUN_NAME(MinHeap, max)(T h);
+void *MODULE_FUN_NAME(MinHeap, min)(T h);
 
 void *MODULE_FUN_NAME(MinHeap, extract_min)(T h);
 
@@ -33,6 +33,6 @@ void *MODULE_FUN_NAME(MinHeap, delete)(T h, int index);
 
 #undef T
 
-#endif // end of CI_MAX_HEAPIFY_H
+#endif // end of CI_MIN_HEAPIFY_H
 
 
