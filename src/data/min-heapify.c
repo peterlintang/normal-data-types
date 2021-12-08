@@ -242,3 +242,19 @@ void *MODULE_FUN_NAME(MinHeap, delete)(T h, int index)
 	return tmp;
 }
 
+int MODULE_FUN_NAME(MinHeap, search)(T h, int (*cmp)(void *priv, void *arg), void *arg)
+{
+	assert(h && arg);
+
+	for (int i = 0; i < h->size; i++)
+	{
+		if (cmp(h->a[i], arg) == 0)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+

@@ -36,7 +36,8 @@ int main(int argc, char *argv[])
 
 	for (int i = 0; i < size; i++)
 	{
-		a[i] = (void *)(rand() % size + 1);
+//		a[i] = (void *)(rand() % size + 1);
+		a[i] = (void *)(i + 1);
 	}
 
 	fprintf(stdout, "before sort\n");

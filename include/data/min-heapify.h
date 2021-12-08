@@ -31,6 +31,8 @@ int MODULE_FUN_NAME(MinHeap, insert)(T h, void *new_key);
 
 void *MODULE_FUN_NAME(MinHeap, delete)(T h, int index);
 
+int MODULE_FUN_NAME(MinHeap, search)(T h, int (*cmp)(void *priv, void *arg), void *arg);
+
 #undef T
 
 #endif // end of CI_MIN_HEAPIFY_H
