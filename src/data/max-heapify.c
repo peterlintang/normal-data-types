@@ -24,6 +24,7 @@ struct T {
 
 /*
  * modify the property of max heap
+ * size: 数组的最后一个下标
  */
 static void max_heapify(void *a[], int i, int size, int (*cmp)(void *, void *))
 {
@@ -35,7 +36,7 @@ static void max_heapify(void *a[], int i, int size, int (*cmp)(void *, void *))
 	l = LEFT(i);
 	r = RIGHT(i);
 
-	if (l < size && cmp(a[l], a[i]) > 0)
+	if (l <= size && cmp(a[l], a[i]) > 0)
 	{
 		largest = l;
 	}
@@ -44,7 +45,7 @@ static void max_heapify(void *a[], int i, int size, int (*cmp)(void *, void *))
 		largest = i;
 	}
 	
-	if (r < size && cmp(a[r], a[largest]) > 0)
+	if (r <= size && cmp(a[r], a[largest]) > 0)
 	{
 		largest = r;
 	}
@@ -77,7 +78,7 @@ T MODULE_FUN_NAME(MaxHeap, new)(void *a[], int size, int (*cmp)(void *, void *),
 		int i;
 		for (i = size / 2; i >= 0; i--)
 		{
-			max_heapify(a, i, size, cmp);
+			max_heapify(a, i, size - 1, cmp);
 		}
 
 		h->a = a;

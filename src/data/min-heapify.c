@@ -35,7 +35,7 @@ static void min_heapify(void *a[], int i, int size, int (*cmp)(void *, void *))
 	l = LEFT(i);
 	r = RIGHT(i);
 
-	if (l < size && cmp(a[l], a[i]) < 0)
+	if (l <= size && cmp(a[l], a[i]) < 0)
 	{
 		minimum = l;
 	}
@@ -44,7 +44,7 @@ static void min_heapify(void *a[], int i, int size, int (*cmp)(void *, void *))
 		minimum = i;
 	}
 	
-	if (r < size && cmp(a[r], a[minimum]) < 0)
+	if (r <= size && cmp(a[r], a[minimum]) < 0)
 	{
 		minimum = r;
 	}
@@ -77,7 +77,7 @@ T MODULE_FUN_NAME(MinHeap, new)(void *a[], int size, int (*cmp)(void *, void *),
 		int i;
 		for (i = size / 2; i >= 0; i--)
 		{
-			min_heapify(a, i, size, cmp);
+			min_heapify(a, i, size - 1, cmp);
 		}
 
 		h->a = a;
@@ -123,6 +123,7 @@ void *MODULE_FUN_NAME(MinHeap, extract_min)(T h)
 
 	if(h->size <= 0) 
 	{
+//		fprintf(stdout, "%s: size: %d\n", __func__, h->size);
 		return NULL;
 	}
 

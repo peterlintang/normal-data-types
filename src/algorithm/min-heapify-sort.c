@@ -29,11 +29,19 @@ int min_heap_sort(void *a[], int size, int (*cmp)(void *, void *))
 
 	h = MODULE_FUN_NAME(MinHeap, new)(a, size, cmp, decrease);
 
-	while (size > 1)
+	/*
+	for (int i = 0; i < size; i++)
+	{
+		fprintf(stdout, "%s: i: %d, %p\n", __func__, i, a[i]);
+	}
+	*/
+
+	while (size > 0)
 	{
 		tmp = MODULE_FUN_NAME(MinHeap, extract_min)(h);
 		a[size - 1] = tmp;
 		size -= 1;
+//		fprintf(stdout, "%s: size: %d, %p\n", __func__, size, tmp);
 	}
 
 	MODULE_FUN_NAME(MinHeap, free)(&h, 0);	// not free array a
