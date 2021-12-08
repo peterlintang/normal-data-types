@@ -26,6 +26,7 @@ struct NODE {
 	int color;
 	int d;
 	int f;
+	int key;
 	NODE prev;
 	SenDlink_T l;
 };
