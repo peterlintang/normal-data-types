@@ -22,6 +22,7 @@ COMMUNICATE_SRCS := \
 					./bfs.c \
 					./mst-kruskal.c \
 					./mst-prim.c \
+					./bellman-ford.c \
 					./topological-sort.c \
 					./randomized-select.c \
 					./max-heapify-sort.c \
@@ -40,6 +41,7 @@ COMMUNICATE_OBJS := \
 					./bfs.o \
 					./mst-kruskal.o \
 					./mst-prim.o \
+					./bellman-ford.o \
 					./topological-sort.o \
 					./randomized-select.o \
 					./max-heapify-sort.o \
