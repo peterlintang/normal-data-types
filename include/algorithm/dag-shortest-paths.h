@@ -14,6 +14,7 @@
 /*
  *
  * you xiang tu, bian de quan zhong ke yi wei fu zhi 
+ * 也可以用来计算pert图，分析关键路径，具体间算法导论383页
  *
  * return value: 0: negative loop; 1: ok
  *
