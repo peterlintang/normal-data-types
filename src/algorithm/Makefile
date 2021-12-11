@@ -23,6 +23,7 @@ COMMUNICATE_SRCS := \
 					./mst-kruskal.c \
 					./mst-prim.c \
 					./bellman-ford.c \
+					./dag-shortest-paths.c \
 					./topological-sort.c \
 					./randomized-select.c \
 					./max-heapify-sort.c \
@@ -42,6 +43,7 @@ COMMUNICATE_OBJS := \
 					./mst-kruskal.o \
 					./mst-prim.o \
 					./bellman-ford.o \
+					./dag-shortest-paths.o \
 					./topological-sort.o \
 					./randomized-select.o \
 					./max-heapify-sort.o \
