@@ -13,29 +13,29 @@ int main(int argc, char *argv[])
 {
 	int	ret = 0;
 	int	send_bytes = 0;
-	unix_sock_server *server  = NULL;
-	unix_sock_client *client1 = NULL;
+	UnixSockServer_T server  = NULL;
+	UnixSockClient_T client1 = NULL;
 //	unix_sock_client *client2 = NULL;
 
-	if (!(server = create_unix_sock_server(
+	if (!(server = MODULE_FUN_NAME(UnixSockServer, create)(
 					UNIX_DOMAIN_SERVER_PATH,
 					UNIX_DOMAIN_SERVER_BACKLOG))) {
 		fprintf(stderr, "create server failed\n");
 		exit(1);
 	}
 
-	client1 = unix_sock_accept_server(server);
+	client1 = MODULE_FUN_NAME(UnixSockServer, accept)(server);
 	if (!client1) {
 		fprintf(stderr, "accept a client get an error\n");
 	}
 
-	send_bytes = unix_sock_send_server(client1, 
+	send_bytes = MODULE_FUN_NAME(UnixSockServer, send)(client1, 
 				"hello world", strlen("hello world"));
 	fprintf(stdout, "send %d bytes\n", send_bytes);
 	fprintf(stdout, "destroying client1\n");
-	destroy_unix_sock_client(&client1);
+	MODULE_FUN_NAME(UnixSockClient, destroy)(&client1);
 	fprintf(stdout, "destroying server\n");
-	destroy_unix_sock_server(&server);
+	MODULE_FUN_NAME(UnixSockServer, destroy)(&server);
 	fprintf(stdout, "ok\n");
 	return ret;
 }

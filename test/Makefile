@@ -23,4 +23,6 @@ all:
 	gcc -g bellman-ford-test.c -o bellman-ford-test -I../include -I../include/pic -I../include/data -I../include/algorithm ../src/algorithm/libalgorithm.a ../src/data/libdatatype.a ../src/pic/libcommunicate.a -lrt -lpthread
 	gcc -g dag-shortest-paths-test.c -o dag-shortest-paths-test -I../include -I../include/pic -I../include/data -I../include/algorithm ../src/algorithm/libalgorithm.a ../src/data/libdatatype.a ../src/pic/libcommunicate.a -lrt -lpthread
 	gcc -g dijkstra-test.c -o dijkstra-test -I../include -I../include/pic -I../include/data -I../include/algorithm ../src/algorithm/libalgorithm.a ../src/data/libdatatype.a ../src/pic/libcommunicate.a -lrt -lpthread
+	gcc -g ud-client-test.c -o ud-client-test -I../include -I../include/pic -I../include/data -I../include/algorithm ../src/algorithm/libalgorithm.a ../src/data/libdatatype.a ../src/pic/libcommunicate.a -lrt -lpthread
+	gcc -g ud-server-test.c -o ud-server-test -I../include -I../include/pic -I../include/data -I../include/algorithm ../src/algorithm/libalgorithm.a ../src/data/libdatatype.a ../src/pic/libcommunicate.a -lrt -lpthread
 clean:
