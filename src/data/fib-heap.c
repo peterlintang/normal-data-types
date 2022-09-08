@@ -556,7 +556,7 @@ static void fibHeap_print(NODE node)
 		fprintf(stdout, "node: %p, key: %d, child: %p, left: %p, right: %p, parent: %p\n", 
 					x, (int)x->priv, x->child,
 					x->left, x->right, x->p);
-		if (x->child) fibHeap_print(node->child);
+		if (x->child) fibHeap_print(x->child);
 		if (x->right == node)
 			break;
 	}
