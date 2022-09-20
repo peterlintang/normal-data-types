@@ -1,5 +1,5 @@
 
-INC:=-I../../include -I../../include/data
+INC:=-I../../include -I../../include/data -I../../include/data/aes
 
 GCC:=gcc
 
@@ -45,7 +45,16 @@ DATA_SRCS := ./ap.c			\
 		./gve.c	\
 		./max-heapify.c	\
 		./min-heapify.c	\
-		./gve_array.c	
+		./gve_array.c	\
+		./aes/block-cipher.c		\
+		./aes/gmult.c		\
+		./aes/null.c		\
+		./aes/cbc.c		\
+		./aes/ecb.c		\
+		./aes/cfb.c		\
+		./aes/ofb.c		\
+		./aes/pcbc.c		\
+		./aes/aes.c		
 
 
 DATA_OBJS := ./ap.o			\
@@ -82,7 +91,16 @@ DATA_OBJS := ./ap.o			\
 		./gve.o	\
 		./max-heapify.o	\
 		./min-heapify.o	\
-		./gve_array.o	
+		./gve_array.o	\
+		./aes/block-cipher.o		\
+		./aes/gmult.o		\
+		./aes/null.o		\
+		./aes/cbc.o		\
+		./aes/ecb.o		\
+		./aes/cfb.o		\
+		./aes/ofb.o		\
+		./aes/pcbc.o		\
+		./aes/aes.o		
 
 
 all: $(LIBS)
