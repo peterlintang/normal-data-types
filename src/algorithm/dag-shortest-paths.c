@@ -15,9 +15,10 @@ static int initialize_single_source(GraphA_T g, NODE s)
 {
 	NODE node = NULL;
 	int node_count = 0;
+	int i;
 
 	node_count = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
-	for (int i = 0; i < node_count; i++)
+	for (i = 0; i < node_count; i++)
 	{
 		node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		node->d = INFINITE;
@@ -61,6 +62,8 @@ int dag_shortest_paths(GraphA_T g, NODE s)
 	EdgeA_T edge = NULL;
 	EDGE_EXT ext = NULL;
 	SenDlink_T l = NULL;
+	int i;
+	int j;
 
 	l = MODULE_FUN_NAME(SenDlink, create)();
 
@@ -72,13 +75,13 @@ int dag_shortest_paths(GraphA_T g, NODE s)
 	edge_count = MODULE_FUN_NAME(GraphA, EdgesLength)(g);
 	node_count = MODULE_FUN_NAME(SenDlink, count)(l);
 
-	for (int i = 0; i < node_count; i++)
+	for (i = 0; i < node_count; i++)
 	{
 		int count = 0;
 		node = (NODE)MODULE_FUN_NAME(SenDlink, get)(l, i);
 
 		count = MODULE_FUN_NAME(SenDlink, count)(node->l);
-		for (int j = 0; j < count; j++)
+		for (j = 0; j < count; j++)
 		{
 			edge = (EdgeA_T)MODULE_FUN_NAME(SenDlink, get)(node->l, j);
 			MODULE_FUN_NAME(GraphA, EdgeGetVnodes)(edge, (void **)(&u), (void **)(&v));
@@ -86,7 +89,7 @@ int dag_shortest_paths(GraphA_T g, NODE s)
 		}
 	}
 
-	for (int j = 0; j < edge_count; j++)
+	for (j = 0; j < edge_count; j++)
 	{
 		edge = (EdgeA_T)MODULE_FUN_NAME(GraphA, EdgeGet)(g, j);
 		ext = (EDGE_EXT)MODULE_FUN_NAME(GraphA, EdgeGetPriv)(edge);

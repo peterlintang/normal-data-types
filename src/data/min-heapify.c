@@ -246,7 +246,9 @@ int MODULE_FUN_NAME(MinHeap, search)(T h, int (*cmp)(void *priv, void *arg), voi
 {
 	assert(h && arg);
 
-	for (int i = 0; i < h->size; i++)
+	int i;
+
+	for (i = 0; i < h->size; i++)
 	{
 		if (cmp(h->a[i], arg) == 0)
 		{

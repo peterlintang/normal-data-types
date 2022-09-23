@@ -16,9 +16,10 @@ static int initialize_single_source(GraphA_T g, NODE s)
 {
 	NODE node = NULL;
 	int node_count = 0;
+	int i;
 
 	node_count = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
-	for (int i = 0; i < node_count; i++)
+	for (i = 0; i < node_count; i++)
 	{
 		node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		node->d = INFINITE;
@@ -63,14 +64,16 @@ int bellman_ford(GraphA_T g, NODE s)
 	NODE v = NULL;
 	EdgeA_T edge = NULL;
 	EDGE_EXT ext = NULL;
+	int i;
+	int j;
 
 	initialize_single_source(g, s);
 
 	edge_count = MODULE_FUN_NAME(GraphA, EdgesLength)(g);
 	node_count = MODULE_FUN_NAME(GraphA, VnodesLength)(g) - 1;
-	for (int i = 0; i < node_count; i++)
+	for (i = 0; i < node_count; i++)
 	{
-		for (int j = 0; j < edge_count; j++)
+		for (j = 0; j < edge_count; j++)
 		{
 			edge = (EdgeA_T)MODULE_FUN_NAME(GraphA, EdgeGet)(g, j);
 //			ext = (EDGE_EXT)MODULE_FUN_NAME(GraphA, EdgeGetPriv)(edge);
@@ -80,7 +83,7 @@ int bellman_ford(GraphA_T g, NODE s)
 		}
 	}
 
-	for (int j = 0; j < edge_count; j++)
+	for (j = 0; j < edge_count; j++)
 	{
 		edge = (EdgeA_T)MODULE_FUN_NAME(GraphA, EdgeGet)(g, j);
 		ext = (EDGE_EXT)MODULE_FUN_NAME(GraphA, EdgeGetPriv)(edge);

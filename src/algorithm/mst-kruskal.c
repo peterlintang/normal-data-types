@@ -54,9 +54,10 @@ static int sendlink_search(void *priv, void *arg)
 	SetL_T set = (SetL_T)priv;
 	NODE node = (NODE)arg;
 	int count = 0;
+	int i;
 
 	count = MODULE_FUN_NAME(SetL, count)(set);
-	for (int i = 0; i < count; i++)
+	for (i = 0; i < count; i++)
 	{
 		NODE member = MODULE_FUN_NAME(SetL, get)(set, i);
 		if (member == node)
@@ -83,11 +84,12 @@ int mst_kruskal(SenDlink_T edges, GraphA_T g)
 	EDGE_EXT edge_ext = NULL;
 	int node_count = 0;
 	int edge_count = 0;
+	int i;
 	void **array = NULL;
 
 	sets = MODULE_FUN_NAME(SenDlink, create)();
 	node_count = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
-	for (int i = 0; i < node_count; i++)
+	for (i = 0; i < node_count; i++)
 	{
 		SetL_T set = NULL;
 
@@ -99,13 +101,13 @@ int mst_kruskal(SenDlink_T edges, GraphA_T g)
 
 	edge_count = MODULE_FUN_NAME(GraphA, EdgesLength)(g);
 	array = (void **)calloc(edge_count, sizeof(void *));
-	for (int i = 0; i < edge_count; i++)
+	for (i = 0; i < edge_count; i++)
 	{
 		array[i] = (void *)MODULE_FUN_NAME(GraphA, EdgeGet)(g, i);
 	}
 	quicksort(array, edge_cmp, 0, edge_count - 1);
 
-	for (int i = 0; i < edge_count; i++)
+	for (i = 0; i < edge_count; i++)
 	{
 		SetL_T set_v = NULL;
 		SetL_T set_u = NULL;
@@ -129,7 +131,7 @@ int mst_kruskal(SenDlink_T edges, GraphA_T g)
 
 	free(array);
 	int count = MODULE_FUN_NAME(SenDlink, count)(sets);
-	for (int i = 0; i < count; i++)
+	for (i = 0; i < count; i++)
 	{
 		SetL_T set = (SetL_T)MODULE_FUN_NAME(SenDlink, get)(sets, i);
 		MODULE_FUN_NAME(SetL, free)(&set);

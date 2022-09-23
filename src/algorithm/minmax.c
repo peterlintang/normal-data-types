@@ -6,9 +6,10 @@
 
 void *minimum(void *a[], int size, int (*cmp)(void *, void *))
 {
+	int i;
 	void *min = a[0];
 
-	for (int i = 1; i < size; i++)
+	for (i = 1; i < size; i++)
 	{
 		if (cmp(a[i], min) < 0)
 			min = a[i];
@@ -19,9 +20,10 @@ void *minimum(void *a[], int size, int (*cmp)(void *, void *))
 
 void *maximum(void *a[], int size, int (*cmp)(void *, void *))
 {
+	int i;
 	void *max = a[0];
 
-	for (int i = 1; i < size; i++)
+	for (i = 1; i < size; i++)
 	{
 		if (cmp(a[i], max) > 0)
 			max = a[i];
@@ -35,10 +37,11 @@ void *maximum(void *a[], int size, int (*cmp)(void *, void *))
  */
 int minmax(void *a[], int size, int (*cmp)(void *, void *), void **pmin, void **pmax)
 {
+	int i;
 	void *min = a[0];
 	void *max = a[0];
 
-	for (int i = 1; i < size; i++)
+	for (i = 1; i < size; i++)
 	{
 		if (cmp(a[i], min) < 0)
 			min = a[i];
@@ -54,6 +57,7 @@ int minmax(void *a[], int size, int (*cmp)(void *, void *), void **pmin, void **
 
 int minmax2(void *a[], int size, int (*cmp)(void *, void *), void **pmin, void **pmax)
 {
+	int i;
 	void *min = NULL;
 	void *max = NULL;
 
@@ -67,7 +71,7 @@ int minmax2(void *a[], int size, int (*cmp)(void *, void *), void **pmin, void *
 		min = max = a[0];
 	}
 
-	for (int i = (size % 2 == 0 ? 2 : 1); i < size; i += 2)
+	for (i = (size % 2 == 0 ? 2 : 1); i < size; i += 2)
 	{
 		if (cmp(a[i], a[i + 1]) > 0)
 		{

@@ -48,9 +48,10 @@ void MODULE_FUN_NAME(SenDlink, destroy)(T *pl)
 	assert(pl);
 	assert(*pl);
 
+	unsigned int i;
 	unsigned int count = MODULE_FUN_NAME(SenDlink, count)(*pl);
 
-	for (unsigned int i = 0; i < count; i++)
+	for (i = 0; i < count; i++)
 	{
 		MODULE_FUN_NAME(SenDlink, delete_by_index)(*pl, 0);
 	}

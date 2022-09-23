@@ -157,11 +157,12 @@ static void consolidate(T h)
 	NODE w = NULL;
 	NODE tmp = NULL;
 	int d = 0;
+	int i;
 
 	assert(h->min);
 //			fprintf(stdout, "started: %d\n", D);
 
-	for (int i = 0; i < D; i++)
+	for (i = 0; i < D; i++)
 		A[i] = NULL;
 
 	for (w = h->min; w != NULL; )
@@ -222,7 +223,7 @@ static void consolidate(T h)
 //				fprintf(stdout, "finished\n");
 
 	h->min = NULL;
-	for (int i = 0; i < D; i++)
+	for (i = 0; i < D; i++)
 	{
 //			fprintf(stdout, "i: %d, A[i]: %p\n", i, A[i]);
 		if (A[i])

@@ -34,6 +34,7 @@ GraphA_T GA_create(
 	int edge_len = 0;
 	int ret = 0;
 	void *node = NULL;
+	int i;
 
 	assert(filename);
 	assert(get_graph);
@@ -53,7 +54,7 @@ GraphA_T GA_create(
 	node_len = MODULE_FUN_NAME(GraphA, VnodesLength)(g); 
 	edge_len = MODULE_FUN_NAME(GraphA, EdgesLength)(g);
 
-	for (int i = 0; i < node_len; i++)
+	for (i = 0; i < node_len; i++)
 	{
 		node = MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		ret = get_node(fp, g, node);
@@ -63,7 +64,7 @@ GraphA_T GA_create(
 		}
 	}
 
-	for (int i = 0; i < edge_len; i++)
+	for (i = 0; i < edge_len; i++)
 	{
 		edge = MODULE_FUN_NAME(GraphA, EdgeGet)(g, i);
 		ret = get_edge(fp, g, edge);
@@ -102,6 +103,7 @@ void GA_E_print(int (*print)(void *edge, void *arg), void *edge, void *arg)
 
 void GA_print(GraphA_T g, int (*v_print)(void *, void *), int (*e_print)(void *, void *arg), void *v_arg, void *e_arg)
 {
+	int i;
 	int len = 0;
 	void *priv = NULL;
 
@@ -110,14 +112,14 @@ void GA_print(GraphA_T g, int (*v_print)(void *, void *), int (*e_print)(void *,
 	assert(e_print);
 
 	len = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
-	for (int i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		priv = MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		GA_V_print(v_print, priv, v_arg);
 	}
 
 	len = MODULE_FUN_NAME(GraphA, EdgesLength)(g);
-	for (int i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		priv = MODULE_FUN_NAME(GraphA, EdgeGet)(g, i);
 		GA_E_print(e_print, priv, e_arg);

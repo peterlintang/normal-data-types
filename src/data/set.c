@@ -283,6 +283,7 @@ void MODULE_FUN_NAME(Set, free)(T *set)
  */
 void *MODULE_FUN_NAME(Set, first)(T set)
 {
+	int i;
 	int len = 0;
 	struct member *p = NULL;
 
@@ -294,7 +295,7 @@ void *MODULE_FUN_NAME(Set, first)(T set)
 		return NULL;
 	}
 
-	for (int i = 0; i < set->size; i++)
+	for (i = 0; i < set->size; i++)
 	{
 		p = set->buckets[i];
 		if (p != NULL)

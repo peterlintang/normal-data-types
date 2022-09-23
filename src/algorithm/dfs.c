@@ -21,6 +21,7 @@
 /*********************************************************/
 void dfs_V_tree_produce(GraphA_T g, NODE v, SetL_T set)
 {
+	int i;
 	int count = 0;
 	NODE node = NULL;
 
@@ -29,7 +30,7 @@ void dfs_V_tree_produce(GraphA_T g, NODE v, SetL_T set)
 	MODULE_FUN_NAME(SetL, add)(set, (void *)v);
 
 	count = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
-	for (int i = 0; i < count; i++)
+	for (i = 0; i < count; i++)
 	{
 		node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		if ((node->d > v->d) && (node->f < v->f))
@@ -56,13 +57,14 @@ static int set_cmp(void *key, void *arg)
 
 void dfs_G_trees_produce(GraphA_T g, SenDlink_T l)
 {
+	int i;
 	int len = 0;
 	NODE node = NULL;
 
 	assert(g);
 
 	len = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
-	for (int i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		if (node->prev == NULL)
@@ -80,6 +82,7 @@ static int time = 0;
 
 int dfs_visit(GraphA_T g, NODE u, int (*cb)(void *arg, void *node), void *arg)
 {
+	int i;
 	int len = 0;
 	EdgeA_T edge = NULL;
 	NODE v = NULL;
@@ -91,7 +94,7 @@ int dfs_visit(GraphA_T g, NODE u, int (*cb)(void *arg, void *node), void *arg)
 	u->color = GRAY;
 
 	len = MODULE_FUN_NAME(SenDlink, count)(u->l);
-	for (int i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		edge = (EdgeA_T)MODULE_FUN_NAME(SenDlink, get)(u->l, i);
 		MODULE_FUN_NAME(GraphA, EdgeGetVnodes)(edge, (void **)&unused, (void **)&v);
@@ -119,11 +122,12 @@ int dfs_visit(GraphA_T g, NODE u, int (*cb)(void *arg, void *node), void *arg)
  */
 int dfs(GraphA_T g, int (*cb)(void *arg, void *node), void *arg)
 {
+	int i;
 	int len = 0;
 	NODE u = NULL;
 
 	len = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
-	for (int i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		u = (NODE )MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		u->color = WHITE;
@@ -132,7 +136,7 @@ int dfs(GraphA_T g, int (*cb)(void *arg, void *node), void *arg)
 
 	time = 0;
 
-	for (int i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		u = (NODE )MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		if (u->color == WHITE)

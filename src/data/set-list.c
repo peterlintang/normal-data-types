@@ -184,10 +184,11 @@ void MODULE_FUN_NAME(SetL, map)(T set, int (*map)(void *priv, void *arg), void *
 {
 	assert(set);
 
+	int i;
 	void *priv = NULL;
 	int count = MODULE_FUN_NAME(SetL, count)(set);
 
-	for (int i = 0; i < count; i++)
+	for (i = 0; i < count; i++)
 	{
 		priv = MODULE_FUN_NAME(SetL, get)(set, i);
 		if (map)
@@ -205,6 +206,7 @@ void MODULE_FUN_NAME(SetL, map)(T set, int (*map)(void *priv, void *arg), void *
 
 static void copy(T set, T s)
 {
+	int i;
 	int count = 0;
 	void *priv = NULL;
 
@@ -214,7 +216,7 @@ static void copy(T set, T s)
 	}
 
 	count = MODULE_FUN_NAME(SetL, count)(s);
-	for (int i = 0; i < count; i++)
+	for (i = 0; i < count; i++)
 	{
 		priv = MODULE_FUN_NAME(SetL, get)(s, i);
 		MODULE_FUN_NAME(SetL, add)(set, priv);
@@ -269,9 +271,10 @@ T MODULE_FUN_NAME(SetL, union)(T s, T t)
 
 		copy(set, t);
 
+		int i;
 		int count = MODULE_FUN_NAME(SetL, count)(s);
 		void *priv = NULL;
-		for (int i = 0; i < count; i++)
+		for (i = 0; i < count; i++)
 		{
 			priv = MODULE_FUN_NAME(SetL, get)(s, i);
 			if (MODULE_FUN_NAME(SetL, isMember)(set, priv) == 0)
@@ -319,10 +322,11 @@ T MODULE_FUN_NAME(SetL, inter)(T s, T t)
 			return set;
 		}
 
+		int i;
 		int count = MODULE_FUN_NAME(SetL, count)(t);
 		void *priv = NULL;
 
-		for (int i = 0; i < count; i++)
+		for (i = 0; i < count; i++)
 		{
 			priv = MODULE_FUN_NAME(SetL, get)(t, i);
 			if (MODULE_FUN_NAME(SetL, isMember)(s, priv))
@@ -369,11 +373,12 @@ T MODULE_FUN_NAME(SetL, diff)(T s, T t)
 			return set;
 		}
 
+		int i;
 		int count = 0;
 		void *priv = NULL;
 
 		count = MODULE_FUN_NAME(SetL, count)(t);
-		for (int i = 0; i < count; i++)
+		for (i = 0; i < count; i++)
 		{
 			priv = MODULE_FUN_NAME(SetL, get)(t, i);
 			if (MODULE_FUN_NAME(SetL, isMember)(s, priv) == 0)
@@ -383,7 +388,7 @@ T MODULE_FUN_NAME(SetL, diff)(T s, T t)
 		}
 
 		count = MODULE_FUN_NAME(SetL, count)(s);
-		for (int i = 0; i < count; i++)
+		for (i = 0; i < count; i++)
 		{
 			priv = MODULE_FUN_NAME(SetL, get)(s, i);
 			if (MODULE_FUN_NAME(SetL, isMember)(t, priv) == 0)
@@ -431,10 +436,11 @@ T MODULE_FUN_NAME(SetL, minus)(T s, T t)
 			return NULL;
 		}
 
+		int i;
 		int count = MODULE_FUN_NAME(SetL, count)(s);
 		void *priv = NULL;
 
-		for (int i = 0; i < count; i++)
+		for (i = 0; i < count; i++)
 		{
 			priv = MODULE_FUN_NAME(SetL, get)(s, i);
 			if (MODULE_FUN_NAME(SetL, isMember)(t, priv) == 0)
@@ -750,12 +756,13 @@ struct G {
 
 void connected_components(struct sets *sets, struct G *g)
 {
-	for (int i = 0; i < g->vs_num; i++)
+	int i;
+	for (i = 0; i < g->vs_num; i++)
 	{
 		set_make(sets, g->vs[i].v);
 	}
 
-	for (int i = 0; i < g->es_num; i++)
+	for (i = 0; i < g->es_num; i++)
 	{
 		if (set_find(sets, g->es[i].u) != set_find(sets, g->es[i].v))
 		{

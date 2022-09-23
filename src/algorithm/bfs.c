@@ -26,6 +26,7 @@
  */
 int bfs(GraphA_T g, int k, int (*cb)(void *arg, void *priv), void *arg)
 {
+	int i;
 	int count = 0;
 	NODE u = NULL;
 	NODE v = NULL;
@@ -42,7 +43,7 @@ int bfs(GraphA_T g, int k, int (*cb)(void *arg, void *priv), void *arg)
 		return -1;
 	}
 
-	for (int i = 0; i < count; i++)
+	for (i = 0; i < count; i++)
 	{
 		u = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		if (u->index != k)
@@ -70,7 +71,7 @@ int bfs(GraphA_T g, int k, int (*cb)(void *arg, void *priv), void *arg)
 		MODULE_FUN_NAME(Queue, de)(q, (void **)&u);
 		count = MODULE_FUN_NAME(SenDlink, count)(u->l);
 
-		for (int i = 0; i < count; i++)
+		for (i = 0; i < count; i++)
 		{
 			edge = (EdgeA_T)MODULE_FUN_NAME(SenDlink, get)(u->l, i);
 			MODULE_FUN_NAME(GraphA, EdgeGetVnodes)(edge, (void **)&unused, (void **)&v);

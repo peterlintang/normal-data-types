@@ -64,11 +64,12 @@ static int insert_set_to_sets(ListD_T sets, SetL_T set)
 
 SetL_T set_find(ListD_T sets, NODE p)
 {
+	int i;
 	int count = 0;
 	ListDNode_T cur = NULL;
 
 	count = MODULE_FUN_NAME(ListD, count)(sets);
-	for (int i = 0; i < count; i++)
+	for (i = 0; i < count; i++)
 	{
 		cur = MODULE_FUN_NAME(ListD, get)(sets, i);
 //		fprintf(stdout, "%s: i: %d, cur: %p, priv: %p, p: %p\n",
@@ -136,9 +137,10 @@ void components_connected(ListD_T sets, GraphA_T g)
 	void *node = NULL;
 	void *v = NULL;
 	void *u = NULL;
+	int i;
 
 	node_count = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
-	for (int i = 0; i < node_count; i++)
+	for (i = 0; i < node_count; i++)
 	{
 		node = MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 
@@ -156,7 +158,7 @@ void components_connected(ListD_T sets, GraphA_T g)
 
 //	fprintf(stdout, "%s ********************\n", __func__);
 	edge_count = MODULE_FUN_NAME(GraphA, EdgesLength)(g);
-	for (int i = 0; i < edge_count; i++)
+	for (i = 0; i < edge_count; i++)
 	{
 		edge = MODULE_FUN_NAME(GraphA, EdgeGet)(g, i);
 		MODULE_FUN_NAME(GraphA, EdgeGetVnodes)(edge, &v, &u);
@@ -201,6 +203,8 @@ GraphA_T convert_graphA_edges(GraphA_T g)
 	{
 		int node_count = 0;
 		int edge_count = 0;
+		int i;
+		int j;
 		NODE node = NULL;
 		EdgeA_T edge = NULL;
 		NODE v = NULL;
@@ -211,7 +215,7 @@ GraphA_T convert_graphA_edges(GraphA_T g)
 		node_count = MODULE_FUN_NAME(GraphA, VnodesLength)(copy);
 		edge_count = MODULE_FUN_NAME(GraphA, EdgesLength)(copy);
 
-		for (int i = 0; i < node_count; i++)
+		for (i = 0; i < node_count; i++)
 		{
 			node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(copy, i);
 			node->l = MODULE_FUN_NAME(SenDlink, create)();
@@ -221,7 +225,7 @@ GraphA_T convert_graphA_edges(GraphA_T g)
 			}
 		}
 
-		for (int i = 0; i < edge_count; i++)
+		for (i = 0; i < edge_count; i++)
 		{
 			edge = MODULE_FUN_NAME(GraphA, EdgeGet)(copy, i);
 			MODULE_FUN_NAME(GraphA, EdgeGetVnodes)(edge, (void **)&v, (void **)&u);
@@ -229,7 +233,7 @@ GraphA_T convert_graphA_edges(GraphA_T g)
 			v_c = NULL;
 			u_c = NULL;
 
-			for (int j = 0; j < node_count; j++)
+			for (j = 0; j < node_count; j++)
 			{
 				node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(copy, j);
 				if (node->index == v->index)
@@ -311,6 +315,7 @@ int strongly_components_connected(SenDlink_T sets, GraphA_T g)
 	SenDlink_T l = NULL;
 	void **array = NULL;
 	int node_count = 0;
+	int i;
 
 	dfs(g, NULL, NULL);
 
@@ -319,7 +324,7 @@ int strongly_components_connected(SenDlink_T sets, GraphA_T g)
 	node_count = MODULE_FUN_NAME(GraphA, VnodesLength)(convert);
 	array = (void **)calloc(node_count, sizeof(void *));
 
-	for (int i = 0; i < node_count; i++)
+	for (i = 0; i < node_count; i++)
 	{
 		node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(convert, i);
 		node->color = WHITE;
@@ -336,7 +341,7 @@ int strongly_components_connected(SenDlink_T sets, GraphA_T g)
 
 	quicksort(array, node_cmp, 0, node_count - 1);
 
-	for (int i = node_count - 1; i >= 0; i--)
+	for (i = node_count - 1; i >= 0; i--)
 	{
 		node = (NODE)(array[i]);
 		if (node->color == WHITE)
@@ -349,15 +354,16 @@ int strongly_components_connected(SenDlink_T sets, GraphA_T g)
 	dfs_G_trees_produce(convert, l);
 
 	int count = MODULE_FUN_NAME(SenDlink, count)(l);
-	for (int i = 0; i < count; i++)
+	for (i = 0; i < count; i++)
 	{
 		SetL_T set = (SetL_T)MODULE_FUN_NAME(SenDlink, get)(l, i);
 
 		int set_count = MODULE_FUN_NAME(SetL, count)(set);
+		int j;
 		SetL_T new = MODULE_FUN_NAME(SetL, new)(set_cmp);
 		NODE v = NULL;
 
-		for (int j = 0; j < set_count; j++)
+		for (j = 0; j < set_count; j++)
 		{
 			node = (NODE)MODULE_FUN_NAME(SetL, get)(set, j);
 			v = (NODE)MODULE_FUN_NAME(GraphA, VnodeSearch)(g, graphA_cmp, (void *)(node->index));

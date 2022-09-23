@@ -67,12 +67,13 @@ int mst_prim(SenDlink_T edges, GraphA_T g, NODE r)
 	NODE u = NULL;
 	EdgeA_T edge = NULL;
 	EDGE_EXT edge_ext = NULL;
+	int i;
 
 	/*
 	 * initialize
 	 */
 	node_count = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
-	for (int i = 0; i < node_count; i++)
+	for (i = 0; i < node_count; i++)
 	{
 		node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		node->key = POSITIVE_INFINITE;
@@ -91,7 +92,7 @@ int mst_prim(SenDlink_T edges, GraphA_T g, NODE r)
 		return -1;
 	}
 
-	for (int i = 0; i < node_count; i++)
+	for (i = 0; i < node_count; i++)
 	{
 		node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		array[i] = node;
@@ -115,7 +116,7 @@ int mst_prim(SenDlink_T edges, GraphA_T g, NODE r)
 			int edge_count = 0;
 
 			edge_count = MODULE_FUN_NAME(GraphA, EdgesLength)(g);
-			for (int i = 0; i < edge_count; i++)
+			for (i = 0; i < edge_count; i++)
 			{
 				edge = (EdgeA_T)MODULE_FUN_NAME(GraphA, EdgeGet)(g, i);
 //				edge_ext = (EDGE_EXT)MODULE_FUN_NAME(GraphA, EdgeGetPriv)(edge);
@@ -133,7 +134,7 @@ int mst_prim(SenDlink_T edges, GraphA_T g, NODE r)
 		 * update nodes
 		 */
 		int count = MODULE_FUN_NAME(SenDlink, count)(node->l);
-		for (int i = 0; i < count; i++)
+		for (i = 0; i < count; i++)
 		{
 			int index = -1;
 			edge = (EdgeA_T)MODULE_FUN_NAME(SenDlink, get)(node->l, i);

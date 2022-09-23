@@ -99,13 +99,14 @@ E MODULE_FUN_NAME(GraphA, EdgeSearch)(G g, int (*cmp)(void *arg, void *priv), vo
 {
 	E e = NULL;
 	int len = 0;
+	int i;
 	void *edge_priv = NULL;
 
 	assert(g && cmp);
 
 	len = MODULE_FUN_NAME(Array, length)(g->es);
 
-	for (int i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		e = (E)MODULE_FUN_NAME(Array, get)(g->es, i);
 		edge_priv = MODULE_FUN_NAME(GraphA, EdgeGetPriv)(e);
@@ -147,12 +148,13 @@ void *MODULE_FUN_NAME(GraphA, VnodeSearch)(G g, int (*cmp)(void *arg, void *priv
 {
 	void *node = NULL;
 	int len = 0;
+	int i;
 
 	assert(g && cmp);
 
 	len = MODULE_FUN_NAME(Array, length)(g->vs);
 
-	for (int i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		node = MODULE_FUN_NAME(Array, get)(g->vs, i);
 		if ((node) && (cmp(node, priv) == 0))

@@ -24,6 +24,7 @@ void gve_V_print(NODE v)
 {
 	NODE u = NULL;
 	int len = 0;
+	int i;
 	EdgeA_T edge = NULL;
 	NODE unused = NULL;
 
@@ -31,7 +32,7 @@ void gve_V_print(NODE v)
 	fprintf(stdout, "v: %d, color: %d, p: %p, d: %d, f: %d, es: %d\n",
 					v->index, v->color, v->prev, v->d, v->f, MODULE_FUN_NAME(SenDlink, count)(v->l));
 	len = MODULE_FUN_NAME(SenDlink, count)(v->l);
-	for (int i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		edge = (EdgeA_T)MODULE_FUN_NAME(SenDlink, get)(v->l, i);
 		MODULE_FUN_NAME(GraphA, EdgeGetVnodes)(edge, (void **)&unused, (void **)&u);
@@ -47,13 +48,14 @@ void gve_E_print(EDGE_EXT edge)
 
 void gve_G_print(GraphA_T g)
 {
+	int i;
 	int len = 0;
 	NODE node = NULL;
 
 	assert(g);
 
 	len = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
-	for (int i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		fprintf(stdout, "\n");
@@ -67,11 +69,12 @@ void gve_G_print(GraphA_T g)
  */
 void G_tree_print(GraphA_T g, int k)
 {
+	int i;
 	int count = 0;
 	NODE v = NULL;
 
 	count = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
-	for (int i = 0; i < count; i++)
+	for (i = 0; i < count; i++)
 	{
 		v = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		if (v->index == k)
@@ -110,6 +113,7 @@ static void _G_tree_print_path(GraphA_T g, NODE s, NODE v)
  */
 void G_tree_print_path(GraphA_T g, int s, int v)
 {
+	int i;
 	int count = 0;
 	NODE s_p = NULL;
 	NODE v_p = NULL;
@@ -119,7 +123,7 @@ void G_tree_print_path(GraphA_T g, int s, int v)
 	assert(s != v);
 
 	count = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
-	for (int i = 0; i < count; i++)
+	for (i = 0; i < count; i++)
 	{
 		u = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		if (u->index == s)

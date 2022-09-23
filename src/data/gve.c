@@ -234,6 +234,7 @@ int MODULE_FUN_NAME(Graph, EdgeAdd)(G g, E e)
  */
 int MODULE_FUN_NAME(Graph, EdgeRemove)(G g, E e)
 {
+	int i;
 	int len = 0;
 	E edge = NULL;
 
@@ -242,7 +243,7 @@ int MODULE_FUN_NAME(Graph, EdgeRemove)(G g, E e)
 
 	len = MODULE_FUN_NAME(Seq, length)(g->es);
 
-	for (int i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		edge = (E)MODULE_FUN_NAME(Seq, get)(g->es, i);
 		if ((edge) && (edge->v == e->v) && (edge->u == e->u))
@@ -267,12 +268,13 @@ E MODULE_FUN_NAME(Graph, EdgeSearch)(G g, int (*cmp)(void *arg, void *priv), voi
 {
 	E e = NULL;
 	int len = 0;
+	int i;
 
 	assert(g && cmp);
 
 	len = MODULE_FUN_NAME(Seq, length)(g->es);
 
-	for (int i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		e = (E)MODULE_FUN_NAME(Seq, get)(g->es, i);
 		if ((e) && (cmp(e->priv, priv) == 0))
@@ -328,12 +330,13 @@ int MODULE_FUN_NAME(Graph, VnodeRemove)(G g, V v)
 {
 	V node = NULL;
 	int len = 0;
+	int i;
 
 	assert(g && v);
 
 	len = MODULE_FUN_NAME(Seq, length)(g->vs);
 
-	for (int i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		node = (V)MODULE_FUN_NAME(Seq, get)(g->vs, i);
 		if ((node) && (node->iner_key == v->iner_key))
@@ -357,12 +360,13 @@ V MODULE_FUN_NAME(Graph, VnodeSearch)(G g, int (*cmp)(void *arg, void *priv), vo
 {
 	V node = NULL;
 	int len = 0;
+	int i;
 
 	assert(g && cmp);
 
 	len = MODULE_FUN_NAME(Seq, length)(g->vs);
 
-	for (int i = 0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		node = (V)MODULE_FUN_NAME(Seq, get)(g->vs, i);
 		if ((node) && (cmp(node->priv, priv) == 0))

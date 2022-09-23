@@ -43,9 +43,10 @@ static int initialize_single_source(GraphA_T g, NODE s)
 {
 	NODE node = NULL;
 	int node_count = 0;
+	int i;
 
 	node_count = MODULE_FUN_NAME(GraphA, VnodesLength)(g);
-	for (int i = 0; i < node_count; i++)
+	for (i = 0; i < node_count; i++)
 	{
 		node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		node->d = INFINITE;
@@ -92,6 +93,7 @@ int dijkstra(GraphA_T g, NODE s)
 	NODE u = NULL;
 	EdgeA_T edge = NULL;
 	EDGE_EXT edge_ext = NULL;
+	int i;
 
 	/*
 	 * init g
@@ -111,7 +113,7 @@ int dijkstra(GraphA_T g, NODE s)
 		return -1;
 	}
 
-	for (int i = 0; i < node_count; i++)
+	for (i = 0; i < node_count; i++)
 	{
 		node = (NODE)MODULE_FUN_NAME(GraphA, VnodeGet)(g, i);
 		array[i] = node;
@@ -126,7 +128,7 @@ int dijkstra(GraphA_T g, NODE s)
 	{
 		int index = -1;
 		int count = MODULE_FUN_NAME(SenDlink, count)(node->l);
-		for (int i = 0; i < count; i++)
+		for (i = 0; i < count; i++)
 		{
 			int index = -1;
 			edge = (EdgeA_T)MODULE_FUN_NAME(SenDlink, get)(node->l, i);
