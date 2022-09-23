@@ -43,6 +43,7 @@ DATA_SRCS := ./ap.c			\
 		./fib-heap.c	\
 		./os_rank.c	\
 		./gve.c	\
+		./base64.c	\
 		./max-heapify.c	\
 		./min-heapify.c	\
 		./gve_array.c	\
@@ -89,6 +90,7 @@ DATA_OBJS := ./ap.o			\
 		./fib-heap.o	\
 		./os_rank.o	\
 		./gve.o	\
+		./base64.o	\
 		./max-heapify.o	\
 		./min-heapify.o	\
 		./gve_array.o	\
