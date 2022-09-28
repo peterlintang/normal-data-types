@@ -14,13 +14,17 @@ LIBS:=$(LIBNET)
 NET_SRCS := ./client_addr.c			\
 		./client.c					\
 		./server_addr.c				\
-		./server.c			
+		./server.c					\
+		./socket.c				\
+		./resolve.c
 
 
 NET_OBJS := ./client_addr.o			\
 		./client.o					\
-		./server_addr.o			\
-		./server.o
+		./server_addr.o				\
+		./server.o					\
+		./socket.o				\
+		./resolve.o
 
 
 all: $(LIBS)

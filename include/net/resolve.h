@@ -1,24 +1,29 @@
-/*
- * this implements teh resolve and host port interfaces
- *
- */
-#ifndef __resolve_H__
-#define __resolve_H__
+
+#ifndef __net_resolve_H__
+#define __net_resolve_H__
+
 
 #include <netinet/in.h>
-#include <arpa/inet.h>
+#include <arpa/inet.h>			/* for inet_ntoa */
 
-/* resolve interfaces */
-in_addr_t _name2ip_resolve(const char *h);
-char *_ip2string_resolve(in_addr_t ip);
+#include "module.h"
 
-typedef struct {
-	char 	*host;
-	int	port;
-} host_port_t;
+in_addr_t MODULE_FUN_NAME(Resolve, name2ip)(const char *h);
+char     *MODULE_FUN_NAME(Resolve, ip2string)(in_addr_t ip);
 
-/* host port interfaces */
-host_port_t *_new_host_port_pair(const char *);
-void _destroy_host_port_pair(host_port_t **);
+#define T HostPort_T
+typedef struct T *T;
+
+struct T {
+    char *host;
+    int   port;
+};
+
+T MODULE_FUN_NAME(HostPort, new)(const char *);
+void         MODULE_FUN_NAME(HostPort, destroy)(T *);
+    
+#undef T
 
 #endif
+
+

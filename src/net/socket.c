@@ -1,191 +1,304 @@
-/*
- * this implements simple socket interfaces
- * firstly to code network, wow
- *
- */
 
-#include "socket.h"
+#include <errno.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
 
-socket_t *_new_socket(enum _socket_types type)
+#include <netinet/in.h> /* for htons() */
+
+#include <net/if_arp.h>
+#include <linux/if.h>
+#include <linux/if_packet.h>
+#include <linux/netlink.h>
+#include <linux/if_ether.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "resolve.h"
+#include "socket-2.h"
+
+#define T_S Socket_T
+
+/*//////// API ROUTINES //////////////////////////////////////////*/
+T_S MODULE_FUN_NAME(Socket, new)(enum _socketTypes type)
 {
-	socket_t *socket = calloc(1, sizeof(socket_t));
-	if (socket) {
-		socket->type = type;
-		switch (type) {
-		case SOCKET_DGRAM:
-			socket->skd = socket(AF_INET, SOCK_DGRAM, 0);
-			break;
-#if defined (linux)
-		case SOCKET_NETLINK:
-			socket->skd = socket(AF_NETLINK, 
-					SOCK_RAW, 
-					NETLINK_USERSOCK);
-			break;
-		case SOCKET_RAW:
-			socket->skd = socket(PF_PACKET, 
-					SOCK_RAW, 
-					htons(ETH_P_ALL));
-			break;
-#endif
-		case SOCKET_STREAM:
-			socket->skd = socket(AF_INET, SOCK_STREAM, 0);
-			break;
-		case SOCKET_DUMMY:
-			break;
-		case SOCKET_UNIX:
-			socket->skd = socket(AF_UNIX, SOCK_STREAM, 0);
-			break;
-		default:
-			socket->skd = -1;
-			break;
-		}
-		
-		if (socket->skd == -1) {
-			free(socket);
-			socket = NULL;
-		}
-	}
-	return socket;
+    T_S sock = (T_S) calloc(1, sizeof (*socket));
+    if (sock) 
+	{
+      //  fprintf(stdout, "accessing socket type [%s]", _socketDescr[type]);
+        sock->type = type;
+        switch (type) 
+		{
+            case SOCKET_DGRAM:
+                sock->skd = socket(AF_INET, SOCK_DGRAM, 0);
+                break;
+
+            case SOCKET_NETLINK:
+                sock->skd = socket(AF_NETLINK, SOCK_RAW, NETLINK_USERSOCK);
+                break;
+
+            case SOCKET_RAW:
+                sock->skd = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+                break;
+
+            case SOCKET_STREAM:
+                sock->skd = socket(AF_INET, SOCK_STREAM, 0);
+                break;
+
+            case SOCKET_DUMMY:
+                break;
+
+            case SOCKET_UNIX:
+                sock->skd = socket(AF_UNIX, SOCK_STREAM, 0);
+                break;
+
+            default:
+                sock->skd = -1;
+                break;
+        }
+
+        if (sock->skd == -1) {
+            fprintf(stderr, "unable to create socket type [%d]", type);
+            free(sock);
+            sock = NULL;
+        }
+    }
+
+    return sock;
 }
 
-void _destroy_socket(socket_t **socket_ptr)
+void MODULE_FUN_NAME(Socket, destroy)(T_S *sock)
 {
-	if (socket_ptr && *socket_ptr) {
-		if ((*socket_ptr)->skd > 0)
-			close((*socket_ptr)->skd);
-		free(*socket_ptr);
-		*socket_ptr = NULL;
-	}
+    if (sock && *sock) 
+	{
+        if ((*sock)->skd > 0)
+            close((*sock)->skd);
+
+        free(*sock);
+        *sock = NULL;
+    }
 }
 
-int _bind_interface_socket(socket_t *sock, const char *ifname)
+int MODULE_FUN_NAME(Socket, bindInterface)(T_S sock, const char *ifname)
 {
-	if (sock && ifname) {
-		struct ifreq req;
-		struct sockaddr_dl skaddr;
+    if (sock && ifname) 
+	{
+        struct ifreq req;
 
-		memset(&req, 0, sizeof(struct ifreq));
-		strncpy(req.ifr_name, ifname, IFNAMESIZE);
-		req.ifr_name[IFNAMESIZE - 1] = '\0';
+        struct sockaddr_ll skaddr;
+        // set the interface
+        memset(&req, 0, sizeof (struct ifreq));
+        strncpy(req.ifr_name, ifname, IFNAMSIZ);
+        req.ifr_name[IFNAMSIZ - 1] = '\0';
+        // verify that the interface exists
+        if (ioctl(sock->skd, SIOCGIFINDEX, &req) >= 0) 
+		{
+            // bind to the interface
+            memset(&skaddr, 0, sizeof (skaddr));
+            skaddr.sll_protocol = htons(ETH_P_ALL);
+            skaddr.sll_ifindex = req.ifr_ifindex;
+            skaddr.sll_family = AF_PACKET;
 
-		if (ioctl(sock->skd, SIOCGIFINDEX, &req) >= 0) {
-			memset(&skaddr, 0, sizeof(skaddr));
-			skaddr.sll_protocol = htons(ETH_P_ALL);
-			skaddr.sll_ifindex  = req.if_ifindex;
-			skaddr.sll_family   = AF_PACKET;
-
-			if (bind(sock->skd, 
-				(struct sockaddr *)&skaddr, 
-				sizeof(struct sockaddr)) >= 0)
-				return 1;
-		}
-	}
-	return 0;
+            if (bind(sock->skd, (struct sockaddr *) &skaddr, sizeof (struct sockaddr_ll)) >= 0)
+			{
+                return 1;
+			}
+            else 
+			{
+                fprintf(stderr, "unable to bind socket to %s:%s", ifname, strerror(errno));
+            }
+        } 
+		else 
+		{
+            fprintf(stderr, "interface %s does not exist.", ifname);
+        }
+    }
+    return 0;
 }
 
-int _bind_socket(socket_t *socket, struct sockaddr *addr)
+int MODULE_FUN_NAME(Socket, bind)(T_S sock, struct sockaddr* addr)
 {
-	if (socket && addr) {
-		if (bind(socket->skd, 
-			(struct sockaddr *)addr, 
-			sizeof(struct sockaddr)) >= 0) {
-			return 1;
-		} else {
-			DEBUGP(DERR, "bind", "unable to bind socket : %s\n",
-				strerror(errno));
-		}
-	}
-	return 0;
+    if (sock && addr) 
+	{
+        if (bind(sock->skd, (struct sockaddr *) addr, sizeof (struct sockaddr)) >= 0) 
+		{
+            return 1;
+        }
+        else 
+		{
+            fprintf(stderr, "unable to bind socket: %s", strerror(errno));
+        }
+    }
+
+    return 0;
 }
 
-int _set_opt_socket(socket_t *socket, int opt)
+int MODULE_FUN_NAME(Socket, setOpt)(T_S sock, int opt)
 {
-	int32_t val = 0;
-	int res = 0;
+    int32_t val = 0;
+    int res = 0;
 
-	if (socket) {
-		switch (opt) {
-		case BCAST:
-			val = 1;
-			res = setsockopt(socket->skd, 
-					SOL_SOCKET, 
-					SO_BROADCAST, 
-					&val, 
-					sizeof(val));
-			break;
-		}
-		if (res == 0) return 1;
-		DEBUG(DWARN, "_set_opt_socket", "setsockopt failed: %s\n",
-			strerron(errno));
-	}
-	return 0;
+    if (sock) 
+	{
+        switch (opt) 
+		{
+            case BCAST:
+//                fprintf(stdout, "enabling BROADCAST on socket #%u", sock->skd);
+                val = 1;
+                res = setsockopt(sock->skd, SOL_SOCKET, SO_BROADCAST, &val, sizeof (val));
+                break;
+        }
+
+        if (res == 0) return 1;
+
+        fprintf(stdout, "setsockopt() failed: %s", strerror(errno));
+    }
+    return 0;
 }
 
-int _set_flag_socket(socket_t *socket, const char *ifname, short flag)
+int MODULE_FUN_NAME(Socket, setFlag)(T_S sock, const char *ifname, short flag)
 {
-	if (socket) {
-		struct ifreq ifr;
-		strncpy(ifr.ifr_name, ifname, IFNAMESIZE);
-		ifr.ifr_name[IFNAMESIZE - 1] = '\0';
-		if (ioctl(socket->skd, SIOCGIFFLAGS, &ifr) >= 0) {
-			ifr.ifr_name |= flag;
-			if (ioctl(socket->skd, SIOCSIFFLAGS, &ifr) >= 0)
-				return 1;
-		}
-	}
-	return 0;
+    if (sock) 
+	{
+        struct ifreq ifr;
+        strncpy(ifr.ifr_name, ifname, IFNAMSIZ);
+        ifr.ifr_name[IFNAMSIZ - 1] = '\0';
+        if (ioctl(sock->skd, SIOCGIFFLAGS, &ifr) >= 0) 
+		{
+            ifr.ifr_flags |= flag;
+            if (ioctl(sock->skd, SIOCSIFFLAGS, &ifr) >= 0)
+                return 1;
+        }
+    }
+    return 0;
 }
 
-int _clear_flag_socket(socket_t *socket, const char *ifname, short flag)
+int MODULE_FUN_NAME(Socket, clearFlag)(T_S sock, const char *ifname, short flag)
 {
-	if (socket) {
-		struct ifreq ifr;
-		strncpy(ifr.ifr_name, ifname, IFNAMESIZE);
-		ifr.ifr_name[IFNAMESIZE - 1] = '\0';
-		if (ioctl(socket->skd, SIOCGIFFLAGS, &ifr) >= 0) {
-			ifr.ifr_flags $= ~flag;
-			if (ioctl(socket->skd, SIOCSIFFLAGS, &ifr) >= 0)
-				return 1;
-		}
-	}
-	return 0;
+    if (sock) 
+	{
+        struct ifreq ifr;
+        strncpy(ifr.ifr_name, ifname, IFNAMSIZ);
+        ifr.ifr_name[IFNAMSIZ - 1] = '\0';
+        if (ioctl(sock->skd, SIOCGIFFLAGS, &ifr) >= 0) 
+		{
+            ifr.ifr_flags &= ~flag;
+            if (ioctl(sock->skd, SIOCSIFFLAGS, &ifr) >= 0)
+                return 1;
+        }
+    }
+    return 0;
+}
+
+int MODULE_FUN_NAME(Socket, verifyArpType)(T_S sock, const char *ifname, u_int16_t type)
+{
+    if (sock) 
+	{
+        struct ifreq ifr;
+        strncpy(ifr.ifr_name, ifname, IFNAMSIZ);
+        ifr.ifr_name[IFNAMSIZ - 1] = '\0';
+        if (ioctl(sock->skd, SIOCGIFHWADDR, &ifr) >= 0) 
+		{
+
+            if (ifr.ifr_hwaddr.sa_family == type)
+                return 1;
+        }
+        fprintf(stderr, "verifyArpType: %s", strerror(errno));
+    }
+    return 0;
+}
+
+int MODULE_FUN_NAME(Socket, setAddress)(T_S socket, const char *to, int port)
+{
+    if (socket && to) 
+	{
+        switch (socket->type) 
+		{
+            case SOCKET_DGRAM:
+            case SOCKET_STREAM:
+            {
+                in_addr_t ip = MODULE_FUN_NAME(Resolve, name2ip)(to);
+                if (ip != INADDR_NONE) 
+				{
+                    socket->addr.in.sin_family = AF_INET;
+                    socket->addr.in.sin_addr.s_addr = ip;
+                    socket->addr.in.sin_port = htons(port);
+                    socket->len = sizeof (socket->addr.in);
+                    return 1;
+                } 
+				else 
+				{
+                    fprintf(stderr, "unable to resolve %s for setting socket address!", to);
+                }
+                break;
+            }
+            case SOCKET_UNIX:
+            {
+                memset((char *) &socket->addr.un, 0, sizeof (socket->addr.un));
+                socket->addr.un.sun_family = AF_UNIX;
+                strncpy(socket->addr.un.sun_path, to, sizeof (socket->addr.un));
+                socket->len = sizeof (socket->addr.un);
+                return 1;
+            }
+            case SOCKET_DUMMY:
+            case SOCKET_NETLINK:
+            case SOCKET_RAW:
+            default:
+                fprintf(stdout, "cannot set address for '%s' socket!", _socketDescr[socket->type]);
+        }
+    }
+    return 0;
+}
+
+#undef T_S
+
+/*//////// SocketPair Interface Implementation //////////////////////////////////////////*/
+
+#define T_P SocketPair_T
+
+T_P MODULE_FUN_NAME(SocketPair, new)(void)
+{
+    T_P pair = (T_P) calloc(1, sizeof (*pair));
+    if (pair) 
+	{
+        if (socketpair(AF_UNIX, SOCK_STREAM, 0, pair->fds) < 0) 
+		{
+            fprintf(stderr, "failed to create a new socket pair!");
+            free(pair);
+            pair = NULL;
+        }
+    }
+    return pair;
+}
+
+void MODULE_FUN_NAME(socketPair, close)(T_P pair)
+{
+    if (pair) 
+	{
+        /* do a soft close until it is explicitly destroyed! */
+//        fprintf(stdout, "a soft close of %d and %d", pair->fds[0], pair->fds[1]);
+        shutdown(pair->fds[0], SHUT_RDWR);
+        shutdown(pair->fds[1], SHUT_RDWR);
+    }
+}
+
+void MODULE_FUN_NAME(socketPair, destroy)(T_P *ppair)
+{
+    if (ppair) 
+	{
+        T_P pair = *ppair;
+        if (pair) 
+		{
+//            fprintf(stdout, "a full close of %d and %d", pair->fds[0], pair->fds[1]);
+            close(pair->fds[0]);
+            close(pair->fds[1]);
+            free(pair);
+            *ppair = NULL;
+        }
+    }
 }
 
 
+#undef T_P
 
-/*
- * socket pair interfaces
- */
-socket_pair_t *_new_socket_pair(void)
-{
-	socket_pair_t *socket_pair = calloc(1, sizeof(socket_pair_t));
-	if (socket_pair) {
-		if (socketpair(AF_UNIX, 
-			SOCK_STREAM, 
-			0, 
-			socket_pair->fds) < 0) {
-			free(socket_pair);
-			socket_pair = NULL;
-		}
-	}
-	return socket_pair;
-}
-
-void _close_socket_pair(socket_pair_t *pair)
-{
-	if (pair) {
-		shutdown(pair->fds[0]);
-		shutdown(pair->fds[1]);
-	}
-}
-
-void _destroy_socket_pair(socket_pair_t **pair_ptr)
-{
-	if (pair_ptr && *pair_ptr) {
-		close((*pair_ptr)->fds[0]);
-		close((*pair_ptr)->fds[1]);
-		free(*pair_ptr);
-		*pair_ptr = NULL;
-	}
-}
-
+    

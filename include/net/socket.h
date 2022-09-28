@@ -1,61 +1,103 @@
-/*
- * this will implements the socket 
- * interfaces, 
- * wow, first time to code network program
- * socket is the basic concepts which will 
- * be used by udp and tcp concepts
- */
-#ifndef __socket_H__
-#define __socket_H__
+
+
+#ifndef __net_socket_H__
+#define __net_socket_H__
+
 
 #include <netinet/in.h>
 #include <sys/un.h>
 
-#ifndef IFNAMESIZE
-# define IFNAMESIZE 16
+#include "module.h"
+
+#ifndef IFNAMSIZ
+# define IFNAMSIZ 16
 #endif
 
-enum _socket_types { SOCKET_DUMMY, SOCKET_DGRAM, \
-			SOCKET_NETLINK, SOCKET_RAW,\
-			SOCKET_STREAM, SOCKET_UNIX };
-const char *_socket_descr[] = { "DUMMY", "DGRAM", "NETLINK", \
-				"RAW", "STREAM", "UNIX" };
+enum _socketTypes {  SOCKET_DUMMY, SOCKET_DGRAM, SOCKET_NETLINK, SOCKET_RAW, SOCKET_STREAM, SOCKET_UNIX };
+const char *_socketDescr[] = { "DUMMY", "DATAGRAM", "NETLINK", "RAW", "STREAM", "UNIX" };
 
-enum _opt_types { BCAST };
+enum _optTypes { BCAST };
 
-typedef struct {
+#define T_S Socket_T
+typedef struct T_S *T_S;
+
+struct T_S {
 	int32_t skd;
-	enum _socket_types type;
+	enum _socketTypes type;
 	unsigned char flags;
-
-	socklen_t len;
-	union {
-		struct sockaddr_in in;
-		struct sockaddr_un un;
-	} addr;
-
-} socket_t;
-
-
-/* the socket interfaces */
-socket_t *_new_socket(enum _socket_typse type);
-void _destroy_socket(socket_t **socket_ptr);
-int _bind_interface_socket(socket_t *sock, const char *ifname);
-int _bind_socket(socket_t *socket, struct sockaddr *addr);
-int _set_opt_socket(socket_t *socket, int opt);
-int _set_flag_socket(socket_t *socket, const char *ifname, short flag);
-int _clear_flag_socket(socket_t *socket, const char *ifname, short flag);
-/* in futrue we will implement these two */
-//int _verify_arptype_socket(socket_t *sock, const char *ifname, uint16_t type);
-//int _set_address_socket(socket_t *sock, const char *to, int port);
+#define SOCKET_LISTEN_FLAG  0x1
+#define SOCKET_ACCEPT_FLAG  0x2
+#define SOCKET_CONNECT_FLAG 0x4
+    socklen_t len;
+    union {
+        struct sockaddr_in in;
+        struct sockaddr_un un;
+    } addr;
+};
 
 
-typedef struct {
-	int 	fds[2];
-} socket_pair_t;
+T_S MODULE_FUN_NAME(Socket, new)(enum _socketTypes type);
+void       MODULE_FUN_NAME(Socket, destroy)(T_S *psocket);
+int MODULE_FUN_NAME(Socket, bindInterface)(T_S socket, const char *ifname);
+int MODULE_FUN_NAME(Socket, bind)(T_S socket, struct sockaddr* addr);
+int MODULE_FUN_NAME(Socket, setFlag)(T_S socket, const char *ifname, short flag);
+int MODULE_FUN_NAME(Socket, setOpt)(T_S socket, int opt);
+int MODULE_FUN_NAME(Socket, clearFlag)(T_S socket, const char *ifname, short flag);
+int MODULE_FUN_NAME(Socket, verifyArpType)(T_S socket, const char *ifname, u_int16_t type);
+int MODULE_FUN_NAME(Socket, setAddress)(T_S socket, const char *to, int port);
 
-socket_pair_t *_new_socket_pair(void);
-void _close_socket_pair(socket_pair_t *socket_pair);
-void _destroy_socket_pair(socket_pair_t **socket_pair_ptr);
+#undef T_S
+    
+
+/*
+ * interface of socket pair
+ */
+#define T_P SocketPair_T
+typedef struct T_P *T_P;
+struct T_P{
+    int	fds[2];
+    int closed;
+};
+
+T_P MODULE_FUN_NAME(SocketPair, new)(void);
+void MODULE_FUN_NAME(SocketPair, close)(T_P pair);
+void MODULE_FUN_NAME(SocketPair, destroy)(T_P *ppair);
+    
+#undef T_P
+
+// special section for some Endian magic functions...
+
+inline uint32_t swapel(uint32_t a) {
+    uint32_t b = 0;
+    char *bp = (char *) &b;
+    char *ap = (char *) &a;
+    bp[0] = ap[3];
+    bp[1] = ap[2];
+    bp[2] = ap[1];
+    bp[3] = ap[0];
+    return b;
+}
+
+inline uint32_t htolel(uint32_t a) {
+    uint32_t magic = 1;
+    char *mp = (char *) &magic;
+    if(mp[3] == 1) {     // big-endian 
+        fprintf(stdout, "htolel: converting from big-endian to little-endian");
+        return swapel(a);
+    }
+    return a;
+}
+
+inline uint32_t ltohel(uint32_t a) {
+    uint32_t magic = 1;
+    char *mp = (char *) &magic;
+    if(mp[3] == 1) {     // big-endian
+        fprintf(stdout, "htolel: converting from little-endian to big-endian");
+        return swapel(a);
+    }
+    return a;
+}
 
 #endif
+
+
