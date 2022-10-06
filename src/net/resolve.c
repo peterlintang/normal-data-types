@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "resolve-2.h"
+#include "resolve.h"
 
 #define T HostPort_T
 

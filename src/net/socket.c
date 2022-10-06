@@ -15,7 +15,7 @@
 #include <stdlib.h>
 
 #include "resolve.h"
-#include "socket-2.h"
+#include "socket.h"
 
 #define T_S Socket_T
 

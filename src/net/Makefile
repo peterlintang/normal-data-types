@@ -11,20 +11,16 @@ LIBNET:=libnet.a
 
 LIBS:=$(LIBNET)
 
-NET_SRCS := ./client_addr.c			\
-		./client.c					\
-		./server_addr.c				\
-		./server.c					\
+NET_SRCS := 	\
 		./socket.c				\
-		./resolve.c
+		./resolve.c				\
+		./udp.c
 
 
-NET_OBJS := ./client_addr.o			\
-		./client.o					\
-		./server_addr.o				\
-		./server.o					\
+NET_OBJS := 	\
 		./socket.o				\
-		./resolve.o
+		./resolve.o				\
+		./udp.o
 
 
 all: $(LIBS)

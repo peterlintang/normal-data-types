@@ -1,35 +1,46 @@
-/*
- * this implenents the udp interfaces, which depends on socket
- * 
- *
- */
+
 
 #ifndef __udp_H__
 #define __udp_H__
 
+
 #include <netinet/in.h>
+
 #include "socket.h"
 
-typedef struct {
-	socket_t *sock;
-	char 			*dest_host_name;
-	struct sockaddr_in	 dest_host_addr;
-	uint16_t		 dest_host_port;
+#include "module.h"
 
-	char 			*src_host_name;
-	struct sockaddr_in	 src_host_addr;
-	uint16_t		 src_host_port;
+#define T_S Socket_T
+#define T Udp_T 
+typedef struct T *T;
 
-	unsigned char 		 retry_counter;
+struct T {
+    T_S sock;
 
-} udp_t;
+    char              *destHostName;
+    struct sockaddr_in destHostAddr;
+    uint16_t           destHostPort;
+
+    char              *srcHostName;
+    struct sockaddr_in srcHostAddr;
+    uint16_t           srcHostPort;
+	
+    unsigned char retryCounter;
+
+};
 
 
-void _destroy_udp(udp_t **);
-upp_t *_connect_udp(const char *host, uint16_t port);
-upp_t *_bconnect_udp(const char *host, uint16_t port);
-socket_t *_listen_udp(uint16_t port);
-uint32_t _read_from_udp(udp_t *, char **buf, uint32_t size);
-uint32_t _write_to_udp(udp_t *, char *buf, uint32_t size);
+void MODULE_FUN_NAME(Udp, destroy)(T *);
+T MODULE_FUN_NAME(Udp, connect)    (const char *host, u_int16_t port);
+T MODULE_FUN_NAME(Udp, bconnect)    (const char *host, u_int16_t port);
+T_S MODULE_FUN_NAME(Udp, listen)     (u_int16_t port);
+T_S MODULE_FUN_NAME(Udp, listen2)     (in_addr_t host, u_int16_t port);
+uint32_t   MODULE_FUN_NAME(Udp, read)    (T , char **buf, uint32_t size);
+uint32_t   MODULE_FUN_NAME(Udp, write)   (T , char  *buf, uint32_t size);
+
+#undef T_S
+#undef T
 
 #endif
+
+
