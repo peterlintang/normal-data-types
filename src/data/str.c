@@ -6,6 +6,8 @@
 
 #include "str.h"
 
+#include "dlist.h"
+
 // <macros 251>
 #define IDX(i, len)	((i) <= 0 ? (i) + (len) : (i) - 1)
 #define CONVERT(s, i, j)  do { \
@@ -453,6 +455,31 @@ int MODULE_FUN_NAME(Str, rmatch)(const char *s, int i, int j,
 	return 0;
 }
 
+ListD_T MODULE_FUN_NAME(Str, tokenize)(const char *buf, const char *delim)
+{
+	char *p = NULL;
+	char *oldp = NULL;
+	char *copy = NULL;
+	ListD_T list = NULL;
+
+	if (buf == NULL || delim == NULL)
+		return list;
+
+	list = MODULE_FUN_NAME(ListD, new)();
+	if (list == NULL)
+		return list;
+
+	copy = strdup(buf);
+	p = copy;
+
+	while ((oldp = strsep(&p, delim)) != NULL)
+	{
+		MODULE_FUN_NAME(ListD, insert)( list, MODULE_FUN_NAME(ListDNode, new)(strdup(oldp)) );
+	}
+	free(copy);
+
+	return list;
+}
 
 void MODULE_FUN_NAME(Str, fmt)(int code, va_list *app,
 			int put(int c, void *cl), void *cl,

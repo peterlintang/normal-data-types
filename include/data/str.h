@@ -16,6 +16,7 @@
 #include <stdarg.h>
 
 #include "module.h"
+#include "dlist.h"
 
 #define T Str_T
 
@@ -75,6 +76,7 @@ extern int MODULE_FUN_NAME(Str, match)
 extern int MODULE_FUN_NAME(Str, rmatch)
 		(const char *s, int i, int j,
 				const char *str);
+extern ListD_T MODULE_FUN_NAME(Str, tokenize)(const char *buf, const char *delim);
 
 extern void MODULE_FUN_NAME(Str, fmt)
 		(int code, va_list *app, 
