@@ -9,7 +9,17 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 #include "tcp.h"
+#include "route.h"
+#include "resolve.h"
+#include "socket.h"
+
+#define TRUE	1
+#define FALSE	0
 
 #define T_S Socket_T
 #define T Tcp_T
@@ -23,32 +33,32 @@ T MODULE_FUN_NAME(Tcp, connect2)(const char *host, u_int16_t port, const char *i
         /*
          * below is a HACK for now to preserve previous interface API
          */
-        DEBUGP (DDEBUG,"connect2","resolving %s",host);
-        in_addr_t ip = I (Resolve)->name2ip (host);
+        fprintf (stdout,"connect2 resolving %s\n",host);
+        in_addr_t ip = MODULE_FUN_NAME(Resolve, name2ip)(host);
         if (ip != INADDR_NONE) {
-            tcp->sock = I (Socket)->new (SOCKET_STREAM);
+            tcp->sock = MODULE_FUN_NAME(Socket, new)(SOCKET_STREAM);
 
             if(tcp->sock && ifname) {
 
-                struct sockaddr_in addr = { .sin_addr.s_addr = I (Route)->getIfIP((char *)ifname), .sin_family = AF_INET };
+                struct sockaddr_in addr = { .sin_addr.s_addr = MODULE_FUN_NAME(Route, getIfIP)((char *)ifname), .sin_family = AF_INET };
                 
-                if(!I (Socket)->bind(tcp->sock, (struct sockaddr*)&addr)) {
+                if(!MODULE_FUN_NAME(Socket, bind)(tcp->sock, (struct sockaddr*)&addr)) {
 
-                    DEBUGP(DERROR, "_connect2", "failed to bind to '%s'", ifname);
+                    fprintf(stderr, "_connect2 failed to bind to '%s'\n", ifname);
 
                 }
 
             }
 
         } else {
-            tcp->sock = I (Socket)->new (SOCKET_UNIX);
+            tcp->sock = MODULE_FUN_NAME(Socket, new)(SOCKET_UNIX);
         }
         tcp->records = FALSE;
         if (tcp->sock) {
-            char *ipstring = I (Resolve)->ip2string (ip); /* optimization hack */
-            DEBUGP (DDEBUG,"connect2","setting up socket for %s:%d",ipstring,port);
-            if (I (Socket)->setAddress (tcp->sock, ipstring, port)) {
-                tcp->destHostName = I (String)->copy (host);
+            char *ipstring = MODULE_FUN_NAME(Resolve, ip2string)(ip); /* optimization hack */
+            fprintf (stdout, "connect2 setting up socket for %s:%d\n",ipstring,port);
+            if (MODULE_FUN_NAME(Socket, setAddress)(tcp->sock, ipstring, port)) {
+                tcp->destHostName = strdup(host);
                 tcp->destHostPort = port;
                 free (ipstring); /* done using this hack */
                 /*
@@ -63,35 +73,35 @@ T MODULE_FUN_NAME(Tcp, connect2)(const char *host, u_int16_t port, const char *i
                  */
                 int flags = fcntl (tcp->sock->skd, F_GETFL, 0);
                 if (fcntl (tcp->sock->skd, F_SETFL, flags | O_NONBLOCK) < 0) {
-                    DEBUGP (DERR,"connect2","unable to set socket into NONBLOCKING mode!");
-                    I (TcpConnector)->destroy (&tcp);
+                    fprintf (stderr, "connect2 unable to set socket into NONBLOCKING mode!\n");
+                    MODULE_FUN_NAME(Tcp, destroy)(&tcp);
                     return NULL;
                 }
 
 			  try_connect:
-				DEBUGP(DINFO,"connect2","making a connection to %s:%d (%u attempt)",host,port,tcp->retryCounter+1);
+				fprintf(stdout, "connect2 making a connection to %s:%d (%u attempt)\n",host,port,tcp->retryCounter+1);
 				if (connect(tcp->sock->skd,(struct sockaddr *)&tcp->sock->addr,tcp->sock->len)==0) {
 
                     if (fcntl (tcp->sock->skd, F_SETFL, flags) == 0) {
                         tcp->retryCounter = 0; /* reset to 0 */
-                        DEBUGP (DINFO,"connect2","connection to %s:%d successful!",host,port);
+                        fprintf (stdout, "connect2 connection to %s:%d successful!\n",host,port);
                         return tcp;
                     }
-                    DEBUGP (DERR,"connect2","unable to set socket back into BLOCKING mode!");
+                    fprintf (stderr, "connect2 unable to set socket back into BLOCKING mode!\n");
 				} else {
 					switch(errno) {
                       case EISCONN:
-                          DEBUGP(DERR,"connect2","already connected?!? tear-down & reopen socket!");
-                          I (Socket)->destroy (&tcp->sock);
-                          tcp->sock = I (Socket)->new (SOCKET_STREAM);
+                          fprintf(stderr, "connect2 already connected?!? tear-down & reopen socket!\n");
+                          MODULE_FUN_NAME(Socket, destroy)(&tcp->sock);
+                          tcp->sock = MODULE_FUN_NAME(Socket, new)(SOCKET_STREAM);
                           if (!tcp->sock) {
-                              DEBUGP (DERR,"connect2","unable to create a new socket!");
+                              fprintf (stderr, "connect2 unable to create a new socket!\n");
                               break;
                           }
                       case EAGAIN:
                       case EINTR:
-                          if(SystemExit)
-                              break;
+//                          if(SystemExit)
+ //                             break;
                           goto try_connect;
 
                       case EINPROGRESS:
@@ -111,49 +121,49 @@ T MODULE_FUN_NAME(Tcp, connect2)(const char *host, u_int16_t port, const char *i
 
                                       if (fcntl (tcp->sock->skd, F_SETFL, flags) == 0) {
                                           tcp->retryCounter = 0; /* reset to 0 */
-                                          DEBUGP (DINFO,"connect2","connection to %s:%d successful! (via fcntl)",host,port);
+                                          fprintf (stdout, "connect2 connection to %s:%d successful! (via fcntl)\n",host,port);
                                           return tcp;
                                       }
-                                      DEBUGP (DERR,"connect2","unable to set socket back into BLOCKING mode!");
+                                      fprintf (stderr, "connect2 unable to set socket back into BLOCKING mode!\n");
                                   } else {
-                                      DEBUGP (DERR,"connect2","error() %d - %s", valopt, strerror (valopt));
+                                      fprintf (stderr, "connect2 error() %d - %s\n", valopt, strerror (valopt));
                                   }
                               } else {
-                                  DEBUGP (DERR,"connect2","error in getsockopt() %d - %s", errno, strerror (errno));
+                                  fprintf (stderr, "connect2 error in getsockopt() %d - %s\n", errno, strerror (errno));
                               }
                           }
                       }
                       case ETIMEDOUT:
-                          if(SystemExit)
-                              break;
+//                          if(SystemExit)
+ //                             break;
 
                           if (++tcp->retryCounter < TCP_CONNECT_MAX_RETRY) {
                               if (tcp->sock->type == SOCKET_STREAM) {
-                                  DEBUGP (DINFO,"connect2","re-resolving host (%s) for another connection attempt",host);
-                                  in_addr_t ip2 = I (Resolve)->name2ip (host);
+                                  fprintf(stdout, "connect2 re-resolving host (%s) for another connection attempt\n",host);
+                                  in_addr_t ip2 = MODULE_FUN_NAME(Resolve, name2ip)(host);
                                   if (ip2 != INADDR_NONE) {
                                       if (ip2 != ip) {
                                           ip = ip2;
                                           tcp->sock->addr.in.sin_addr.s_addr = ip;
                                           goto try_connect;
                                       } else {
-                                          DEBUGP (DERR,"connect2","unable to re-resolve host (%s) to a different IP to retry",host);
+                                          fprintf(stderr, "connect2 unable to re-resolve host (%s) to a different IP to retry\n",host);
                                       }
                                   } else {
-                                      DEBUGP (DERR,"connect2","unable to re-resolve host (%s)",host);
+                                      fprintf(stderr, "connect2 unable to re-resolve host (%s)\n",host);
                                   }
                               } else {
                                   goto try_connect;
                               }
                           } else {
-                              DEBUGP (DERR,"connect2","too many retries! giving up!");
+                              fprintf (stderr,"connect2 too many retries! giving up!\n");
                           }
                           break;
 
                       default:
-                          DEBUGP (DERR,"connect2","unhandled error (%s)",strerror (errno));
+                          fprintf (stderr,"connect2 unhandled error (%s)\n",strerror (errno));
 					}
-                    DEBUGP (DERR,"connect2","unable to make a connection to (%s)",host);
+                    fprintf (stderr,"connect2 unable to make a connection to (%s)\n",host);
 					MODULE_FUN_NAME(Tcp, destroy)(&tcp);
 				}
 			} else {
@@ -161,7 +171,7 @@ T MODULE_FUN_NAME(Tcp, connect2)(const char *host, u_int16_t port, const char *i
 				MODULE_FUN_NAME(Tcp, destroy)(&tcp);
 			}
 		} else {
-			DEBUGP(DERR,"connect2","unable to create network socket");
+			fprintf(stderr,"connect2 unable to create network socket\n");
 			MODULE_FUN_NAME(Tcp, destroy)(&tcp);
 		}
 	}
@@ -175,19 +185,19 @@ T MODULE_FUN_NAME(Tcp, connect)(const char *host, u_int16_t port)
         /*
          * below is a HACK for now to preserve previous interface API
          */
-        DEBUGP (DDEBUG,"connect","resolving %s",host);
-        in_addr_t ip = I (Resolve)->name2ip (host);
+        fprintf (stdout,"connect resolving %s\n",host);
+        in_addr_t ip = MODULE_FUN_NAME(Resolve, name2ip)(host);
         if (ip != INADDR_NONE) {
-            tcp->sock = I (Socket)->new (SOCKET_STREAM);
+            tcp->sock = MODULE_FUN_NAME(Socket, new)(SOCKET_STREAM);
         } else {
-            tcp->sock = I (Socket)->new (SOCKET_UNIX);
+            tcp->sock = MODULE_FUN_NAME(Socket, new)(SOCKET_UNIX);
         }
         tcp->records = FALSE;
         if (tcp->sock) {
-            char *ipstring = I (Resolve)->ip2string (ip); /* optimization hack */
-            DEBUGP (DDEBUG,"connect","setting up socket for %s:%d",ipstring,port);
-            if (I (Socket)->setAddress (tcp->sock, ipstring, port)) {
-                tcp->destHostName = I (String)->copy (host);
+            char *ipstring = MODULE_FUN_NAME(Resolve, ip2string)(ip); /* optimization hack */
+            fprintf (stdout,"connect setting up socket for %s:%d\n",ipstring,port);
+            if (MODULE_FUN_NAME(Socket, setAddress)(tcp->sock, ipstring, port)) {
+                tcp->destHostName = strdup(host);
                 tcp->destHostPort = port;
                 free (ipstring); /* done using this hack */
                 /*
@@ -202,35 +212,35 @@ T MODULE_FUN_NAME(Tcp, connect)(const char *host, u_int16_t port)
                  */
                 int flags = fcntl (tcp->sock->skd, F_GETFL, 0);
                 if (fcntl (tcp->sock->skd, F_SETFL, flags | O_NONBLOCK) < 0) {
-                    DEBUGP (DERR,"connect","unable to set socket into NONBLOCKING mode!");
-                    I (TcpConnector)->destroy (&tcp);
+                    fprintf (stderr,"connect unable to set socket into NONBLOCKING mode!\n");
+                    MODULE_FUN_NAME(Tcp, destroy)(&tcp);
                     return NULL;
                 }
                 
 			  try_connect:
-				DEBUGP(DINFO,"connect","making a connection to %s:%d (%u attempt)",host,port,tcp->retryCounter+1);
+				fprintf(stdout, "connect making a connection to %s:%d (%u attempt)\n",host,port,tcp->retryCounter+1);
 				if (connect(tcp->sock->skd,(struct sockaddr *)&tcp->sock->addr,tcp->sock->len)==0) {
 
                     if (fcntl (tcp->sock->skd, F_SETFL, flags) == 0) {
                         tcp->retryCounter = 0; /* reset to 0 */
-                        DEBUGP (DINFO,"connect","connection to %s:%d successful!",host,port);
+                        fprintf (stdout, "connect connection to %s:%d successful!\n",host,port);
                         return tcp;
                     }
-                    DEBUGP (DERR,"connect","unable to set socket back into BLOCKING mode!");
+                    fprintf (stderr,"connect unable to set socket back into BLOCKING mode!\n");
 				} else {
 					switch(errno) {
                       case EISCONN:
-                          DEBUGP(DERR,"connect","already connected?!? tear-down & reopen socket!");
-                          I (Socket)->destroy (&tcp->sock);
-                          tcp->sock = I (Socket)->new (SOCKET_STREAM);
+                          fprintf(stderr,"connect already connected?!? tear-down & reopen socket!\n");
+                          MODULE_FUN_NAME(Socket, destroy)(&tcp->sock);
+                          tcp->sock = MODULE_FUN_NAME(Socket, new)(SOCKET_STREAM);
                           if (!tcp->sock) {
-                              DEBUGP (DERR,"connect","unable to create a new socket!");
+                              fprintf (stderr,"connect unable to create a new socket!\n");
                               break;
                           }
                       case EAGAIN:
                       case EINTR:
-                          if(SystemExit)
-                              break;
+//                          if(SystemExit)
+//                              break;
                           goto try_connect;
 
                       case EINPROGRESS:
@@ -250,58 +260,58 @@ T MODULE_FUN_NAME(Tcp, connect)(const char *host, u_int16_t port)
 
                                       if (fcntl (tcp->sock->skd, F_SETFL, flags) == 0) {
                                           tcp->retryCounter = 0; /* reset to 0 */
-                                          DEBUGP (DINFO,"connect","connection to %s:%d successful! (via fcntl)",host,port);
+                                          fprintf (stdout, "connect connection to %s:%d successful! (via fcntl)\n",host,port);
                                           return tcp;
                                       }
-                                      DEBUGP (DERR,"connect","unable to set socket back into BLOCKING mode!");
+                                      fprintf (stderr,"connect unable to set socket back into BLOCKING mode!\n");
                                   } else {
-                                      DEBUGP (DERR,"connect","error() %d - %s", valopt, strerror (valopt));
+                                      fprintf (stderr,"connect error() %d - %s\n", valopt, strerror (valopt));
                                   }
                               } else {
-                                  DEBUGP (DERR,"connect","error in getsockopt() %d - %s", errno, strerror (errno));
+                                  fprintf (stderr,"connect error in getsockopt() %d - %s\n", errno, strerror (errno));
                               }
                           }
                       }
                       case ETIMEDOUT:
-                          if(SystemExit)
-                              break;
+//                          if(SystemExit)
+ //                             break;
                           
                           if (++tcp->retryCounter < TCP_CONNECT_MAX_RETRY) {
                               if (tcp->sock->type == SOCKET_STREAM) {
-                                  DEBUGP (DINFO,"connect","re-resolving host (%s) for another connection attempt",host);
-                                  in_addr_t ip2 = I (Resolve)->name2ip (host);
+                                  fprintf (stdout, "connect re-resolving host (%s) for another connection attempt\n",host);
+                                  in_addr_t ip2 = MODULE_FUN_NAME(Resolve, name2ip)(host);
                                   if (ip2 != INADDR_NONE) {
                                       if (ip2 != ip) {
                                           ip = ip2;
                                           tcp->sock->addr.in.sin_addr.s_addr = ip;
                                           goto try_connect;
                                       } else {
-                                          DEBUGP (DERR,"connect","unable to re-resolve host (%s) to a different IP to retry",host);
+                                          fprintf (stderr,"connect unable to re-resolve host (%s) to a different IP to retry\n",host);
                                       }
                                   } else {
-                                      DEBUGP (DERR,"connect","unable to re-resolve host (%s)",host);
+                                      fprintf (stderr,"connect unable to re-resolve host (%s)\n",host);
                                   }
                               } else {
                                   goto try_connect;
                               }
                           } else {
-                              DEBUGP (DERR,"connect","too many retries! giving up!");
+                              fprintf (stderr,"connect too many retries! giving up!\n");
                           }
                           break;
                           
                       default:
-                          DEBUGP (DERR,"connect","unhandled error (%s)",strerror (errno));
+                          fprintf (stderr,"connect unhandled error (%s)\n",strerror (errno));
 					}
-                    DEBUGP (DERR,"connect","unable to make a connection to (%s)",host);
-					I (TcpConnector)->destroy (&tcp);
+                    fprintf (stderr,"connect unable to make a connection to (%s)\n",host);
+					MODULE_FUN_NAME(Tcp, destroy)(&tcp);
 				}
 			} else {
-                free (ipstring); /* done using this hack */
-				I (TcpConnector)->destroy (&tcp);
+                free(ipstring); /* done using this hack */
+				MODULE_FUN_NAME(Tcp, destroy)(&tcp);
 			}
 		} else {
-			DEBUGP(DERR,"connect","unable to create network socket");
-			I (TcpConnector)->destroy (&tcp);
+			fprintf(stderr,"connect unable to create network socket\n");
+			MODULE_FUN_NAME(Tcp, destroy)(&tcp);
 		}
 	}
 	return (tcp);
@@ -330,19 +340,19 @@ T MODULE_FUN_NAME(Tcp, accept)(T_S sock)
 	{
 		if (sock && sock->flags & SOCKET_LISTEN_FLAG) 
 		{
-			tcp->sock = I (Socket)->new (SOCKET_DUMMY);
+			tcp->sock = MODULE_FUN_NAME(Socket, new)(SOCKET_DUMMY);
 			if (tcp->sock) 
 			{
 				uint32_t addrLen = sizeof (struct sockaddr_in);
 			  try_accept:
-				DEBUGP(DINFO,"accept","waiting for incoming connection...");
+				fprintf(stdout, "accept waiting for incoming connection...\n");
 				if ((tcp->sock->skd = accept (sock->skd,(struct sockaddr *)&tcp->srcHostAddr, &addrLen))>=0) 
 				{
-                    char *host = I (Resolve)->ip2string (tcp->srcHostAddr.sin_addr.s_addr);
+                    char *host = MODULE_FUN_NAME(Resolve, ip2string)(tcp->srcHostAddr.sin_addr.s_addr);
 					tcp->sock->flags |= SOCKET_ACCEPT_FLAG;
 					tcp->srcHostPort = ntohs (tcp->srcHostAddr.sin_port);
 					tcp->retryCounter = 0; /* reset to 0 */
-					DEBUGP (DINFO,"accept","accepted incoming connection from %s:%u", host, tcp->srcHostPort);
+					fprintf (stdout, "accept accepted incoming connection from %s:%u\n", host, tcp->srcHostPort);
                     tcp->srcHostName = host;
                     tcp->records = FALSE;
 				} 
@@ -352,36 +362,36 @@ T MODULE_FUN_NAME(Tcp, accept)(T_S sock)
 					{
                       case EINTR:
                       case EAGAIN:
-                          if(SystemExit)
-                              break;
+//                          if(SystemExit)
+ //                             break;
 					
                           if (tcp->retryCounter++ < TCP_ACCEPT_MAX_RETRY) 
 						  {
-                              DEBUGP (DINFO,"accept","trying again (%u retries)...",tcp->retryCounter);
+                              fprintf (stdout, "accept trying again (%u retries)...\n",tcp->retryCounter);
                               goto try_accept;
                           } 
 						  else 
 						  {
-                              DEBUGP (DERR,"accept","too many retries! giving up!");
+                              fprintf (stderr,"accept too many retries! giving up!\n");
                           }
                           break;
                           
                       default:
-                          DEBUGP (DERR,"accept","unhandled error: %s",strerror (errno));
+                          fprintf (stderr,"accept unhandled error: %s\n",strerror (errno));
 					}
-					I (TcpConnector)->destroy (&tcp);
+					MODULE_FUN_NAME(Tcp, destroy)(&tcp);
 				}
 			} 
 			else 
 			{
-				DEBUGP (DERR,"accept","unable to create network socket");
-                I (TcpConnector)->destroy (&tcp);
+				fprintf (stderr,"accept unable to create network socket\n");
+                MODULE_FUN_NAME(Tcp, destroy)(&tcp);
 			}
 		} 
 		else 
 		{
-			DEBUGP (DERR,"accept","invalid socket to accept from!");
-            I (TcpConnector)->destroy (&tcp);
+			fprintf (stderr,"accept invalid socket to accept from!\n");
+            MODULE_FUN_NAME(Tcp, destroy)(&tcp);
 		}
 	}
 	return tcp;
@@ -408,14 +418,14 @@ T_S MODULE_FUN_NAME(Tcp, listen)(u_int16_t port)
 			} 
 			else 
 			{
-				DEBUGP(DERR,"listen","%s",strerror(errno));
-				I (Socket)->destroy (&sock);
+				fprintf(stderr, "listen %s\n",strerror(errno));
+				MODULE_FUN_NAME(Socket, destroy)(&sock);
 			}
 		} 
 		else 
 		{
-			DEBUGP(DERR,"listen","unable to bind to port %d",port);
-			I (Socket)->destroy (&sock);
+			fprintf(stderr,"listen unable to bind to port %d\n",port);
+			MODULE_FUN_NAME(Socket, destroy)(&sock);
 		}
 	}
 	return sock;
@@ -454,7 +464,7 @@ void  MODULE_FUN_NAME(Tcp, useRecords)(T tcp, int state)
 */
 uint32_t   MODULE_FUN_NAME(Tcp, read)(T tcp, char **buf, uint32_t size)
 {
-    boolean_t dynamicBuffer = FALSE;
+    int dynamicBuffer = FALSE;
     int32_t returnValue = 0, totalReceived = 0, recordSize = 0;
     uint32_t delay = 1000;
     
@@ -462,21 +472,21 @@ uint32_t   MODULE_FUN_NAME(Tcp, read)(T tcp, char **buf, uint32_t size)
 	{
         if (tcp->records) 
 		{
-            DEBUGP(DDEBUG, "_tcpRead", "reading %u bytes with records", size);
+            fprintf(stdout, "_tcpRead reading %u bytes with records\n", size);
 
             if (recv(tcp->sock->skd, &recordSize, sizeof(recordSize), 0) <= 0) 
 			{
-                DEBUGP(DERR, "_tcpRead", "unable to receive record size");
+                fprintf(stderr, "_tcpRead unable to receive record size\n");
                 return 0;
             }
             
-            DEBUGP(DDEBUG, "_tcpRead", "received %u record size", recordSize);
+            fprintf(stdout, "_tcpRead received %u record size\n", recordSize);
             recordSize = ltohel (recordSize); // was sent to us as Little Endian
-            DEBUGP(DDEBUG, "_tcpRead", "converted record size from little endian to host: %u", recordSize);
+            fprintf(stdout, "_tcpRead converted record size from little endian to host: %u\n", recordSize);
             
             if (recordSize > size) 
 			{
-                DEBUGP(DERR, "_tcpRead", "record(%d) is too large for allocated buffer (%d)", recordSize, size);
+                fprintf(stderr, "_tcpRead record(%d) is too large for allocated buffer (%d)\n", recordSize, size);
                 return 0;
             }
         }
@@ -487,7 +497,7 @@ uint32_t   MODULE_FUN_NAME(Tcp, read)(T tcp, char **buf, uint32_t size)
             *buf = (char *) calloc(size+1, sizeof(char));
             if(!*buf) 
 			{
-                DEBUGP (DERR,"_tcpRead","cannot allocate memory for %lu bytes!",(unsigned long)size+1);
+                fprintf (stderr, "_tcpRead cannot allocate memory for %lu bytes!\n",(unsigned long)size+1);
                 return 0;
             }
             (*buf)[size] = '\0';
@@ -498,12 +508,13 @@ uint32_t   MODULE_FUN_NAME(Tcp, read)(T tcp, char **buf, uint32_t size)
 		{
             if((returnValue = recv(tcp->sock->skd, *buf+totalReceived, size-totalReceived, 0)) < 0) 
 			{
-                if(errno == EINTR && !SystemExit) 
+              //  if(errno == EINTR && !SystemExit) 
+                if(errno == EINTR) 
 				{
-                    DEBUGP(DDEBUG, "_tcpRead", "signal interrupted recv() call (%s), retrying", strerror(errno));
+                    fprintf(stdout, "_tcpRead signal interrupted recv() call (%s), retrying\n", strerror(errno));
                     continue;
                 }
-                DEBUGP (DERR,"_tcpRead","tcp socket read error (%s)", strerror(errno));
+                fprintf (stderr, "_tcpRead tcp socket read error (%s)\n", strerror(errno));
                 if(dynamicBuffer) 
 				{
                     free(*buf);
@@ -516,7 +527,7 @@ uint32_t   MODULE_FUN_NAME(Tcp, read)(T tcp, char **buf, uint32_t size)
 			{
                 if(returnValue == 0) 
 				{
-                    DEBUGP(DDEBUG, "_tcpRead", "peer closed the connection");
+                    fprintf(stdout, "_tcpRead peer closed the connection\n");
                     break;		
                 }
 			}
@@ -527,7 +538,7 @@ uint32_t   MODULE_FUN_NAME(Tcp, read)(T tcp, char **buf, uint32_t size)
 
             if(totalReceived < size) 
 			{
-                DEBUGP(DDEBUG, "_tcpRead", "interrupted recv() (%s), retrying", strerror(errno));
+                fprintf(stdout, "_tcpRead interrupted recv() (%s), retrying\n", strerror(errno));
                 usleep (delay);
                 delay *= 2;
             }
@@ -560,10 +571,10 @@ uint32_t MODULE_FUN_NAME(Tcp, write)(T tcp, char  *buf, uint32_t size)
 		{
             uint32_t tmp_size = htolel (size); // send size as Little Endian
 
-            DEBUGP(DDEBUG, "_tcpWrite", "writing %u bytes with records", size);
+            fprintf(stdout, "_tcpWrite writing %u bytes with records\n", size);
             
             if(send(tcp->sock->skd,&tmp_size,sizeof(tmp_size), 0) < 0) {
-                DEBUGP (DERR, "_tcpWrite", "error while sending record size");
+                fprintf (stderr, "_tcpWrite error while sending record size\n");
                 return 0;
             }
         }
@@ -574,7 +585,7 @@ uint32_t MODULE_FUN_NAME(Tcp, write)(T tcp, char  *buf, uint32_t size)
 		{
             if((returnValue = send(tcp->sock->skd, buf+totalSent, size-totalSent, 0)) < 0) 
 			{
-                DEBUGP (DERR, "_tcpWrite", "tcp socket write error (errno %d)", errno);
+                fprintf (stderr, "_tcpWrite tcp socket write error (errno %d)\n", errno);
                 totalSent = 0;
                 break;
 	
@@ -583,7 +594,7 @@ uint32_t MODULE_FUN_NAME(Tcp, write)(T tcp, char  *buf, uint32_t size)
 			{
                 if(returnValue == 0) 
 				{
-                    DEBUGP (DALL, "_tcpWrite", "peer closed the connection");
+                    fprintf(stdout, "_tcpWrite peer closed the connection\n");
                     break;
                 }
 			}
@@ -592,7 +603,7 @@ uint32_t MODULE_FUN_NAME(Tcp, write)(T tcp, char  *buf, uint32_t size)
 	    
             if(totalSent < size) 
 			{
-                DEBUGP (DERR, "_tcpWrite", "interrupted send() (errno %d), retrying", errno);
+                fprintf(stderr, "_tcpWrite interrupted send() (errno %d), retrying\n", errno);
                 usleep (delay);
                 delay *= 2;
             }
