@@ -1,46 +1,55 @@
-/*
- * this implements the tcp interfaces
- *
- *
- */
+
 
 #ifndef __tcp_H__
 #define __tcp_H__
 
+
 #include <netinet/in.h>
+
+#include "module.h"
 #include "socket.h"
 
-typedef struct {
-	socket_t *sock;
+#define T_S Socket_T
+#define T Tcp_T
+typedef struct T *T;
 
-	unsigned char records;	/* boolent_t o or 1 */
+struct T {
+	T_S sock;
 
-	char			*dest_host_name;
-	struct sockaddr_in 	dest_host_addr;
-	uint16_t		dest_host_port;
+    int records;
+    
+	char              *destHostName;
+	struct sockaddr_in destHostAddr;
+	uint16_t           destHostPort;
 
-	char			*src_host_name;
-	struct sockaddr_in	src_host_addr;
-	uint16_t		src_host_port;
+	char              *srcHostName;
+	struct sockaddr_in srcHostAddr;
+	uint16_t           srcHostPort;
+	
+	unsigned char retryCounter;
+    
+};
 
-	unsigned char 	retry_counter;
-} tcp_t;
+#define TCP_CONNECT_TIMEOUT   10 /* wait 10 seconds */
+#define TCP_CONNECT_MAX_RETRY 3
+#define TCP_ACCEPT_MAX_RETRY  3
 
-#define TCP_CONNECT_TIMEOUT	10
-#define TCP_CONNECT_MAX_RETRY	3
-#define TCP_ACCEPT_MAX_RETRY	3
+void MODULE_FUN_NAME(Tcp, destroy)(T *);
+T MODULE_FUN_NAME(Tcp, connect)(const char *host, u_int16_t port);
+T MODULE_FUN_NAME(Tcp, connect2)(const char *host, u_int16_t port, const char *ifname);
+T_S MODULE_FUN_NAME(Tcp, listen)(u_int16_t port);
+T MODULE_FUN_NAME(Tcp, accept)(T_S);
 
-/* tcp interfaces */
-void _destroy_tcp(tcp_t **tcp_ptr);
-tcp_t *_connect_tcp(const char *host, uint16_t port);
-tcp_t *_connect2_tcp(const char *host, uint16_t port, const char *ifname);
-socket_t *_listen_tcp(uint16_t port);
-tcp_t *_accept_tcp(socket_t *);
+void  MODULE_FUN_NAME(Tcp, useRecords)(T , int state);
+int MODULE_FUN_NAME(Tcp, setTimeout)(T , int32_t seconds);
 
-void _use_records_tcp(tcp_t *tcp, unsigned char stat); /* state : 0 or 1 */
-unsigned char _set_timeout_tcp(tcp_t *tcp, int32_t seconds);
+uint32_t MODULE_FUN_NAME(Tcp, read)(T , char **buf, uint32_t size);
+uint32_t MODULE_FUN_NAME(Tcp, write)(T , char  *buf, uint32_t size);
 
-uint32_t _read_tcp(tcp_t *tcp, char **buf, uint32_t size);
-uint32_t _write_tcp(tcp_t *tcp, char *buf, uint32_t size);
+
+#undef T_S
+#undef T
 
 #endif
+
+
