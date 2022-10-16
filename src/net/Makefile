@@ -1,5 +1,5 @@
 
-INC:=-I../../include -I../../include/net
+INC:=-I../../include -I../../include/net -I../../include/data
 
 GCC:=gcc
 
@@ -14,13 +14,17 @@ LIBS:=$(LIBNET)
 NET_SRCS := 	\
 		./socket.c				\
 		./resolve.c				\
-		./udp.c
+		./route.c				\
+		./udp.c					\
+		./tcp.c
 
 
 NET_OBJS := 	\
 		./socket.o				\
 		./resolve.o				\
-		./udp.o
+		./route.o				\
+		./udp.o					\
+		./tcp.o
 
 
 all: $(LIBS)
