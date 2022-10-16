@@ -55,7 +55,8 @@ char *MODULE_FUN_NAME(Resolve, ip2string)(in_addr_t ip)
 
 
 /*
- * interface of host port
+ * interface of host port 
+ * format:  ip:port
  */
 T MODULE_FUN_NAME(HostPort, new)(const char *addr)
 {

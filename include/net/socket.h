@@ -6,8 +6,10 @@
 
 #include <netinet/in.h>
 #include <sys/un.h>
+#include <stdio.h>
 
 #include "module.h"
+
 
 #ifndef IFNAMSIZ
 # define IFNAMSIZ 16
