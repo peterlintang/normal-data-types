@@ -143,4 +143,23 @@ int MODULE_FUN_NAME(QueueA, isEmpty)(T q)
 }
 
 
+/*
+ * name: MODULE_FUN_NAME(QueueA, isFull)
+ * description: is queue is full or not
+ * return value: 1: queue is full
+ * 				0 : queue is not full 
+ * args: @q pointer to queue
+ */
+int MODULE_FUN_NAME(QueueA, isFull)(T q)
+{
+	assert(q);
+
+#define IS_QUEUE_FULL(q)	 \
+	((q->last + 1) % MODULE_FUN_NAME(Array, length)(q->head)  \
+		== q->first % MODULE_FUN_NAME(Array, length)(q->head))
+
+	return IS_QUEUE_FULL(q);
+}
+
+
 
