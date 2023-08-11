@@ -25,11 +25,26 @@ char bt_lename[25 + 3 + 5 + 1]; // 低功耗蓝牙名称
 PairedDevice bt_plist[9];       // 已配对的传统蓝牙 // 注: 蓝牙mac
 int bt_plist_cnt = 0;
 
+int data_count = 0;
 
-static int default_callback(char *data, int len)
+static int default_callback(char *event, char *data, int len)
 {
-	printf("%s: , data: %s\n", __func__, data);
-	printf("%s: , len: %d\n", __func__, len);
+	char *p = NULL;
+
+	if (strncmp(event, "GATTDATA", strlen("GATTDATA")) == 0)
+	{
+		p = strchr(data, ',');
+		if (p)
+		{
+//			if (strncmp(p + 1, "abcdefghijklmnopq", strlen("abcdefghijklmnopq")) == 0)
+				data_count++;
+		}
+	}
+	printf("%s: event name: %s, data_count: %d\n", __func__, event, data_count);
+
+	printf("%s: data: %s\n", __func__, data);
+	printf("%s: len: %d\n", __func__, len);
+
 	return 0;
 }
 
@@ -43,6 +58,22 @@ struct btEvent btEvents[BT_EVENTS_NUM] =
 		{"HFPCID", default_callback},
 		{"HFPCIE", default_callback},
 		{"HFPAUDIO", default_callback},
+		{"HFPSIG", default_callback},
+		{"HFPROAM", default_callback},
+		{"HFPBATT", default_callback},
+		{"HFPNET", default_callback},
+		{"HFPMANU", default_callback},
+		{"HFPNUM", default_callback},
+		{"HFPIBR", default_callback},
+		{"A2DPSTAT", default_callback},
+		{"A2DPDEV", default_callback},
+		{"AVRCPSTAT", default_callback},
+		{"PLAYSTAT", default_callback},
+		{"TRACKSTAT", default_callback},
+		{"TRACKINFO", default_callback},
+		{"PBSTAT", default_callback},
+		{"PBCNT", default_callback},
+		{"PBDATA", default_callback},
 		{"SPPSTAT", default_callback},
 		{"SPPDATA", default_callback},
 		{"GATTSTAT", default_callback},
@@ -63,6 +94,54 @@ int isEvent(char *str, int len)
 
 	return 0;
 }
+
+int BtGetVersion(char *ver, int length)
+{
+	int ret = 0;
+
+	assert(ver && length > 0);
+
+	ret = BTCONTEXT->sendAt("AT+VER", "+VER", ver, length);
+
+	return ret;
+}
+
+int BtGetBaud(char *baud, int length)
+{
+	int ret = 0;
+
+	assert(baud && length > 0);
+
+	ret = BTCONTEXT->sendAt("AT+BAUD", "+BAUD", baud, length);
+
+	return ret;
+}
+
+int BtGetName(char *name, int length)
+{
+	int ret = 0;
+
+	assert(name && length > 0);
+
+	ret = BTCONTEXT->sendAt("AT+NAME", "+NAME", name, length);
+
+	return ret;
+}
+
+int BtSetName(char *name, int length)
+{
+	int ret = 0;
+	char atbuf[128] = { 0 };
+
+	assert(name && length > 0);
+
+	snprintf(atbuf, 128, "AT+NAME=%s", name);
+	ret = BTCONTEXT->sendAt(atbuf, "+NAME", NULL, 0);
+
+	return ret;
+}
+
+
 
 // 透传数据回调(不需要用户注册)
 int on_gattdata(const char *urc, char *buf, int len) {
@@ -252,8 +331,12 @@ int bt_init() {
 
     // todo： 设置配对模式和密码
 
+	char version[264] = { 0 };
+	char name[128] = { 0 };
+
     pln("bt_init ...");
     BtContext *ctx = BtContext::getInstance();
+
 
     if (!bt_at())
         return -1;
@@ -261,18 +344,25 @@ int bt_init() {
     int res = 0;
     res = ctx->sendAt("AT+TPMODE", "+TPMODE");
     if (res != AtStOk) {
-        return -1;
+  //      return -1;
     }
     res = ctx->sendAt("AT+TPMODE=0");
     if (res != AtStOk) {
-        return -1;
+//        return -1;
     }
 
     bt_get_ver();
     bt_set_name("GolfCar");
 
+    BtGetName(name, 128);
+    fprintf(stdout, "name: %s\n", name);
+
     bt_read_st();
     bt_read_paired();
+
+    BtGetVersion(version, 260);
+    fprintf(stdout, "get version: %s\n", version);
+
 
     // test
     // bt_reboot();

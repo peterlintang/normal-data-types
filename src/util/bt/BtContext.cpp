@@ -86,15 +86,16 @@ static int isError(char *data, int len)
                         return 0;
 }
 
-static int parse(char data)
+static inline int parse(char data)
 {
-	static char responseBuf[UART_DATA_BUF_LEN] = { 0 };
+	static char responseBuf[260] = { 0 };
 	static int responseLen = 0;
 	static int begin_cr = 0;
 	static int begin_lf = 0;
 	static int end_cr = 0;
 	static int end_lf = 0;
 
+//rintf("%s: data: %02x\n", __func__, data);
 	if (begin_cr == 0)
 	{
 		if (data == CR)
@@ -104,7 +105,7 @@ static int parse(char data)
 		}
 		else
 		{
-			fprintf(stderr, "parse error: %d %d %d %d %x\n", begin_cr, begin_lf,  end_cr, end_lf, data);
+//	fprintf(stderr, "%d parse error: %d %d %d %d %02x\n", __LINE__, begin_cr, begin_lf,  end_cr, end_lf, data);
 			return -1;
 		}
 	}
@@ -118,7 +119,7 @@ static int parse(char data)
 		}
 		else
 		{
-			fprintf(stderr, "parse error: %d %d %d %d %x\n", begin_cr, begin_lf,  end_cr, end_lf, data);
+//	fprintf(stderr, "%d parse error: %d %d %d %d %02x\n", __LINE__, begin_cr, begin_lf,  end_cr, end_lf, data);
 			begin_cr = 0;
 			return -1;
 		}
@@ -159,7 +160,7 @@ static int parse(char data)
 					for (i = 0; i < BT_EVENTS_NUM; i++)
 					{
 						if (strncmp(responseBuf + 1, btEvents[i].name, strlen(btEvents[i].name)) == 0)
-							btEvents[i].callback(responseBuf, responseLen);
+							btEvents[i].callback(btEvents[i].name, responseBuf, responseLen);
 					}
 				}
 				else if((isOk(responseBuf, responseLen) == 1) || (isError(responseBuf, responseLen) == 1))
@@ -200,13 +201,13 @@ static int parse(char data)
 			}
 			else
 			{
-				fprintf(stderr, "parse error: %d %d %d %d %x\n", begin_cr, begin_lf,  end_cr, end_lf, data);
+		//fprintf(stderr, "%d parse error: %d %d %d %d %02x\n", __LINE__, begin_cr, begin_lf,  end_cr, end_lf, data);
 				return -1;
 			}
 		}
 		else 
 		{
-			fprintf(stderr, "should not be here! parse error: %d %d %d %d %x\n", begin_cr, begin_lf,  end_cr, end_lf, data);
+	//fprintf(stderr, "%d should not be here! parse error: %d %d %d %d %02x\n", __LINE__, begin_cr, begin_lf,  end_cr, end_lf, data);
 			return -1;
 		}
 		responseBuf[responseLen++] = data;
@@ -214,7 +215,7 @@ static int parse(char data)
 	}
 	else
 	{
-		fprintf(stderr, "parse error: %d %d %d %d %x\n", begin_cr, begin_lf,  end_cr, end_lf, data);
+	//printf(stderr, "%d parse error: %d %d %d %d %02x\n", __LINE__, begin_cr, begin_lf,  end_cr, end_lf, data);
 		begin_cr = 0;
 		begin_lf = 0;
 		return -1;
@@ -228,12 +229,13 @@ static int parse(char data)
  * 参数：data 待解析数据，
  * 返回值：实际解析的长度
  */
-static int parseCodes(char *data, int len) 
+static int parseCodes(char *data, int len)
 {
-	int i; 
+	int i;
 
 	for (i = 0; i < len; i++)
 	{
+//printf("%s: i: %d, data: %02x\n", __func__, i, data[i]);
 		parse(data[i]);
 	}
 
@@ -473,6 +475,11 @@ int BtContext::sendAt(const char *pData,
 		if (strncmp(urc, mDataBufPtr, strlen(urc)) == 0)
 		{
 			fprintf(stdout, "%s: %s, %s, %d, %d, %d\n", __func__, mDataBufPtr, mDataBufPtr + strlen(urc), mDataBufLen, strlen(OK), strlen(urc));
+			if (pValue && valueLen > (mDataBufLen - strlen(OK)))
+			{
+				memcpy(pValue, mDataBufPtr, mDataBufLen - strlen(OK));
+				pValue[mDataBufLen - strlen(OK)] = '\0';
+			}
 			//memcpy(pValue , mDataBufPtr + strlen(urc), mDataBufLen - strlen(OK) - strlen(urc));
 			//pValue[mDataBufLen - strlen(OK) - strlen(urc)] = '\0';
 			//fprintf(stdout, "%s: %s\n", __func__, pValue);
@@ -554,7 +561,7 @@ bool BtContext::readyToRun() {
 bool BtContext::threadLoop() 
 {
 	int readNum = 0;
-	char buffer[UART_DATA_BUF_LEN] = { 0 };
+	char buffer[230] = { 0 };
 
     if (reOpening) 
 	{
@@ -564,14 +571,36 @@ bool BtContext::threadLoop()
 
     if (mIsOpen) 
 	{
-        readNum = read(mUartID, buffer, UART_DATA_BUF_LEN);
+        readNum = read(mUartID, buffer, 230);
         if (readNum <= 0) {
             Thread::sleep(50);
             return true;
         }
 
 
-        pln("ttyS2 rx %d, get all:%d %s", readNum, mDataBufLen, mDataBufPtr);
+        pln("ttyS2 rx %d, %s", readNum, buffer);
+      /*
+      {
+    	fprintf(stdout, "origin data: %d\n", readNum);
+        int ret = 0;
+        int len = 0;
+        char buf_tmp[1024] = { 0 };
+        for (int i = 0; i < readNum; i++)
+        {
+                ret = sprintf(&(buf_tmp[len]), "%02x ", buffer[i]);
+                len += ret;
+//                fprintf(stdout, "ret: %d, len: %d\n", ret, len);
+                if ((i + 1) % 16 == 0)
+                {
+                        ret = sprintf(&(buf_tmp[len]), "%s", "\n");
+                        len += ret;
+//                fprintf(stdout, "ret: %d, len: %d\n", ret, len);
+                }
+        }
+        fprintf(stdout, "%s", buf_tmp);
+        fprintf(stdout, "origin data: end\n");
+      }
+      */
 
 		parseCodes(buffer, readNum);
 

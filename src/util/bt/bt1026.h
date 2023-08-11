@@ -117,10 +117,10 @@ extern UrcCbItem urc_callbacks[];
 int on_gattdata(const char *urc, char *buf, int len);
 // void cb_plist(const char *urc, const char *value);
 
-#define BT_EVENTS_NUM 12
+#define BT_EVENTS_NUM 28
 struct btEvent {
 	const char *name;
-	int (*callback)(char *data, int len);
+	int (*callback)(char *name, char *data, int len);
 };
 
 extern struct btEvent btEvents[];
