@@ -90,7 +90,7 @@ int ibe_recve_cmd(int sock_fd, unsigned char *recv_buf, int recv_buf_len)
 	}
 	fprintf(stdout, "\n");
 
-	return left + PACK_HEADER_SIZE + COMMAND_HEADER_SIZE;
+	return cmdHead->DataLen + PACK_HEADER_SIZE + COMMAND_HEADER_SIZE;
 }
 
 int ibe_send_request(int sock_fd, int cmd, unsigned char *data, int data_len)
