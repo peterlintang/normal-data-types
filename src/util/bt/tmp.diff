@@ -1,0 +1,284 @@
+diff --git a/src/util/bt/bt_context.c b/src/util/bt/bt_context.c
+index 105a738..23327b6 100644
+--- a/src/util/bt/bt_context.c
++++ b/src/util/bt/bt_context.c
+@@ -1,8 +1,6 @@
+ /*
+- * BtContext.cpp
+- *
+- * 串口: BT
+  */
++
+ #include <stdio.h>
+ #include <unistd.h>
+ #include <fcntl.h>
+@@ -11,28 +9,26 @@
+ #include <sys/ioctl.h>
+ #include <sys/time.h>
+ #include <pthread.h>
+-#include "utils/Log.h"
+-#include "bt1026.h"
+-#include "BtContext.h"
+-
+-// #include <vector>
+-// #include <string.h>
+-// #include <system/Mutex.h>
+-// #include "CommDef.h"
+-// #include "ProtocolData.h"
+ 
+-#define UART_DATA_BUF_LEN 16384 // 16KB
+ 
+-volatile AtStat at_sending = AtStIdle;
+ 
+-pthread_cond_t  btCond;
+-pthread_mutex_t btLock;
+-pthread_mutex_t btLock2;
++int serial_init(char *dev, int baud)
++{
++	int ret = 0;
++	return ret;
++}
+ 
++int serial_deinit(void )
++{
++	int ret = 0;
++	return ret;
++}
+ 
+-// 用于拼接缓存数据，可能存在上一包数据解析未完全，残留有数据
+-char *mDataBufPtr = NULL;
+-int mDataBufLen = 0;
++int serial_change_baud(int baud)
++{
++	int ret = 0;
++	return ret;
++}
+ 
+ static const char *getBaudRate(UINT baudRate) {
+     struct {
+@@ -61,29 +57,21 @@ static const char *getBaudRate(UINT baudRate) {
+     return NULL;
+ }
+ 
+-int isDataUrc(const char *pData) {
+-    if (strncmp(pData + 2, "+GATTDATA", strlen("+GATTDATA")) == 0) {
+-        return 9;
+-    } else if (strncmp(pData + 2, "+SSPDATA", strlen("+SSPDATA")) == 0) {
+-        return 8;
+-    }
+-    return 0;
+-}
+ 
+ static int isOk(char *data, int len)
+ {
+-        if (strcmp(data, "OK") == 0)
+-                        return 1;
+-        else
+-                        return 0;
++	if (strcmp(data, "OK") == 0)
++		return 1;
++	else
++		return 0;
+ }
+ 
+ static int isError(char *data, int len)
+ {
+-        if (strcmp(data, "ERROR") == 0)
+-                        return 1;
+-        else
+-                        return 0;
++	if (strcmp(data, "ERROR") == 0)
++		return 1;
++	else
++		return 0;
+ }
+ 
+ static int parse(char data)
+@@ -240,57 +228,17 @@ static int parseCodes(char *data, int len)
+ 	return 0;
+ }
+ 
+-// BtContext::BtContext(EnumUartId uartNum) :
+-BtContext::BtContext() :
+-    mIsOpen(false),
+-    reOpening(false),
+-    mUartID(0)
+-// ,mUartNumber(uartNum)
+-{
+ 		pthread_cond_init(&btCond, NULL);
+ 		pthread_mutex_init(&btLock, NULL);
+ 		pthread_mutex_init(&btLock2, NULL);
+-}
+ 
+-BtContext::~BtContext() 
+-{
+-    delete[] mDataBufPtr;
+-    mDataBufPtr = NULL;
+-    mDataBufLen = 0;
+-    closeUart();
+ 	pthread_cond_destroy(&btCond);
+ 	pthread_mutex_destroy(&btLock);
+ 	pthread_mutex_destroy(&btLock2);
+-}
+ 
+-BtContext *BtContext::getInstance() 
+-{
+-    static BtContext sUC;
+-    return &sUC;
+-}
+ 
+-UINT BtContext::nextBaud() 
++int openUart(const char *pFileName, UINT baudRate) 
+ {
+-    UINT baudRate = B115200;
+-
+-    switch (mBaudRate) {
+-    case B9600:
+-        baudRate = B115200;
+-        break;
+-    case B115200:
+-        baudRate = B9600;
+-        break;
+-    // case B921600:
+-    //     baudRate = B9600;
+-    //     break;
+-    default:
+-        break;
+-    }
+-    return baudRate;
+-}
+-
+-// 指定波特率打开串口(若指定0则使用下一个波特率)
+-bool BtContext::openUart(const char *pFileName, UINT baudRate) {
+     if (mIsOpen) {
+         // AT握手时需要用不同波特率 reopen
+         pln("reopen ...");
+@@ -341,7 +289,8 @@ bool BtContext::openUart(const char *pFileName, UINT baudRate) {
+     return mIsOpen;
+ }
+ 
+-void BtContext::closeUart() {
++int closeUart() 
++{
+     LOGD("closeUart mIsOpen: %d...\n", mIsOpen);
+     if (mIsOpen) {
+         requestExit();
+@@ -353,7 +302,7 @@ void BtContext::closeUart() {
+     }
+ }
+ 
+-bool BtContext::send(const char *pData, int len) 
++int send(const char *pData, int len) 
+ {
+ 	int ret = 0;
+ 	int sent = 0;
+@@ -382,7 +331,7 @@ bool BtContext::send(const char *pData, int len)
+     return true;
+ }
+ 
+-int BtContext::sendAt(const char *pData,
++int sendAt(const char *pData,
+                   const char *urc = NULL, 
+ 				  char *pValue = NULL, 
+ 				  int valueLen = 0) 
+@@ -494,90 +443,20 @@ err1:
+     return ret;
+ }
+ 
+-int BtContext::sendBlk(const char *pData, int blk_len) {
+-    assert(blk_len <= 241);
+-    char send_buf[512] = "";
+-
+-    int slen = sprintf(send_buf, "AT+GATTSEND=%d,", blk_len);
+-    memcpy(send_buf + slen, pData, blk_len);
+-
+-    logw("sendBlk %d %s %d", blk_len, pData, slen);
+-
+-    int len = slen + blk_len;
+-    int res = AtStWaiting;
+-    strcpy(at_urc_kw, "OK");
+-    at_urc_values[0] = 0;
+-
+-    assert(len + 2 < 1024);
+-    send_buf[len] = '\r';
+-    send_buf[len + 1] = '\n';
+-    send_buf[len + 2] = 0;
+-    pln("ttyS2 tx %s", send_buf);
+-    at_sending = AtStWaiting;
+-    if (!this->send(send_buf, len + 2)) {
+-        at_sending = AtStIdle;
+-        return AtStFalt;
+-    }
+-
+-    // 等待响应 1s
+-    for (int i = 0; i < 20; i++) {
+-        if (at_sending == AtStOk) {
+-            res = at_sending;
+-            break;
+-        } else if (at_sending == AtStErr) {
+-            res = at_sending;
+-            break;
+-        }
+-        Thread::sleep(50);
+-    }
+-    if (at_sending == AtStWaiting) {
+-        res = AtStTimeout;
+-    }
+-
+-    at_sending = AtStIdle;
+-
+-    return res;
+-}
+-
+-bool BtContext::readyToRun() {
+-    if (mDataBufPtr == NULL) {
+-        mDataBufPtr = new char[UART_DATA_BUF_LEN];
+-    }
+-
+-    if (mDataBufPtr == NULL) {
+-        closeUart();
+-    }
+-
+-    return (mDataBufPtr != NULL);
+-}
+-
+-bool BtContext::threadLoop() 
++static int process_data(void *priv)
+ {
+-	int readNum = 0;
+-	char buffer[UART_DATA_BUF_LEN] = { 0 };
++#define UART_DATA_BUF_LEN 1024
+ 
+-    if (reOpening) 
+-	{
+-        Thread::sleep(50);
+-        return true;
+-    }
+-
+-    if (mIsOpen) 
+-	{
+-        readNum = read(mUartID, buffer, UART_DATA_BUF_LEN);
+-        if (readNum <= 0) {
+-            Thread::sleep(50);
+-            return true;
+-        }
+-
+-
+-        pln("ttyS2 rx %d, get all:%d %s", readNum, mDataBufLen, mDataBufPtr);
+-
+-		parseCodes(buffer, readNum);
++	int len = 0;
++	char buffer[UART_DATA_BUF_LEN] = { 0 };
+ 
++	len = read(, buffer, UART_DATA_BUF_LEN);
++	if (len <= 0) {
++		fprintf(stderr, "%s: read error %s\n", __func__, strerror(errno));
++		return NULL;
++	}
+ 
+-        return true;
+-    }
++	parseCodes(buffer, len);
+ 
+     return false;
+ }
