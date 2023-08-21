@@ -98,6 +98,7 @@ bool bt_get_mac();
 int parseInts(char *input, int arr[], int size);
 bool bt_read_st();
 bool bt_read_paired();
+bool bt_take_photo(void);
 
 bool bt_sw(int on);
 bool bt_set_name(const char *newname);
@@ -126,5 +127,14 @@ struct btEvent {
 extern struct btEvent btEvents[];
 
 int isEvent(char *str, int len);
+
+/*
+ * 组装应用层数据并通过蓝牙发送
+ * cmd: 命令字
+ * pdata: 用户数据
+ * datalen: 数据长度
+ * timeout: 等待蓝牙没包发送的超时时间，单位ms
+ */
+int ble_send_data(int cmd, unsigned char *pdata, short datalen, int timeout);
 
 #endif

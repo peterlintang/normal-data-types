@@ -355,7 +355,7 @@ void BtContext::closeUart() {
     }
 }
 
-bool BtContext::send(const char *pData, int len) 
+int BtContext::send(const char *pData, int len)
 {
 	int ret = 0;
 	int sent = 0;
@@ -387,16 +387,18 @@ bool BtContext::send(const char *pData, int len)
 int BtContext::sendAt(const char *pData,
                   const char *urc = NULL, 
 				  char *pValue = NULL, 
-				  int valueLen = 0) 
+				  int valueLen = 0,
+				  int dataLen = 0,
+				  int timeout = 100)
 {
     char send_buf[1024] = {0};
     int len = 0; 
     int ret = 0;
 	struct timeval  now;
 	struct timespec to;
-	int timeout_ms = 3000;
+	int timeout_ms = timeout;
 
-	len = strlen(pData);
+	len = dataLen;
 
     assert(len + 2 <= 1024);
 
@@ -404,7 +406,7 @@ int BtContext::sendAt(const char *pData,
     send_buf[len] = '\r';
     send_buf[len + 1] = '\n';
 
-    pln("ttyS2 tx %s", send_buf);
+//    pln("ttyS2 tx %s", send_buf);
 
 	pthread_mutex_lock(&btLock2);
 
@@ -414,23 +416,32 @@ int BtContext::sendAt(const char *pData,
 		goto err1;
     }
 
-	pthread_mutex_lock(&btLock);
 
-	gettimeofday(&now, NULL);
 
-	to.tv_sec = now.tv_sec + timeout_ms / 1000;
-	to.tv_nsec = (now.tv_usec * 1000) + (timeout_ms % 1000 * 1000000);
-	if (to.tv_nsec >= 1000000000) 
-	{
-		to.tv_sec += 1;
-		to.tv_nsec %= 1000000000;
-	}
+    pthread_mutex_lock(&btLock);
 
-	if (pthread_cond_timedwait(&btCond, &btLock, (const struct timespec *)&to) != 0)
-	{
-		ret = -2;
-		goto err2;
-	}
+    fprintf(stdout, "%s no wait timeout_ms: %d\n", __func__, timeout_ms);
+    if (timeout_ms <= 0)
+    {
+    	goto out;
+    }
+
+    gettimeofday(&now, NULL);
+
+    to.tv_sec = now.tv_sec + timeout_ms / 1000;
+    to.tv_nsec = (now.tv_usec * 1000) + (timeout_ms % 1000 * 1000000);
+    if (to.tv_nsec >= 1000000000)
+    {
+    	to.tv_sec += 1;
+    	to.tv_nsec %= 1000000000;
+    }
+
+    if (pthread_cond_timedwait(&btCond, &btLock, (const struct timespec *)&to) != 0)
+    {
+    	ret = -2;
+    	goto err2;
+    }
+
 
 	/*
 	for (int i = 0; i < mDataBufLen; i++)
@@ -492,6 +503,7 @@ int BtContext::sendAt(const char *pData,
 		}
 	}
 
+out:
 err2:
 	memset(mDataBufPtr, 0, UART_DATA_BUF_LEN);
 	mDataBufLen = 0;
@@ -501,15 +513,27 @@ err1:
     return ret;
 }
 
-int BtContext::sendBlk(const char *pData, int blk_len) {
+int BtContext::sendBlk(const char *pData, int blk_len, int timeout = 100)
+{
     assert(blk_len <= 241);
+    int ret = 0;
     char send_buf[512] = "";
 
     int slen = sprintf(send_buf, "AT+GATTSEND=%d,", blk_len);
     memcpy(send_buf + slen, pData, blk_len);
 
-    logw("sendBlk %d %s %d", blk_len, pData, slen);
+//    logw("sendBlk %d %s %d", blk_len, pData, slen);
 
+    ret = this->sendAt(send_buf, NULL, NULL, 0, slen + blk_len, timeout);
+    if (ret != 0)
+    {
+    	fprintf(stdout, "%s send data error %d\n", __func__, ret);
+    	return AtStErr;
+    }
+
+    return AtStOk;
+
+    /*
     int len = slen + blk_len;
     int res = AtStWaiting;
     strcpy(at_urc_kw, "OK");
@@ -519,12 +543,15 @@ int BtContext::sendBlk(const char *pData, int blk_len) {
     send_buf[len] = '\r';
     send_buf[len + 1] = '\n';
     send_buf[len + 2] = 0;
-    pln("ttyS2 tx %s", send_buf);
+//    pln("ttyS2 tx %s", send_buf);
     at_sending = AtStWaiting;
     if (!this->send(send_buf, len + 2)) {
         at_sending = AtStIdle;
         return AtStFalt;
     }
+
+
+    return AtStOk;
 
     // 等待响应 1s
     for (int i = 0; i < 20; i++) {
@@ -544,6 +571,7 @@ int BtContext::sendBlk(const char *pData, int blk_len) {
     at_sending = AtStIdle;
 
     return res;
+    */
 }
 
 bool BtContext::readyToRun() {

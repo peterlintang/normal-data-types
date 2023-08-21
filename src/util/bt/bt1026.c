@@ -1,4 +1,5 @@
 
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -428,6 +429,21 @@ bool bt_get_ver() {
     return AtStOk == BTCONTEXT->sendAt("AT+VER", "+VER", bt_vers, sizeof(bt_vers));
 }
 
+bool bt_take_photo(void)
+{
+    int ret = 0;
+    char buf[128] = {0};
+
+    ret = snprintf(buf, 128, "AT+HIDCMD=");
+    buf[ret + 1] = 0xE9;
+    buf[ret + 2] = 0x0D;
+    buf[ret + 3] = 0x0A;
+    buf[ret + 4] = '\0';
+
+    return BTCONTEXT->send(buf, ret + 4);
+}
+
+
 bool bt_get_mac() {
     // AT+ADDR
     // AT+LEADDR
@@ -573,4 +589,96 @@ bool bt_set_autoconn(int cnt) {
     char cmd_buf[32];
     sprintf(cmd_buf, "AT+AUTOCONN=%d", cnt);
     return AtStOk == BTCONTEXT->sendAt(cmd_buf);
+}
+
+static unsigned char checksumBCC(uint8_t* data, int length)
+{
+    uint8_t checksum = 0;
+    for (int i = 0; i < length; i++) {
+        checksum ^= data[i];
+    }
+    return checksum;
+}
+
+int bt_send_raw(const char *data, int len, int timeout)
+{
+    return BTCONTEXT->sendBlk(data, len, timeout);
+}
+
+
+int ble_send_data(int cmd, uint8_t *pdata, short datalen, int timeout)
+{
+#define PACKET_SIZE 100
+    int packets = 0;
+    int left_data = 0;
+    int data_index = 0;
+    unsigned char buf[512] = {0};
+    unsigned char crc = 0;
+
+    // for (int i = 0; i < datalen; i++)
+    // {
+    //         fprintf(stdout, "%02x ", pdata[i]);
+    //         if ((i + 1) % 16 == 0)
+    //                 fprintf(stdout, "\n");
+    // }
+    // fprintf(stdout, "\n");
+
+    crc = checksumBCC(pdata, datalen);
+    packets = (6 + datalen + PACKET_SIZE - 1) / PACKET_SIZE;
+    if (packets == 1)
+    {
+        left_data = datalen;
+    }
+    else
+    {
+        left_data = (6 + datalen) % PACKET_SIZE;
+    }
+    printf("packets = %d,left = %d\n", packets, left_data);
+
+    for (int i = 0; i < packets; i++)
+    {
+        printf("cur packets = %d\n", i+1);
+        int buf_idx = 0;
+        int blk_len = PACKET_SIZE;
+        if (i == 0)
+        {
+            buf[0] = 0xff;
+            buf[1] = 0xFF & datalen;
+            buf[2] = (datalen >> 8) & 0xFF;
+            buf[3] = cmd;
+            buf[4] = packets;
+            buf[5] = crc;
+            buf_idx = 6;
+            blk_len -= 6;
+        }
+
+        if (i == packets - 1)
+        {
+            blk_len = left_data;
+        }
+
+        // printf("packets = %d,left === %d\n",packets,left_data);
+        memcpy(buf + buf_idx, pdata + data_index, blk_len);
+        data_index += blk_len;
+
+        int res = bt_send_raw((const char *)buf, buf_idx + blk_len, timeout);
+        if(res != AtStOk)
+        {
+             loge("send failed bt_send_raw = %d\n",res);
+             return -1;
+        }
+        usleep(100 * 1);
+        // printf("\n");
+            // for(int j = 0; j < buf_idx + blk_len; j++)
+            // {
+            //     printf("%02x ",buf[j]);
+            //     if((j+1) % 16 ==0)
+            //     {
+            //             printf("\n");
+        //     }
+        // }
+        // printf("\n");
+    }
+
+    return datalen;
 }

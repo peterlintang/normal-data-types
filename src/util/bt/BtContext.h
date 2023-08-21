@@ -29,10 +29,10 @@ public:
         return mIsOpen;
     }
 
-    bool send(const char *pData, int len);
+    int send(const char *pData, int len);
     int sendAt(const char *pData,
-               const char *urc = NULL, char *pValue = NULL, int valueLen = 0);
-    int sendBlk(const char *pData, int blk_len);
+               const char *urc = NULL, char *pValue = NULL, int valueLen = 0, int dataLen = 0, int timeout = 100);
+    int sendBlk(const char *pData, int blk_len, int timeout = 100);
 
 protected:
     virtual bool
