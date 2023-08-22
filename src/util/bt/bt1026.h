@@ -1,3 +1,7 @@
+
+/*
+ * comminucat with bluetooth module
+ */
 #ifndef BT1026_H
 #define BT1026_H
 
