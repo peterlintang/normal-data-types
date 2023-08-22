@@ -21,6 +21,7 @@
 // #include "CommDef.h"
 // #include "ProtocolData.h"
 
+#define DEBUG
 #define UART_DATA_BUF_LEN 16384 // 16KB
 
 volatile AtStat at_sending = AtStIdle;
@@ -152,7 +153,9 @@ static inline int parse(char data)
 				}
 				fprintf(stdout, "\n");
 				*/
-
+#ifdef DEBUG
+				fprintf(stdout, ">> %s\n", responseBuf);
+#endif
 				if (isEvent(responseBuf, responseLen) == 1)
 				{
 					int i;
@@ -172,10 +175,17 @@ static inline int parse(char data)
 //					memcpy(mDataBufPtr + mDataBufLen , &tmp, 1);
 //					mDataBufLen += 1;
 					mDataBufPtr[mDataBufLen ] = '\0';
-
+#ifdef DEBUG
 					fprintf(stdout, "%s: %s\n", __func__, mDataBufPtr);
 					fprintf(stdout, "%s: %d\n", __func__, mDataBufLen );
-
+					for (int i = 0; i < mDataBufLen; i++)
+					{
+						fprintf(stdout, "%02x ", mDataBufPtr[i]);
+						if ((i + 1) % 16 == 0)
+							fprintf(stdout, "\n");
+					}
+					fprintf(stdout, "\n");
+#endif
 					pthread_cond_broadcast(&btCond);
 
 					pthread_mutex_unlock(&btLock);
@@ -385,11 +395,11 @@ int BtContext::send(const char *pData, int len)
 }
 
 int BtContext::sendAt(const char *pData,
-                  const char *urc = NULL, 
-				  char *pValue = NULL, 
-				  int valueLen = 0,
-				  int dataLen = 0,
-				  int timeout = 100)
+                  const char *urc,
+				  char *pValue,
+				  int valueLen,
+				  int dataLen,
+				  int timeout)
 {
     char send_buf[1024] = {0};
     int len = 0; 
@@ -405,8 +415,19 @@ int BtContext::sendAt(const char *pData,
     memcpy(send_buf, pData, len);
     send_buf[len] = '\r';
     send_buf[len + 1] = '\n';
+    send_buf[len + 2] = '\0';
 
-//    pln("ttyS2 tx %s", send_buf);
+#ifdef DEBUG
+    fprintf(stdout, "<< %s\n", send_buf);
+    for (int i = 0; i < len + 2; i++)
+    {
+    	fprintf(stdout, "%02x ", send_buf[i]);
+    	if ((i + 1) % 16 == 0)
+    		fprintf(stdout, "\n");
+    }
+    fprintf(stdout, "\n");
+    fprintf(stdout, "%s wait timeout_ms: %d\n", __func__, timeout_ms);
+#endif
 
 	pthread_mutex_lock(&btLock2);
 
@@ -420,7 +441,6 @@ int BtContext::sendAt(const char *pData,
 
     pthread_mutex_lock(&btLock);
 
-    fprintf(stdout, "%s no wait timeout_ms: %d\n", __func__, timeout_ms);
     if (timeout_ms <= 0)
     {
     	goto out;
@@ -442,23 +462,9 @@ int BtContext::sendAt(const char *pData,
     	goto err2;
     }
 
-
-	/*
-	for (int i = 0; i < mDataBufLen; i++)
-	{
-		fprintf(stdout, "%02x ", mDataBufPtr[i]);
-		if ((i + 1) % 16 == 0)
-			fprintf(stdout, "\n");
-	}
-	fprintf(stdout, "\n");
-
-	fprintf(stdout, "\n1111\n");
-	fprintf(stdout, "%s, %d, %d, %s, %s\n", mDataBufPtr, mDataBufLen, strlen(OK), mDataBufPtr + mDataBufLen - strlen(OK) - 1, OK);
-	fprintf(stdout, "\n1111\n");
-	*/
-
 	if (strncmp(mDataBufPtr + mDataBufLen - strlen(OK), OK, strlen(OK)) == 0)
 	{
+#ifdef DEBUG
 		fprintf(stdout, "cmd response: %s, len: %d\n", mDataBufPtr, mDataBufLen);
 		for (int i = 0; i < mDataBufLen; i++)
 		{
@@ -467,6 +473,7 @@ int BtContext::sendAt(const char *pData,
 				fprintf(stdout, "\n");
 		}
 		fprintf(stdout, "\n");
+#endif
 
 	}
 	else if (strncmp(mDataBufPtr + mDataBufLen - strlen(ERROR), ERROR, strlen(ERROR)) == 0)
@@ -485,11 +492,36 @@ int BtContext::sendAt(const char *pData,
 	{
 		if (strncmp(urc, mDataBufPtr, strlen(urc)) == 0)
 		{
-			fprintf(stdout, "%s: %s, %s, %d, %d, %d\n", __func__, mDataBufPtr, mDataBufPtr + strlen(urc), mDataBufLen, strlen(OK), strlen(urc));
-			if (pValue && valueLen > (mDataBufLen - strlen(OK)))
+			int copy_len = (mDataBufLen - strlen(urc) - strlen(OK) - 1) - 1;
+			if (pValue && valueLen >= copy_len)
 			{
-				memcpy(pValue, mDataBufPtr, mDataBufLen - strlen(OK));
-				pValue[mDataBufLen - strlen(OK)] = '\0';
+				memcpy(pValue, mDataBufPtr + strlen(urc) + 1, copy_len);
+				pValue[copy_len] = '\0';
+
+#ifdef DEBUG
+				fprintf(stdout, "%s pValue: %s, len: %d\n", __func__, pValue, copy_len);
+				for (int i = 0; i < copy_len; i++)
+				{
+					fprintf(stdout, "%02x ", pValue[i]);
+					if ((i + 1) % 16 == 0)
+						fprintf(stdout, "\n");
+				}
+				fprintf(stdout, "\n");
+#endif
+
+			}
+			else
+			{
+				fprintf(stdout, "%s: %s, %s, %d, %d, %d\n",
+						__func__,
+						mDataBufPtr,
+						mDataBufPtr + strlen(urc),
+						mDataBufLen,
+						strlen(OK),
+						strlen(urc));
+
+				fprintf(stderr, "%s: pValue: %p, valueLen: %d, mDataBufLen: %d\n",
+									__func__, pValue, valueLen, (mDataBufLen - strlen(urc) - strlen(OK) - 1));
 			}
 			//memcpy(pValue , mDataBufPtr + strlen(urc), mDataBufLen - strlen(OK) - strlen(urc));
 			//pValue[mDataBufLen - strlen(OK) - strlen(urc)] = '\0';
@@ -513,7 +545,7 @@ err1:
     return ret;
 }
 
-int BtContext::sendBlk(const char *pData, int blk_len, int timeout = 100)
+int BtContext::sendBlk(const char *pData, int blk_len, int timeout)
 {
     assert(blk_len <= 241);
     int ret = 0;
@@ -600,40 +632,28 @@ bool BtContext::threadLoop()
     if (mIsOpen) 
 	{
         readNum = read(mUartID, buffer, 230);
-        if (readNum <= 0) {
+        if (readNum <= 0)
+        {
             Thread::sleep(50);
             return true;
         }
 
-
-        pln("ttyS2 rx %d, %s", readNum, buffer);
-      /*
+#ifdef DEBUG
+      fprintf(stdout, "ttyS2 rx %d, %s", readNum, buffer);
+      for (int i = 0; i < readNum; i++)
       {
-    	fprintf(stdout, "origin data: %d\n", readNum);
-        int ret = 0;
-        int len = 0;
-        char buf_tmp[1024] = { 0 };
-        for (int i = 0; i < readNum; i++)
-        {
-                ret = sprintf(&(buf_tmp[len]), "%02x ", buffer[i]);
-                len += ret;
-//                fprintf(stdout, "ret: %d, len: %d\n", ret, len);
-                if ((i + 1) % 16 == 0)
-                {
-                        ret = sprintf(&(buf_tmp[len]), "%s", "\n");
-                        len += ret;
-//                fprintf(stdout, "ret: %d, len: %d\n", ret, len);
-                }
-        }
-        fprintf(stdout, "%s", buf_tmp);
-        fprintf(stdout, "origin data: end\n");
+    	  fprintf(stdout, "%02x ", buffer[i]);
+    	  if ((i + 1) % 16 == 0)
+    	  {
+    		  fprintf(stdout, "\n");
+    	  }
       }
-      */
+      fprintf(stdout, "\n");
+#endif
 
-		parseCodes(buffer, readNum);
+      parseCodes(buffer, readNum);
 
-
-        return true;
+      return true;
     }
 
     return false;

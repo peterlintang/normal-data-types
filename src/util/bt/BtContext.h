@@ -31,8 +31,8 @@ public:
 
     int send(const char *pData, int len);
     int sendAt(const char *pData,
-               const char *urc = NULL, char *pValue = NULL, int valueLen = 0, int dataLen = 0, int timeout = 100);
-    int sendBlk(const char *pData, int blk_len, int timeout = 100);
+               const char *urc, char *pValue, int valueLen, int dataLen, int timeout);
+    int sendBlk(const char *pData, int blk_len, int timeout);
 
 protected:
     virtual bool

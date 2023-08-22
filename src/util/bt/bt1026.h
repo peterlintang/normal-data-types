@@ -115,10 +115,10 @@ typedef struct
 
 extern UrcCbItem urc_callbacks[];
 
-int on_gattdata(const char *urc, char *buf, int len);
+int on_gattdata(char *urc, char *buf, int len);
 // void cb_plist(const char *urc, const char *value);
 
-#define BT_EVENTS_NUM 28
+#define BT_EVENTS_NUM 29
 struct btEvent {
 	const char *name;
 	int (*callback)(char *name, char *data, int len);

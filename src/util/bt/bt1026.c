@@ -28,6 +28,9 @@ int bt_plist_cnt = 0;
 
 int data_count = 0;
 
+static unsigned char checksumBCC(uint8_t* data, int length);
+extern int on_ble_data(int cmd, char *data, int length);
+
 static int default_callback(char *event, char *data, int len)
 {
 	char *p = NULL;
@@ -78,8 +81,9 @@ struct btEvent btEvents[BT_EVENTS_NUM] =
 		{"SPPSTAT", default_callback},
 		{"SPPDATA", default_callback},
 		{"GATTSTAT", default_callback},
-		{"GATTDATA", default_callback},
+		{"GATTDATA", on_gattdata},
 		{"HIDSTAT", default_callback},
+		{"DEVSTAT", default_callback},
 };
 
 int isEvent(char *str, int len)
@@ -102,7 +106,7 @@ int BtGetVersion(char *ver, int length)
 
 	assert(ver && length > 0);
 
-	ret = BTCONTEXT->sendAt("AT+VER", "+VER", ver, length);
+	ret = BTCONTEXT->sendAt("AT+VER", "+VER", ver, length, strlen("AT+VER"), 100);
 
 	return ret;
 }
@@ -113,7 +117,7 @@ int BtGetBaud(char *baud, int length)
 
 	assert(baud && length > 0);
 
-	ret = BTCONTEXT->sendAt("AT+BAUD", "+BAUD", baud, length);
+	ret = BTCONTEXT->sendAt("AT+BAUD", "+BAUD", baud, length, strlen("AT+BAUD"), 100);
 
 	return ret;
 }
@@ -124,7 +128,7 @@ int BtGetName(char *name, int length)
 
 	assert(name && length > 0);
 
-	ret = BTCONTEXT->sendAt("AT+NAME", "+NAME", name, length);
+	ret = BTCONTEXT->sendAt("AT+NAME", "+NAME", name, length, strlen("AT+NAME"), 100);
 
 	return ret;
 }
@@ -137,7 +141,7 @@ int BtSetName(char *name, int length)
 	assert(name && length > 0);
 
 	snprintf(atbuf, 128, "AT+NAME=%s", name);
-	ret = BTCONTEXT->sendAt(atbuf, "+NAME", NULL, 0);
+	ret = BTCONTEXT->sendAt(atbuf, "+NAME", NULL, 0, strlen(atbuf), 100);
 
 	return ret;
 }
@@ -145,8 +149,91 @@ int BtSetName(char *name, int length)
 
 
 // 透传数据回调(不需要用户注册)
-int on_gattdata(const char *urc, char *buf, int len) {
-    logw("on_gattdata %s %d %s", urc, len, buf);
+static char recv_buf[1024 * 2] = {0};
+static int recv_cmd = 0;
+static int recv_len = 0;
+static int recv_need = 0;
+int gattdata_process(char *buf, int len, void *priv)
+{
+#define HEAD_FLAG 0xFF
+    int i;
+    char *p = NULL;
+#define DEBUG
+#ifdef DEBUG
+    fprintf(stdout, "len: %d\n", len);
+    for (i = 0; i < len; i++)
+    {
+        fprintf(stdout, "%02x ", buf[i]);
+        if ((i + 1) % 16 == 0)
+            fprintf(stdout, "\n");
+    }
+    fprintf(stdout, "\n");
+#endif
+
+    p = buf;
+    if (recv_need == 0)
+    {
+        if (p[0] != HEAD_FLAG && len < 6)
+        {
+            printf("%s head flag error p[0] = %2x, len: %d\n", __func__, p[0], len);
+            return -1;
+        }
+        else
+        {
+            recv_need = (p[1] | p[2] << 8) + 6;
+            recv_cmd = p[3];
+            fprintf(stdout, "recv_need: %d, p[1]: %02x, p[2]: %02x\n", recv_need, p[1], p[2]);
+        }
+    }
+
+    memcpy(recv_buf + recv_len, buf, len);
+    recv_len += len;
+
+    if (recv_len == recv_need)
+    {
+        if (p[5] == checksumBCC((unsigned char *)recv_buf + 6, recv_len - 6))
+        {
+            on_ble_data(recv_cmd, recv_buf + 6, recv_len - 6);
+        }
+        else
+        {
+            printf("checksum error!");
+        }
+
+#ifdef DEBUG
+        for (i = 0; i < recv_len; i++)
+        {
+            fprintf(stdout, "%02x ", recv_buf[i]);
+            if ((i + 1) % 16 == 0)
+                fprintf(stdout, "\n");
+        }
+        fprintf(stdout, "\n");
+#endif
+
+        memset(recv_buf, 0, sizeof(recv_buf));
+        recv_len = 0;
+        recv_need = 0;
+    }
+
+    return 0;
+}
+
+int on_gattdata(char *urc, char *buf, int len) {
+//    logw("on_gattdata %s %d %s", urc, len, buf);
+	char *p = NULL;
+	p = strchr(buf, ',');
+	if (p)
+	{
+		*p = '\0';
+		len -= strlen(buf) + 1;
+//		fprintf(stderr, "%s: buf: %s, len: %d\n", __func__, p + 1, len);
+		gattdata_process(p + 1, len, NULL);
+	}
+	else
+	{
+		fprintf(stderr, "%s: buf: %s, len: %d\n", __func__, buf, len);
+	}
+
     return 0;
 }
 
@@ -338,21 +425,24 @@ int bt_init() {
     pln("bt_init ...");
     BtContext *ctx = BtContext::getInstance();
 
-
-    if (!bt_at())
-        return -1;
-
     int res = 0;
-    res = ctx->sendAt("AT+TPMODE", "+TPMODE");
-    if (res != AtStOk) {
-  //      return -1;
+    res = ctx->sendAt("AT+TPMODE", "+TPMODE", NULL, 0, strlen("AT+TPMODE"), 100);
+    if (res != 0)
+    {
+    	fprintf(stderr, "%s query tpmode failed %d\n", __func__, res);
+        return -1;
     }
-    res = ctx->sendAt("AT+TPMODE=0");
-    if (res != AtStOk) {
-//        return -1;
+
+    res = ctx->sendAt("AT+TPMODE=0", NULL, NULL, 0, strlen("AT+TPMODE=0"), 100);
+    if (res != 0)
+    {
+    	fprintf(stderr, "%s set tpmode = 0 failed %d\n", __func__, res);
+        return -1;
     }
 
     bt_get_ver();
+    fprintf(stdout, "%s ver: %s\n", __func__, bt_vers);
+
     bt_set_name("GolfCar");
 
     BtGetName(name, 128);
@@ -394,7 +484,7 @@ bool bt_at() {
     for (i = 0; i < 3; i++) {
         ctx->send("\r\n\r\n", 4);
         Thread::sleep(100);
-        int res = ctx->sendAt("AT");
+        //int res = ctx->sendAt("AT");
 //        if (res == AtStOk)
             break;
 //        pln("bt_init AT fail %d", i);
@@ -416,7 +506,7 @@ bool bt_at() {
 
 bool bt_reboot() {
     // AT+REBOOT
-    return AtStOk == BTCONTEXT->sendAt("AT+REBOOT");
+    return 0 == BTCONTEXT->sendAt("AT+REBOOT", "+REBOOT", NULL, 0, strlen("AT+REBOOT"), 100);
 }
 
 bool bt_spk_vol() {
@@ -426,7 +516,7 @@ bool bt_spk_vol() {
 
 bool bt_get_ver() {
     // AT+VER
-    return AtStOk == BTCONTEXT->sendAt("AT+VER", "+VER", bt_vers, sizeof(bt_vers));
+    return 0 == BTCONTEXT->sendAt("AT+VER", "+VER", bt_vers, sizeof(bt_vers), strlen("AT+VER"), 100);
 }
 
 bool bt_take_photo(void)
@@ -447,7 +537,14 @@ bool bt_take_photo(void)
 bool bt_get_mac() {
     // AT+ADDR
     // AT+LEADDR
-    return AtStOk == BTCONTEXT->sendAt("AT+ADDR", "+ADDR", bt_addr, sizeof(bt_addr));
+	int ret = 0;
+	ret = BTCONTEXT->sendAt("AT+ADDR", "+ADDR", bt_addr, sizeof(bt_addr), strlen("AT+ADDR"), 200);
+	fprintf(stdout, "%s: bt_addr: %s, ret: %d\n", __func__, bt_addr, ret);
+
+	if (ret == 0)
+		return true;
+	else
+		return false;
 }
 
 // 设置蓝牙名称
@@ -457,6 +554,7 @@ bool bt_set_name(const char *newname) {
     char cmd_buf[64];
     BtContext *ctx = BtContext::getInstance();
 
+    fprintf(stdout, "%s get_mac now\n", __func__);
     if (!bt_get_mac()) {
         loge("get mac fail");
         return false;
@@ -465,16 +563,16 @@ bool bt_set_name(const char *newname) {
     // AT+NAME - 读/写BR/EDR蓝牙名称
     // sprintf(want_full_name, "%s-%s", newname, bt_addr + 8);
     sprintf(want_full_name, "%s-%s", newname, bt_addr + 8);
-
-    int res = ctx->sendAt("AT+NAME", "+NAME", bt_name, sizeof(bt_name));
-    if (res != AtStOk) {
+    fprintf(stdout, "new_name: %s, addr: %s\n", want_full_name, bt_addr);
+    int res = ctx->sendAt("AT+NAME", "+NAME", bt_name, sizeof(bt_name), strlen("AT+NAME"), 100);
+    if (res != 0) {
         return false;
     }
     if (strcmp(want_full_name, bt_name) != 0) {
         logw("want %s but %s", want_full_name, bt_name);
         sprintf(cmd_buf, "AT+NAME=%s,%d", want_full_name, !!with_postfix);
-        res = ctx->sendAt(cmd_buf);
-        if (res != AtStOk) {
+        res = ctx->sendAt(cmd_buf, "+NAME", NULL, 0, strlen(cmd_buf), 100);
+        if (res != 0) {
             return false;
         }
     }
@@ -483,14 +581,14 @@ bool bt_set_name(const char *newname) {
     // sprintf(want_full_name, "%s-LE-%s", newname, bt_addr + 8);
     sprintf(want_full_name, "%s-LE-%s", newname, bt_addr + 8);
 
-    res = ctx->sendAt("AT+LENAME", "+LENAME", bt_lename, sizeof(bt_lename));
-    if (res != AtStOk) {
+    res = ctx->sendAt("AT+LENAME", "+LENAME", bt_lename, sizeof(bt_lename), strlen("AT+LENAME"), 100);
+    if (res != 0) {
         return false;
     }
     if (strcmp(want_full_name, bt_lename) != 0) {
         sprintf(cmd_buf, "AT+LENAME=%s,%d", want_full_name, !!with_postfix);
-        res = ctx->sendAt(cmd_buf);
-        if (res != AtStOk) {
+        res = ctx->sendAt(cmd_buf, "+LENAME", NULL, 0, strlen(cmd_buf), 100);
+        if (res != 0) {
             return false;
         }
     }
@@ -502,8 +600,8 @@ bool bt_set_name(const char *newname) {
 bool bt_read_st() {
     // AT+STAT - 读所有状态 *
     char buf[32];
-    int res = BTCONTEXT->sendAt("AT+STAT", "+STAT", buf, sizeof(buf));
-    if (res != AtStOk) {
+    int res = BTCONTEXT->sendAt("AT+STAT", "+STAT", buf, sizeof(buf), strlen("AT+STAT"), 100);
+    if (res != 0) {
         return false;
     }
     int arr[8] = {0};
@@ -536,17 +634,25 @@ bool bt_read_paired() {
     // +PLIST=3,288FF6578E1C,wenkun的iPhone
     // +PLIST=E
     // OK
-    return AtStOk == BTCONTEXT->sendAt("AT+PLIST");
+	char buf[1024] = { 0 };
+	int ret = 0;
+    ret = BTCONTEXT->sendAt("AT+PLIST", "+PLIST", buf, 1024, strlen("AT+PLIST"), 100);
+
+    fprintf(stdout, "paired info: %s\n", buf);
+    if (ret == 0)
+    	return true;
+    else
+    	return false;
 }
 
 // 设置配对模式 & 配对密码
 bool bt_set_pair_mode(int mode, const char *pin) {
     // AT+SSP - 读/写BR/EDR配对模式 *
     // AT+PIN - 读/写配对密码
-    int res = BTCONTEXT->sendAt("AT+SSP=2");
-    int res2 = BTCONTEXT->sendAt("AT+PIN=2023");
+    int res = BTCONTEXT->sendAt("AT+SSP=2", "+SSP", NULL, 0, strlen("AT+SSP=2"), 100);
+    int res2 = BTCONTEXT->sendAt("AT+PIN=2023", "+PIN", NULL, 0, strlen("AT+PIN=2023"), 100);
 
-    return res == AtStOk && res2 == AtStOk;
+    return res == 0 && res2 == 0;
 }
 
 // 蓝牙开关
@@ -554,7 +660,7 @@ bool bt_sw(int on) {
     // AT+BTEN - 开关蓝牙
     char cmd_buf[16];
     sprintf(cmd_buf, "AT+BTEN=%d", !!on);
-    return AtStOk == BTCONTEXT->sendAt(cmd_buf);
+    return 0 == BTCONTEXT->sendAt(cmd_buf, "+BTEN", NULL, 0, strlen(cmd_buf), 100);
 }
 
 // 数据透传.发送 (接收由回调实现)
@@ -573,7 +679,7 @@ int bt_tx(const char *json) {
         if (i == blk_cnt - 1)
             blk_len = json_len - 241 * i;
 
-        if (AtStOk != BTCONTEXT->sendBlk(json + 241 * i, blk_len)) {
+        if (AtStOk != BTCONTEXT->sendBlk(json + 241 * i, blk_len, 100)) {
             loge("sendBlk fail %d", i);
             return -1;
         } else {
@@ -588,7 +694,7 @@ bool bt_set_autoconn(int cnt) {
     // AT+AUTOCONN - 设置蓝牙上电重连次数
     char cmd_buf[32];
     sprintf(cmd_buf, "AT+AUTOCONN=%d", cnt);
-    return AtStOk == BTCONTEXT->sendAt(cmd_buf);
+    return 0 == BTCONTEXT->sendAt(cmd_buf, "+AUTOCONN", NULL, 0, strlen(cmd_buf), 100);
 }
 
 static unsigned char checksumBCC(uint8_t* data, int length)
