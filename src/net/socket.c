@@ -79,6 +79,64 @@ void MODULE_FUN_NAME(Socket, destroy)(T_S *sock)
     }
 }
 
+int MODULE_FUN_NAME(Socket, setInterfaceIp)(T_S sock, const char *ifname, char *ip, int len)
+{
+	assert(sock && ip && len > 0);
+
+	struct ifreq ifr;
+	struct sockaddr_in *addr = NULL;
+	char buf[128] = { 0 };
+	int ret = 0;
+
+	strncpy(ifr.ifr_name, ifname, IFNAMSIZ);
+	ifr.ifr_name[IFNAMSIZ - 1] = '\0';
+
+	addr = (struct sockaddr_in *)&(ifr.ifr_addr);
+	if (inet_aton(ip, (struct in_addr *)&(addr->sin_addr)) == 0)
+	{
+		return -2;
+	}
+
+	if (ioctl(sock->skd, SIOCSIFADDR, &ifr) == -1) 
+	{
+		return -1;
+	}
+
+	return 1;
+
+}
+
+int MODULE_FUN_NAME(Socket, getInterfaceIp)(T_S sock, const char *ifname, char *ip, int len)
+{
+	assert(sock && ip && len > 0);
+
+	struct ifreq ifr;
+	struct sockaddr_in *addr = NULL;
+	char buf[128] = { 0 };
+	int ret = 0;
+
+	strncpy(ifr.ifr_name, ifname, IFNAMSIZ);
+	ifr.ifr_name[IFNAMSIZ - 1] = '\0';
+
+	if (ioctl(sock->skd, SIOCGIFADDR, &ifr) == -1) 
+	{
+		return -1;
+	}
+
+	addr = (struct sockaddr_in *)&(ifr.ifr_addr);
+	ret = snprintf(buf, "%s", inet_ntoa(addr->sin_addr));
+	buf[ret] = '\0';
+
+	if (ret > len)
+	{
+		return -2;
+	}
+
+	memcpy(ip, buf, ret);
+	return 1;
+
+}
+
 int MODULE_FUN_NAME(Socket, bindInterface)(T_S sock, const char *ifname)
 {
     if (sock && ifname) 

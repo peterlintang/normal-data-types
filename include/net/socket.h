@@ -42,6 +42,8 @@ T_S MODULE_FUN_NAME(Socket, new)(enum _socketTypes type);
 void       MODULE_FUN_NAME(Socket, destroy)(T_S *psocket);
 int MODULE_FUN_NAME(Socket, bindInterface)(T_S socket, const char *ifname);
 int MODULE_FUN_NAME(Socket, bind)(T_S socket, struct sockaddr* addr);
+int MODULE_FUN_NAME(Socket, getInterfaceIp)(T_S sock, const char *ifname, char *ip, int len);
+int MODULE_FUN_NAME(Socket, setInterfaceIp)(T_S sock, const char *ifname, char *ip, int len);
 int MODULE_FUN_NAME(Socket, setFlag)(T_S socket, const char *ifname, short flag);
 int MODULE_FUN_NAME(Socket, setOpt)(T_S socket, int opt);
 int MODULE_FUN_NAME(Socket, clearFlag)(T_S socket, const char *ifname, short flag);
