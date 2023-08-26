@@ -92,6 +92,8 @@ int MODULE_FUN_NAME(Socket, setInterfaceIp)(T_S sock, const char *ifname, char *
 	ifr.ifr_name[IFNAMSIZ - 1] = '\0';
 
 	addr = (struct sockaddr_in *)&(ifr.ifr_addr);
+	addr->sin_family = AF_INET;
+	addr->sin_port = 0;
 	if (inet_aton(ip, (struct in_addr *)&(addr->sin_addr)) == 0)
 	{
 		return -2;
