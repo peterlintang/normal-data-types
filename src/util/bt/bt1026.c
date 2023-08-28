@@ -28,125 +28,123 @@ int bt_plist_cnt = 0;
 
 int data_count = 0;
 
-static unsigned char checksumBCC(uint8_t* data, int length);
+static unsigned char checksumBCC(uint8_t *data, int length);
 extern int on_ble_data(int cmd, char *data, int length);
 
 static int default_callback(char *event, char *data, int len)
 {
-	char *p = NULL;
+    char *p = NULL;
 
-	if (strncmp(event, "GATTDATA", strlen("GATTDATA")) == 0)
-	{
-		p = strchr(data, ',');
-		if (p)
-		{
-//			if (strncmp(p + 1, "abcdefghijklmnopq", strlen("abcdefghijklmnopq")) == 0)
-				data_count++;
-		}
-	}
-	printf("%s: event name: %s, data_count: %d\n", __func__, event, data_count);
+    if (strncmp(event, "GATTDATA", strlen("GATTDATA")) == 0)
+    {
+        p = strchr(data, ',');
+        if (p)
+        {
+            //			if (strncmp(p + 1, "abcdefghijklmnopq", strlen("abcdefghijklmnopq")) == 0)
+            data_count++;
+        }
+    }
+    printf("%s: event name: %s, data_count: %d\n", __func__, event, data_count);
 
-	printf("%s: data: %s\n", __func__, data);
-	printf("%s: len: %d\n", __func__, len);
+    printf("%s: data: %s\n", __func__, data);
+    printf("%s: len: %d\n", __func__, len);
 
-	return 0;
+    return 0;
 }
 
 
 struct btEvent btEvents[BT_EVENTS_NUM] =
-{
-		{"SCAN", default_callback},
-		{"PAIRED", default_callback},
-		{"HFPSTAT", default_callback},
-		{"HFPDEV", default_callback},
-		{"HFPCID", default_callback},
-		{"HFPCIE", default_callback},
-		{"HFPAUDIO", default_callback},
-		{"HFPSIG", default_callback},
-		{"HFPROAM", default_callback},
-		{"HFPBATT", default_callback},
-		{"HFPNET", default_callback},
-		{"HFPMANU", default_callback},
-		{"HFPNUM", default_callback},
-		{"HFPIBR", default_callback},
-		{"A2DPSTAT", default_callback},
-		{"A2DPDEV", default_callback},
-		{"AVRCPSTAT", default_callback},
-		{"PLAYSTAT", default_callback},
-		{"TRACKSTAT", default_callback},
-		{"TRACKINFO", default_callback},
-		{"PBSTAT", default_callback},
-		{"PBCNT", default_callback},
-		{"PBDATA", default_callback},
-		{"SPPSTAT", default_callback},
-		{"SPPDATA", default_callback},
-		{"GATTSTAT", default_callback},
-		{"GATTDATA", on_gattdata},
-		{"HIDSTAT", default_callback},
-		{"DEVSTAT", default_callback},
+    {
+        {"SCAN", default_callback},
+        {"PAIRED", default_callback},
+        {"HFPSTAT", default_callback},
+        {"HFPDEV", default_callback},
+        {"HFPCID", default_callback},
+        {"HFPCIE", default_callback},
+        {"HFPAUDIO", default_callback},
+        {"HFPSIG", default_callback},
+        {"HFPROAM", default_callback},
+        {"HFPBATT", default_callback},
+        {"HFPNET", default_callback},
+        {"HFPMANU", default_callback},
+        {"HFPNUM", default_callback},
+        {"HFPIBR", default_callback},
+        {"A2DPSTAT", default_callback},
+        {"A2DPDEV", default_callback},
+        {"AVRCPSTAT", default_callback},
+        {"PLAYSTAT", default_callback},
+        {"TRACKSTAT", default_callback},
+        {"TRACKINFO", default_callback},
+        {"PBSTAT", default_callback},
+        {"PBCNT", default_callback},
+        {"PBDATA", default_callback},
+        {"SPPSTAT", default_callback},
+        {"SPPDATA", default_callback},
+        {"GATTSTAT", default_callback},
+        {"GATTDATA", on_gattdata},
+        {"HIDSTAT", default_callback},
+        {"DEVSTAT", default_callback},
 };
 
 int isEvent(char *str, int len)
 {
-	int i;
+    int i;
 
-	for (i = 0; i < sizeof(btEvents) / sizeof(btEvents[0]); i++)
-	{
-		//fprintf(stdout, "%s : %s\n", str + 1, btEvents[i].name);
-		if (strncmp(str + 1, btEvents[i].name, strlen(btEvents[i].name)) == 0)
-			return 1;
-	}
+    for (i = 0; i < sizeof(btEvents) / sizeof(btEvents[0]); i++)
+    {
+        // fprintf(stdout, "%s : %s\n", str + 1, btEvents[i].name);
+        if (strncmp(str + 1, btEvents[i].name, strlen(btEvents[i].name)) == 0)
+            return 1;
+    }
 
-	return 0;
+    return 0;
 }
 
 int BtGetVersion(char *ver, int length)
 {
-	int ret = 0;
+    int ret = 0;
 
-	assert(ver && length > 0);
+    assert(ver && length > 0);
 
-	ret = BTCONTEXT->sendAt("AT+VER", "+VER", ver, length, strlen("AT+VER"), 100);
+    ret = BTCONTEXT->sendAt("AT+VER", "+VER", ver, length, strlen("AT+VER"), 100);
 
-	return ret;
+    return ret;
 }
 
 int BtGetBaud(char *baud, int length)
 {
-	int ret = 0;
+    int ret = 0;
 
-	assert(baud && length > 0);
+    assert(baud && length > 0);
 
-	ret = BTCONTEXT->sendAt("AT+BAUD", "+BAUD", baud, length, strlen("AT+BAUD"), 100);
+    ret = BTCONTEXT->sendAt("AT+BAUD", "+BAUD", baud, length, strlen("AT+BAUD"), 100);
 
-	return ret;
+    return ret;
 }
 
 int BtGetName(char *name, int length)
 {
-	int ret = 0;
+    int ret = 0;
 
-	assert(name && length > 0);
+    assert(name && length > 0);
 
-	ret = BTCONTEXT->sendAt("AT+NAME", "+NAME", name, length, strlen("AT+NAME"), 100);
+    ret = BTCONTEXT->sendAt("AT+NAME", "+NAME", name, length, strlen("AT+NAME"), 100);
 
-	return ret;
+    return ret;
 }
 
 int BtSetName(char *name, int length)
 {
-	int ret = 0;
-	char atbuf[128] = { 0 };
+    int ret = 0;
+    char atbuf[128] = {0};
 
-	assert(name && length > 0);
+    assert(name && length > 0);
 
-	snprintf(atbuf, 128, "AT+NAME=%s", name);
-	ret = BTCONTEXT->sendAt(atbuf, "+NAME", NULL, 0, strlen(atbuf), 100);
+    snprintf(atbuf, 128, "AT+NAME=%s", name);
+    ret = BTCONTEXT->sendAt(atbuf, "+NAME", NULL, 0, strlen(atbuf), 100);
 
-	return ret;
+    return ret;
 }
-
-
 
 // 透传数据回调(不需要用户注册)
 static char recv_buf[1024 * 2] = {0};
@@ -158,6 +156,7 @@ int gattdata_process(char *buf, int len, void *priv)
 #define HEAD_FLAG 0xFF
     int i;
     char *p = NULL;
+    unsigned char crc = 0;
 #define DEBUG
 #ifdef DEBUG
     fprintf(stdout, "len: %d\n", len);
@@ -182,6 +181,7 @@ int gattdata_process(char *buf, int len, void *priv)
         {
             recv_need = (p[1] | p[2] << 8) + 6;
             recv_cmd = p[3];
+            crc = p[5];
             fprintf(stdout, "recv_need: %d, p[1]: %02x, p[2]: %02x\n", recv_need, p[1], p[2]);
         }
     }
@@ -191,7 +191,7 @@ int gattdata_process(char *buf, int len, void *priv)
 
     if (recv_len == recv_need)
     {
-        if (p[5] == checksumBCC((unsigned char *)recv_buf + 6, recv_len - 6))
+        if (crc == checksumBCC((unsigned char *)recv_buf + 6, recv_len - 6))
         {
             on_ble_data(recv_cmd, recv_buf + 6, recv_len - 6);
         }
@@ -218,31 +218,34 @@ int gattdata_process(char *buf, int len, void *priv)
     return 0;
 }
 
-int on_gattdata(char *urc, char *buf, int len) {
-//    logw("on_gattdata %s %d %s", urc, len, buf);
-	char *p = NULL;
-	p = strchr(buf, ',');
-	if (p)
-	{
-		*p = '\0';
-		len -= strlen(buf) + 1;
-//		fprintf(stderr, "%s: buf: %s, len: %d\n", __func__, p + 1, len);
-		gattdata_process(p + 1, len, NULL);
-	}
-	else
-	{
-		fprintf(stderr, "%s: buf: %s, len: %d\n", __func__, buf, len);
-	}
+int on_gattdata(char *urc, char *buf, int len)
+{
+    //    logw("on_gattdata %s %d %s", urc, len, buf);
+    char *p = NULL;
+    p = strchr(buf, ',');
+    if (p)
+    {
+        *p = '\0';
+        len -= strlen(buf) + 1;
+        //		fprintf(stderr, "%s: buf: %s, len: %d\n", __func__, p + 1, len);
+        gattdata_process(p + 1, len, NULL);
+    }
+    else
+    {
+        fprintf(stderr, "%s: buf: %s, len: %d\n", __func__, buf, len);
+    }
 
     return 0;
 }
 
 // 统计逗号数量
-int fieldCount(char *input) {
+int fieldCount(char *input)
+{
     int count = 0;
 
     char *token = strtok(input, ",");
-    while (token != NULL) {
+    while (token != NULL)
+    {
         // if (fields) {
         //     fields[count] = token;
         // }
@@ -253,11 +256,13 @@ int fieldCount(char *input) {
 }
 
 // 解析逗号分隔的整数字符串
-int parseInts(char *input, int arr[], int size) {
+int parseInts(char *input, int arr[], int size)
+{
     int count = 0;
 
     char *token = strtok(input, ",");
-    while (token != NULL) {
+    while (token != NULL)
+    {
         int num = atoi(token);
         arr[count++] = num;
         if (count >= size)
@@ -268,49 +273,64 @@ int parseInts(char *input, int arr[], int size) {
 }
 
 // 解析 AT+PLIST 记录
-int parsePlist(char *fields, int *pSn, char **pMac, char **pOptName) {
+int parsePlist(char *fields, int *pSn, char **pMac, char **pOptName)
+{
     *pSn = atoi(fields);
 
     char *comma1 = strchr(fields, ',');
-    if (!comma1) return -1;
+    if (!comma1)
+        return -1;
     *comma1 = 0;
     *pMac = comma1 + 1;
 
     char *comma2 = strchr(comma1 + 1, ',');
     // if (!comma2) return -1;
-    if (comma2) {
+    if (comma2)
+    {
         *comma2 = 0;
         *pOptName = comma2 + 1;
-    } else {
+    }
+    else
+    {
         *pOptName = NULL;
     }
     return 0;
 }
 
-void cb_plist(const char *urc, const char *value) {
+void cb_plist(const char *urc, const char *value)
+{
     // +PLIST=sn,mac{,utf8name}
-    if (strcmp(urc, "+PLIST") != 0) {
+    if (strcmp(urc, "+PLIST") != 0)
+    {
         assert(urc == "+PLIST");
         return;
     }
     // pln("cb_plist %s", value);
-    if (strcmp(value, "E") == 0) {
+    if (strcmp(value, "E") == 0)
+    {
         // pln("bt_plist END cnt=%d", bt_plist_cnt);
-        for (int i = 1; i <= bt_plist_cnt; i++) {
+        for (int i = 1; i <= bt_plist_cnt; i++)
+        {
             logi("bt_plist [%d] addr=%s, name=%s", i, bt_plist[i].addr, bt_plist[i].utf8Name);
         }
-    } else {
+    }
+    else
+    {
         int idx = 0;
         char *pMac, *pOptName;
         char *dup_value = strdup(value);
         if (!dup_value)
             return;
-        if (parsePlist(dup_value, &idx, &pMac, &pOptName) == 0) {
+        if (parsePlist(dup_value, &idx, &pMac, &pOptName) == 0)
+        {
             assert(idx <= 8);
             strncpy(bt_plist[idx].addr, pMac, sizeof(bt_plist[0].addr));
-            if (pOptName) {
+            if (pOptName)
+            {
                 strncpy(bt_plist[idx].utf8Name, pOptName, sizeof(bt_plist[0].utf8Name));
-            } else {
+            }
+            else
+            {
                 bt_plist[idx].utf8Name[0] = 0;
             }
             bt_plist_cnt = idx;
@@ -319,7 +339,8 @@ void cb_plist(const char *urc, const char *value) {
     }
 }
 
-void cb_xstat(const char *urc, const char *value) {
+void cb_xstat(const char *urc, const char *value)
+{
     const char *TabGeneralSt[] = {
         "ST_UNSUPPORTED", // 0,
         "ST_STANDBY",     // 1,
@@ -334,48 +355,67 @@ void cb_xstat(const char *urc, const char *value) {
     int ival = atoi(value);
     logi("ui todo: on %s=%X", urc, ival);
 
-    if (strcmp(urc, "+DEVSTAT") == 0) {
+    if (strcmp(urc, "+DEVSTAT") == 0)
+    {
         int chg = bt_stat.devstat ^ ival;
         bt_stat.devstat = ival;
-        if (chg & DEV_STAT_MASK_POWER_OFF) {
+        if (chg & DEV_STAT_MASK_POWER_OFF)
+        {
             logi("POWER_OFF => %d", ival & DEV_STAT_MASK_POWER_OFF);
         }
-        if (chg & DEV_STAT_MASK_BR_EDR_DISCOVERABLE) {
+        if (chg & DEV_STAT_MASK_BR_EDR_DISCOVERABLE)
+        {
             logi("BR_EDR_DISCOVERABLE => %d", ival & DEV_STAT_MASK_BR_EDR_DISCOVERABLE);
         }
-        if (chg & DEV_STAT_MASK_BLE_ADVERTISING) {
+        if (chg & DEV_STAT_MASK_BLE_ADVERTISING)
+        {
             logi("BLE_ADVERTISING => %d", ival & DEV_STAT_MASK_BLE_ADVERTISING);
         }
-    } else {
+    }
+    else
+    {
         assert(ival >= 0 && ival <= 6);
-        if (strcmp(urc, "+HFPSTAT") == 0) {
+        if (strcmp(urc, "+HFPSTAT") == 0)
+        {
             bt_stat.hfpstat = ival;
-            if (ival >= 4) ival += 1;
+            if (ival >= 4)
+                ival += 1;
             logi("HFPSTAT => %s", TabGeneralSt[ival]);
-        } else if (strcmp(urc, "+A2DPSTAT") == 0) {
+        }
+        else if (strcmp(urc, "+A2DPSTAT") == 0)
+        {
             bt_stat.a2dpstat = ival;
             logi("A2DPSTAT => %s", TabGeneralSt[ival]);
-        } else if (strcmp(urc, "+AVRCPSTAT") == 0) {
+        }
+        else if (strcmp(urc, "+AVRCPSTAT") == 0)
+        {
             bt_stat.avrcpstat = ival;
             logi("AVRCPSTAT => %s", TabGeneralSt[ival]);
-        } else if (strcmp(urc, "+SPPSTAT") == 0) {
+        }
+        else if (strcmp(urc, "+SPPSTAT") == 0)
+        {
             bt_stat.sppstat = ival;
             logi("SPPSTAT => %s", TabGeneralSt[ival]);
-        } else if (strcmp(urc, "+GATTSTAT") == 0) {
+        }
+        else if (strcmp(urc, "+GATTSTAT") == 0)
+        {
             bt_stat.gattstat = ival;
             logi("GATTSTAT => %s", TabGeneralSt[ival]);
         }
     }
 }
-void cb_trackinfo(const char *urc, const char *value) {
+void cb_trackinfo(const char *urc, const char *value)
+{
     // +TRACKINFO=Not Provided
     logi("cb_trackinfo %s", value);
 }
-void cb_trackstat(const char *urc, const char *value) {
+void cb_trackstat(const char *urc, const char *value)
+{
     //  +TRACKSTAT=1,570212,570212 或 +TRACKSTAT=1,0,0
     logi("cb_trackstat %s", value);
 }
-void cb_playstat(const char *urc, const char *value) {
+void cb_playstat(const char *urc, const char *value)
+{
     const char *PlayStatDef[] = {
         "Stopped",
         "Playing",
@@ -384,10 +424,12 @@ void cb_playstat(const char *urc, const char *value) {
         "Fast Rewinding",
     };
     int ival = atoi(value);
-    if (ival > 4) return;
+    if (ival > 4)
+        return;
     logi("cb_playstat %s == %s", value, PlayStatDef[ival]);
 }
-void cb_paired(const char *urc, const char *value) {
+void cb_paired(const char *urc, const char *value)
+{
     logi("cb_paired %s ", value);
 }
 
@@ -409,7 +451,8 @@ UrcCbItem urc_callbacks[16] = {
     //
     {NULL, NULL}};
 
-int bt_init() {
+int bt_init()
+{
     // 蓝牙初始化:
     // AT握手，切换到指定波特率;
     // 数传设置为指令模式；
@@ -419,30 +462,28 @@ int bt_init() {
 
     // todo： 设置配对模式和密码
 
-	char version[264] = { 0 };
-	char name[128] = { 0 };
+    char version[264] = {0};
+    char name[128] = {0};
 
     pln("bt_init ...");
     BtContext *ctx = BtContext::getInstance();
+
+    if (!bt_at())
+        return -1;
 
     int res = 0;
     res = ctx->sendAt("AT+TPMODE", "+TPMODE", NULL, 0, strlen("AT+TPMODE"), 100);
     if (res != 0)
     {
-    	fprintf(stderr, "%s query tpmode failed %d\n", __func__, res);
         return -1;
     }
-
     res = ctx->sendAt("AT+TPMODE=0", NULL, NULL, 0, strlen("AT+TPMODE=0"), 100);
     if (res != 0)
     {
-    	fprintf(stderr, "%s set tpmode = 0 failed %d\n", __func__, res);
         return -1;
     }
 
     bt_get_ver();
-    fprintf(stdout, "%s ver: %s\n", __func__, bt_vers);
-
     bt_set_name("GolfCar");
 
     BtGetName(name, 128);
@@ -453,7 +494,6 @@ int bt_init() {
 
     BtGetVersion(version, 260);
     fprintf(stdout, "get version: %s\n", version);
-
 
     // test
     // bt_reboot();
@@ -473,21 +513,24 @@ int bt_init() {
 // +PLIST=3,288FF6578E1C,wenkun的iPhone
 // +PLIST=E
 // OK
-int bt_set_urc_cb() {
+int bt_set_urc_cb()
+{
     return 0;
 }
 
-bool bt_at() {
+bool bt_at()
+{
     BtContext *ctx = BtContext::getInstance();
     int i = 0;
     // 尝试不同波特率
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 3; i++)
+    {
         ctx->send("\r\n\r\n", 4);
         Thread::sleep(100);
-        //int res = ctx->sendAt("AT");
-//        if (res == AtStOk)
-            break;
-//        pln("bt_init AT fail %d", i);
+        // int res = ctx->sendAt("AT");
+        //        if (res == AtStOk)
+        break;
+        //        pln("bt_init AT fail %d", i);
         ctx->openUart(BT_DEV, ctx->nextBaud());
     }
     if (i >= 3)
@@ -504,17 +547,20 @@ bool bt_at() {
     return true;
 }
 
-bool bt_reboot() {
+bool bt_reboot()
+{
     // AT+REBOOT
     return 0 == BTCONTEXT->sendAt("AT+REBOOT", "+REBOOT", NULL, 0, strlen("AT+REBOOT"), 100);
 }
 
-bool bt_spk_vol() {
+bool bt_spk_vol()
+{
     // AT+SPKVOL
     return true;
 }
 
-bool bt_get_ver() {
+bool bt_get_ver()
+{
     // AT+VER
     return 0 == BTCONTEXT->sendAt("AT+VER", "+VER", bt_vers, sizeof(bt_vers), strlen("AT+VER"), 100);
 }
@@ -533,29 +579,31 @@ bool bt_take_photo(void)
     return BTCONTEXT->send(buf, ret + 4);
 }
 
-
-bool bt_get_mac() {
+bool bt_get_mac()
+{
     // AT+ADDR
     // AT+LEADDR
-	int ret = 0;
-	ret = BTCONTEXT->sendAt("AT+ADDR", "+ADDR", bt_addr, sizeof(bt_addr), strlen("AT+ADDR"), 200);
-	fprintf(stdout, "%s: bt_addr: %s, ret: %d\n", __func__, bt_addr, ret);
+    int ret = 0;
+    ret = BTCONTEXT->sendAt("AT+ADDR", "+ADDR", bt_addr, sizeof(bt_addr), strlen("AT+ADDR"), 200);
+    fprintf(stdout, "%s: bt_addr: %s, ret: %d\n", __func__, bt_addr, ret);
 
-	if (ret == 0)
-		return true;
-	else
-		return false;
+    if (ret == 0)
+        return true;
+    else
+        return false;
 }
 
 // 设置蓝牙名称
-bool bt_set_name(const char *newname) {
+bool bt_set_name(const char *newname)
+{
     int with_postfix = 0;
     char want_full_name[sizeof(bt_name)] = {0};
     char cmd_buf[64];
     BtContext *ctx = BtContext::getInstance();
 
     fprintf(stdout, "%s get_mac now\n", __func__);
-    if (!bt_get_mac()) {
+    if (!bt_get_mac())
+    {
         loge("get mac fail");
         return false;
     }
@@ -563,16 +611,19 @@ bool bt_set_name(const char *newname) {
     // AT+NAME - 读/写BR/EDR蓝牙名称
     // sprintf(want_full_name, "%s-%s", newname, bt_addr + 8);
     sprintf(want_full_name, "%s-%s", newname, bt_addr + 8);
-    fprintf(stdout, "new_name: %s, addr: %s\n", want_full_name, bt_addr);
+
     int res = ctx->sendAt("AT+NAME", "+NAME", bt_name, sizeof(bt_name), strlen("AT+NAME"), 100);
-    if (res != 0) {
+    if (res != 0)
+    {
         return false;
     }
-    if (strcmp(want_full_name, bt_name) != 0) {
+    if (strcmp(want_full_name, bt_name) != 0)
+    {
         logw("want %s but %s", want_full_name, bt_name);
         sprintf(cmd_buf, "AT+NAME=%s,%d", want_full_name, !!with_postfix);
         res = ctx->sendAt(cmd_buf, "+NAME", NULL, 0, strlen(cmd_buf), 100);
-        if (res != 0) {
+        if (res != 0)
+        {
             return false;
         }
     }
@@ -582,13 +633,16 @@ bool bt_set_name(const char *newname) {
     sprintf(want_full_name, "%s-LE-%s", newname, bt_addr + 8);
 
     res = ctx->sendAt("AT+LENAME", "+LENAME", bt_lename, sizeof(bt_lename), strlen("AT+LENAME"), 100);
-    if (res != 0) {
+    if (res != 0)
+    {
         return false;
     }
-    if (strcmp(want_full_name, bt_lename) != 0) {
+    if (strcmp(want_full_name, bt_lename) != 0)
+    {
         sprintf(cmd_buf, "AT+LENAME=%s,%d", want_full_name, !!with_postfix);
         res = ctx->sendAt(cmd_buf, "+LENAME", NULL, 0, strlen(cmd_buf), 100);
-        if (res != 0) {
+        if (res != 0)
+        {
             return false;
         }
     }
@@ -597,11 +651,13 @@ bool bt_set_name(const char *newname) {
 }
 
 // 读所有状态
-bool bt_read_st() {
+bool bt_read_st()
+{
     // AT+STAT - 读所有状态 *
     char buf[32];
     int res = BTCONTEXT->sendAt("AT+STAT", "+STAT", buf, sizeof(buf), strlen("AT+STAT"), 100);
-    if (res != 0) {
+    if (res != 0)
+    {
         return false;
     }
     int arr[8] = {0};
@@ -627,26 +683,20 @@ bool bt_read_st() {
 }
 
 // 读取配对记录
-bool bt_read_paired() {
+bool bt_read_paired()
+{
     // AT+PLIST - 读取/清除配对记录
     // +PLIST=1,F487C5984689,HUAWEI Mate 40 Pro
     // +PLIST=2,A06974532BCB,002022050420061301045
     // +PLIST=3,288FF6578E1C,wenkun的iPhone
     // +PLIST=E
     // OK
-	char buf[1024] = { 0 };
-	int ret = 0;
-    ret = BTCONTEXT->sendAt("AT+PLIST", "+PLIST", buf, 1024, strlen("AT+PLIST"), 100);
-
-    fprintf(stdout, "paired info: %s\n", buf);
-    if (ret == 0)
-    	return true;
-    else
-    	return false;
+    return 0 == BTCONTEXT->sendAt("AT+PLIST", "+PLIST", NULL, 0, strlen("AT+PLIST"), 100);
 }
 
 // 设置配对模式 & 配对密码
-bool bt_set_pair_mode(int mode, const char *pin) {
+bool bt_set_pair_mode(int mode, const char *pin)
+{
     // AT+SSP - 读/写BR/EDR配对模式 *
     // AT+PIN - 读/写配对密码
     int res = BTCONTEXT->sendAt("AT+SSP=2", "+SSP", NULL, 0, strlen("AT+SSP=2"), 100);
@@ -656,7 +706,8 @@ bool bt_set_pair_mode(int mode, const char *pin) {
 }
 
 // 蓝牙开关
-bool bt_sw(int on) {
+bool bt_sw(int on)
+{
     // AT+BTEN - 开关蓝牙
     char cmd_buf[16];
     sprintf(cmd_buf, "AT+BTEN=%d", !!on);
@@ -664,7 +715,8 @@ bool bt_sw(int on) {
 }
 
 // 数据透传.发送 (接收由回调实现)
-int bt_tx(const char *json) {
+int bt_tx(const char *json)
+{
     // AT+GATTSEND - 通过GATT发数据
 
     // TODO - 分块发送，暂不考虑附加帧头
@@ -674,15 +726,19 @@ int bt_tx(const char *json) {
     {
         pln("bt_tx json_len %d chuncks %d", json_len, blk_cnt);
     }
-    for (int i = 0; i < blk_cnt; i++) {
+    for (int i = 0; i < blk_cnt; i++)
+    {
         int blk_len = 241;
         if (i == blk_cnt - 1)
             blk_len = json_len - 241 * i;
 
-        if (AtStOk != BTCONTEXT->sendBlk(json + 241 * i, blk_len, 100)) {
+        if (AtStOk != BTCONTEXT->sendBlk(json + 241 * i, blk_len, 100))
+        {
             loge("sendBlk fail %d", i);
             return -1;
-        } else {
+        }
+        else
+        {
             loge("sendBlk ok %d", i);
         }
     }
@@ -690,17 +746,19 @@ int bt_tx(const char *json) {
     return 0;
 }
 
-bool bt_set_autoconn(int cnt) {
+bool bt_set_autoconn(int cnt)
+{
     // AT+AUTOCONN - 设置蓝牙上电重连次数
     char cmd_buf[32];
     sprintf(cmd_buf, "AT+AUTOCONN=%d", cnt);
     return 0 == BTCONTEXT->sendAt(cmd_buf, "+AUTOCONN", NULL, 0, strlen(cmd_buf), 100);
 }
 
-static unsigned char checksumBCC(uint8_t* data, int length)
+static unsigned char checksumBCC(uint8_t *data, int length)
 {
     uint8_t checksum = 0;
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++)
+    {
         checksum ^= data[i];
     }
     return checksum;
@@ -711,10 +769,9 @@ int bt_send_raw(const char *data, int len, int timeout)
     return BTCONTEXT->sendBlk(data, len, timeout);
 }
 
-
 int ble_send_data(int cmd, uint8_t *pdata, short datalen, int timeout)
 {
-#define PACKET_SIZE 100
+#define PACKET_SIZE 230
     int packets = 0;
     int left_data = 0;
     int data_index = 0;
@@ -743,7 +800,7 @@ int ble_send_data(int cmd, uint8_t *pdata, short datalen, int timeout)
 
     for (int i = 0; i < packets; i++)
     {
-        printf("cur packets = %d\n", i+1);
+        printf("cur packets = %d\n", i + 1);
         int buf_idx = 0;
         int blk_len = PACKET_SIZE;
         if (i == 0)
@@ -767,23 +824,62 @@ int ble_send_data(int cmd, uint8_t *pdata, short datalen, int timeout)
         memcpy(buf + buf_idx, pdata + data_index, blk_len);
         data_index += blk_len;
 
-        int res = bt_send_raw((const char *)buf, buf_idx + blk_len, timeout);
-        if(res != AtStOk)
+        int res = bt_send_raw((const char *)buf, buf_idx + blk_len, 100);
+        if (res != AtStOk)
         {
-             loge("send failed bt_send_raw = %d\n",res);
-             return -1;
+            loge("send failed bt_send_raw = %d\n", res);
+            return -1;
         }
-        usleep(100 * 1);
+        //usleep(100 * 1);
         // printf("\n");
-            // for(int j = 0; j < buf_idx + blk_len; j++)
-            // {
-            //     printf("%02x ",buf[j]);
-            //     if((j+1) % 16 ==0)
-            //     {
-            //             printf("\n");
+        // for(int j = 0; j < buf_idx + blk_len; j++)
+        // {
+        //     printf("%02x ",buf[j]);
+        //     if((j+1) % 16 ==0)
+        //     {
+        //             printf("\n");
         //     }
         // }
         // printf("\n");
+    }
+
+    return datalen;
+}
+
+int ble_send_test(int cmd, uint8_t *pdata, short datalen)
+{
+#define PACKET_SIZE 230
+    int packets = 0;
+    int left = 0;
+    int index = 0;
+    int ret = 0;
+
+    packets = datalen / PACKET_SIZE;
+    left = datalen % PACKET_SIZE;
+    printf("packets = %d,left = %d\n", packets, left);
+
+    for (int i = 0; i < packets; i++)
+    {
+        ret = bt_send_raw((const char *)pdata + index, PACKET_SIZE, 0);
+        if (ret != AtStOk)
+        {
+            loge("send failed bt_send_raw = %d\n", ret);
+            return -1;
+        }
+        index += PACKET_SIZE;
+        usleep(100 * 1);
+    }
+
+    if (left)
+    {
+        ret = bt_send_raw((const char *)pdata + index, left, 0);
+        if (ret != AtStOk)
+        {
+            loge("send failed bt_send_raw = %d, left: %d\n", ret, left);
+            return -1;
+        }
+        index += left;
+        usleep(100 * 1);
     }
 
     return datalen;

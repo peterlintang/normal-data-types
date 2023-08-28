@@ -4,6 +4,7 @@
  * 串口: BT
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <memory.h>
@@ -87,7 +88,7 @@ static int isError(char *data, int len)
                         return 0;
 }
 
-static inline int parse(char data)
+int BtContext::parse(char data)
 {
 	static char responseBuf[260] = { 0 };
 	static int responseLen = 0;
@@ -221,6 +222,27 @@ static inline int parse(char data)
 			return -1;
 		}
 		responseBuf[responseLen++] = data;
+
+		if (strncmp(responseBuf, "+GATTDATA=", strlen("+GATTDATA=")) == 0)
+		{
+			int ret = 0;
+			char tmp_buf[512] = { 0 };
+
+			ret = readGattData(tmp_buf, 512);
+			if (ret > 0)
+			{
+				memcpy(&(responseBuf[responseLen]), tmp_buf, ret);
+				responseLen += ret;
+				return 0;
+			}
+			else
+			{
+				fprintf(stderr, "get gatt data failed\n");
+				return -1;
+			}
+		}
+
+
 		return 0;
 	}
 	else
@@ -239,7 +261,7 @@ static inline int parse(char data)
  * 参数：data 待解析数据，
  * 返回值：实际解析的长度
  */
-static int parseCodes(char *data, int len)
+int BtContext::parseCodes(char *data, int len)
 {
 	int i;
 
@@ -618,6 +640,48 @@ bool BtContext::readyToRun() {
     return (mDataBufPtr != NULL);
 }
 
+int BtContext::readGattData(char *buf, int len)
+{
+	char c = 0;
+	char tmp[3] = { 0 };
+	int left = 0;
+	int need_len = 0;
+	int recv_len = 0;
+	int ret = 0;
+
+	ret = read(mUartID, &c, 1);	// data len
+	if (ret < 0)
+	{
+		return -1;
+	}
+
+	buf[0] = c;
+	tmp[0] = c;
+	tmp[1] = '\0';
+	need_len = atoi(tmp);
+//	fprintf(stdout, "%02x %02x, %d\n", buf[0], c, need_len);
+
+	ret = read(mUartID, &c, 1);	// for ,
+	if (ret < 0)
+		return -1;
+
+	buf[1] = c;
+//	fprintf(stdout, "%02x %02x %c\n", c, buf[1], c);
+
+	left = need_len;
+	while (left > 0)
+	{
+		ret = read(mUartID, buf + 2 + recv_len, left);
+		if (ret < 0)
+			return -1;
+		recv_len += ret;
+		left -= ret;
+	}
+
+	fprintf(stdout, "%s: %d\n", __func__, need_len + 2);
+	return need_len + 2;
+}
+
 bool BtContext::threadLoop() 
 {
 	int readNum = 0;
@@ -631,15 +695,15 @@ bool BtContext::threadLoop()
 
     if (mIsOpen) 
 	{
-        readNum = read(mUartID, buffer, 230);
+        readNum = read(mUartID, buffer, 1);
         if (readNum <= 0)
         {
             Thread::sleep(50);
             return true;
         }
 
-#ifdef DEBUG
-      fprintf(stdout, "ttyS2 rx %d, %s", readNum, buffer);
+#if 0
+//      fprintf(stdout, "ttyS2 rx %d, %s", readNum, buffer);
       for (int i = 0; i < readNum; i++)
       {
     	  fprintf(stdout, "%02x ", buffer[i]);
@@ -651,7 +715,7 @@ bool BtContext::threadLoop()
       fprintf(stdout, "\n");
 #endif
 
-      parseCodes(buffer, readNum);
+    parseCodes(buffer, readNum);
 
       return true;
     }
