@@ -1,0 +1,60 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              08/30/2023 10:55:57 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\赛元8003应用资料\SC92F8003 DEM
+                    -O CODE\SC92F8003_Lib\inc) DEBUG OBJECTEXTEND PRINT(.\Listings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          
+   2          #include "sc92f8003_gpio.h"
+   3          #include "onewire.h"
+   4          
+   5            
+   6          
+   7          
+   8          
+   9          void main(void)
+  10          {
+  11   1        unsigned int i;
+  12   1        unsigned char datas[48] = {
+  13   1          0x99,0x0,0xff,0x0,0xff,0x0,0xff,0x0,0xff,
+  14   1        };  
+  15   1        for (i = 0; i < 48; i++)
+  16   1          datas[i] = 10;
+  17   1        
+  18   1        GPIO_Init(GPIO1,GPIO_PIN_3,GPIO_MODE_OUT_PP); 
+  19   1        onewire_init();
+  20   1        
+  21   1        while (1)
+  22   1        {
+  23   2          DQ_OUT;
+  24   2          delayus(1000);
+  25   2          
+  26   2          ops_onewire_reset();
+  27   2          for (i = 0; i < 48; i++)
+  28   2          {
+  29   3            ops_onewire_write(&(datas[i]), 1);
+  30   3            delayus(1000);
+  31   3            GPIO_WriteHigh(GPIO1,GPIO_PIN_3);
+  32   3            delayus(1000);
+  33   3            GPIO_WriteLow(GPIO1,GPIO_PIN_3); 
+  34   3          }
+  35   2        } 
+  36   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    154    ----
+   CONSTANT SIZE    =     48    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      50
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,5 @@
+".\Objects\STARTUP.obj",
+".\Objects\sc92f8003_gpio.obj",
+".\Objects\main.obj" 
+TO ".\Objects\slave" 
+PRINT(".\Listings\slave.m51") RAMSIZE(256) 

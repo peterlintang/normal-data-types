@@ -1,0 +1,518 @@
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                    08/30/2023  11:56:08  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.4.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE .\Objects\STARTUP.obj, .\Objects\sc92f8003_gpio.obj, .\Objects\main.obj TO .\Objects\slave P
+>> RINT (.\Listings\slave.m51) RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\STARTUP.obj (?C_STARTUP)
+  .\Objects\sc92f8003_gpio.obj (SC92F8003_GPIO)
+  .\Objects\main.obj (MAIN)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?COPY)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?CLDPTR)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?ULCMP)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?LLDIIDATA)
+
+
+LINK MAP OF MODULE:  .\Objects\slave (?C_STARTUP)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     003FH     UNIT         _DATA_GROUP_
+            DATA    0047H     0006H     UNIT         ?DT?_WRITE_BYTES?MAIN
+            IDATA   004DH     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     0140H     UNIT         ?C?LIB_CODE
+            CODE    0143H     00CBH     UNIT         ?PR?MAIN?MAIN
+            CODE    020EH     00A0H     UNIT         ?PR?_WRITE_BYTES?MAIN
+            CODE    02AEH     005FH     UNIT         ?PR?_GPIO_INIT?SC92F8003_GPIO
+            CODE    030DH     0055H     UNIT         ?PR?_DELAY_US?MAIN
+            CODE    0362H     0030H     UNIT         ?CO?MAIN
+            CODE    0392H     0024H     UNIT         ?PR?ACT_INIT?MAIN
+            CODE    03B6H     001BH     UNIT         ?PR?_GPIO_READPIN?SC92F8003_GPIO
+            CODE    03D1H     0016H     UNIT         ?PR?_GPIO_WRITELOW?SC92F8003_GPIO
+            CODE    03E7H     0014H     UNIT         ?PR?GPIO_DEINIT?SC92F8003_GPIO
+            CODE    03FBH     0013H     UNIT         ?PR?_GPIO_WRITEHIGH?SC92F8003_GPIO
+            CODE    040EH     0010H     UNIT         ?PR?_GPIO_WRITE?SC92F8003_GPIO
+            CODE    041EH     000FH     UNIT         ?PR?_GPIO_READPORT?SC92F8003_GPIO
+            CODE    042DH     000CH     UNIT         ?C_C51STARTUP
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\slave (?C_STARTUP)
+
+
+SEGMENT                                      DATA_GROUP 
+  +--> CALLED SEGMENT                      START    LENGTH
+----------------------------------------------------------
+?C_C51STARTUP                              -----    -----
+  +--> ?PR?MAIN?MAIN
+
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  08/30/2023  11:56:08  PAGE 2
+
+
+?PR?MAIN?MAIN                              0008H    0037H
+  +--> ?CO?MAIN
+  +--> ?PR?_GPIO_INIT?SC92F8003_GPIO
+  +--> ?PR?_GPIO_READPIN?SC92F8003_GPIO
+  +--> ?PR?_DELAY_US?MAIN
+  +--> ?PR?ACT_INIT?MAIN
+  +--> ?PR?_GPIO_WRITEHIGH?SC92F8003_GPIO
+  +--> ?PR?_GPIO_WRITELOW?SC92F8003_GPIO
+
+?PR?_DELAY_US?MAIN                         003FH    0008H
+
+?PR?ACT_INIT?MAIN                          -----    -----
+  +--> ?PR?_GPIO_INIT?SC92F8003_GPIO
+  +--> ?PR?_DELAY_US?MAIN
+  +--> ?PR?_GPIO_WRITELOW?SC92F8003_GPIO
+  +--> ?PR?_GPIO_WRITEHIGH?SC92F8003_GPIO
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\slave (?C_STARTUP)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        ?C_STARTUP
+  C:042DH         SEGMENT       ?C_C51STARTUP
+  I:004DH         SEGMENT       ?STACK
+  C:0000H         PUBLIC        ?C_STARTUP
+  D:00E0H         SYMBOL        ACC
+  D:00F0H         SYMBOL        B
+  D:0083H         SYMBOL        DPH
+  D:0082H         SYMBOL        DPL
+  N:0000H         SYMBOL        IBPSTACK
+  N:0100H         SYMBOL        IBPSTACKTOP
+  N:0080H         SYMBOL        IDATALEN
+  C:0430H         SYMBOL        IDATALOOP
+  N:0000H         SYMBOL        PBPSTACK
+  N:0100H         SYMBOL        PBPSTACKTOP
+  N:0000H         SYMBOL        PDATALEN
+  N:0000H         SYMBOL        PDATASTART
+  N:0000H         SYMBOL        PPAGE
+  N:0000H         SYMBOL        PPAGEENABLE
+  D:00A0H         SYMBOL        PPAGE_SFR
+  D:0081H         SYMBOL        SP
+  C:042DH         SYMBOL        STARTUP1
+  N:0000H         SYMBOL        XBPSTACK
+  N:0000H         SYMBOL        XBPSTACKTOP
+  N:0000H         SYMBOL        XDATALEN
+  N:0000H         SYMBOL        XDATASTART
+  C:0000H         LINE#         126
+  C:042DH         LINE#         133
+  C:042FH         LINE#         134
+  C:0430H         LINE#         135
+  C:0431H         LINE#         136
+  C:0433H         LINE#         185
+  C:0436H         LINE#         196
+  -------         ENDMOD        ?C_STARTUP
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  08/30/2023  11:56:08  PAGE 3
+
+
+
+  -------         MODULE        SC92F8003_GPIO
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0080H         PUBLIC        P0
+  D:0090H         PUBLIC        P1
+  D:00A0H         PUBLIC        P2
+  D:00A8H         PUBLIC        IE
+  D:009BH         PUBLIC        P0PH
+  D:00B8H         PUBLIC        IP
+  D:0092H         PUBLIC        P1PH
+  D:00A2H         PUBLIC        P2PH
+  C:040EH         PUBLIC        _GPIO_Write
+  C:03FBH         PUBLIC        _GPIO_WriteHigh
+  C:02AEH         PUBLIC        _GPIO_Init
+  D:0098H         PUBLIC        SCON
+  D:0088H         PUBLIC        TCON
+  C:041EH         PUBLIC        _GPIO_ReadPort
+  C:03B6H         PUBLIC        _GPIO_ReadPin
+  C:03E7H         PUBLIC        GPIO_DeInit
+  C:03D1H         PUBLIC        _GPIO_WriteLow
+  D:009AH         PUBLIC        P0CON
+  D:0091H         PUBLIC        P1CON
+  D:00A1H         PUBLIC        P2CON
+  D:00C8H         PUBLIC        T2CON
+  D:00D0H         PUBLIC        PSW
+  -------         PROC          GPIO_DEINIT
+  C:03E7H         LINE#         20
+  C:03E7H         LINE#         21
+  C:03E7H         LINE#         22
+  C:03EAH         LINE#         23
+  C:03ECH         LINE#         24
+  C:03EEH         LINE#         25
+  C:03F0H         LINE#         26
+  C:03F2H         LINE#         27
+  C:03F4H         LINE#         28
+  C:03FAH         LINE#         29
+  -------         ENDPROC       GPIO_DEINIT
+  -------         PROC          _GPIO_INIT
+  D:0007H         SYMBOL        GPIOx
+  D:0005H         SYMBOL        PortPins
+  D:0003H         SYMBOL        GPIO_Mode
+  C:02AEH         LINE#         39
+  C:02AEH         LINE#         40
+  C:02AEH         LINE#         42
+  C:02B1H         LINE#         43
+  C:02B1H         LINE#         44
+  C:02B4H         LINE#         45
+  C:02B4H         LINE#         46
+  C:02B8H         LINE#         47
+  C:02BAH         LINE#         48
+  C:02BAH         LINE#         49
+  C:02BDH         LINE#         50
+  C:02BDH         LINE#         51
+  C:02C1H         LINE#         52
+  C:02C4H         LINE#         53
+  C:02C4H         LINE#         54
+  C:02C9H         LINE#         55
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  08/30/2023  11:56:08  PAGE 4
+
+
+  C:02C9H         LINE#         56
+  C:02CCH         LINE#         57
+  C:02CCH         LINE#         58
+  C:02CDH         LINE#         61
+  C:02D2H         LINE#         62
+  C:02D2H         LINE#         63
+  C:02D5H         LINE#         64
+  C:02D5H         LINE#         65
+  C:02D9H         LINE#         66
+  C:02DBH         LINE#         67
+  C:02DBH         LINE#         68
+  C:02DEH         LINE#         69
+  C:02DEH         LINE#         70
+  C:02E2H         LINE#         71
+  C:02E5H         LINE#         72
+  C:02E5H         LINE#         73
+  C:02EAH         LINE#         74
+  C:02EAH         LINE#         75
+  C:02EDH         LINE#         76
+  C:02EDH         LINE#         77
+  C:02EEH         LINE#         81
+  C:02EEH         LINE#         82
+  C:02F3H         LINE#         83
+  C:02F3H         LINE#         84
+  C:02F6H         LINE#         85
+  C:02F6H         LINE#         86
+  C:02FAH         LINE#         87
+  C:02FCH         LINE#         88
+  C:02FCH         LINE#         89
+  C:02FFH         LINE#         90
+  C:02FFH         LINE#         91
+  C:0303H         LINE#         92
+  C:0306H         LINE#         93
+  C:0306H         LINE#         94
+  C:0309H         LINE#         95
+  C:0309H         LINE#         96
+  C:030CH         LINE#         97
+  C:030CH         LINE#         98
+  C:030CH         LINE#         99
+  C:030CH         LINE#         101
+  -------         ENDPROC       _GPIO_INIT
+  -------         PROC          _GPIO_WRITE
+  D:0007H         SYMBOL        GPIOx
+  D:0005H         SYMBOL        PortVal
+  C:040EH         LINE#         110
+  C:040EH         LINE#         111
+  C:040EH         LINE#         112
+  C:0411H         LINE#         113
+  C:0411H         LINE#         114
+  C:0413H         LINE#         115
+  C:0413H         LINE#         116
+  C:0416H         LINE#         117
+  C:0416H         LINE#         118
+  C:0418H         LINE#         119
+  C:0418H         LINE#         120
+  C:041BH         LINE#         121
+  C:041BH         LINE#         122
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  08/30/2023  11:56:08  PAGE 5
+
+
+  C:041DH         LINE#         123
+  C:041DH         LINE#         124
+  -------         ENDPROC       _GPIO_WRITE
+  -------         PROC          _GPIO_WRITEHIGH
+  D:0007H         SYMBOL        GPIOx
+  D:0005H         SYMBOL        PortPins
+  C:03FBH         LINE#         133
+  C:03FBH         LINE#         134
+  C:03FBH         LINE#         135
+  C:03FEH         LINE#         136
+  C:03FEH         LINE#         137
+  C:0401H         LINE#         138
+  C:0401H         LINE#         139
+  C:0404H         LINE#         140
+  C:0404H         LINE#         141
+  C:0407H         LINE#         142
+  C:0407H         LINE#         143
+  C:040AH         LINE#         144
+  C:040AH         LINE#         145
+  C:040DH         LINE#         146
+  C:040DH         LINE#         147
+  -------         ENDPROC       _GPIO_WRITEHIGH
+  -------         PROC          _GPIO_WRITELOW
+  D:0007H         SYMBOL        GPIOx
+  D:0005H         SYMBOL        PortPins
+  C:03D1H         LINE#         156
+  C:03D1H         LINE#         157
+  C:03D1H         LINE#         158
+  C:03D4H         LINE#         159
+  C:03D4H         LINE#         160
+  C:03D8H         LINE#         161
+  C:03D8H         LINE#         162
+  C:03DBH         LINE#         163
+  C:03DBH         LINE#         164
+  C:03DFH         LINE#         165
+  C:03DFH         LINE#         166
+  C:03E2H         LINE#         167
+  C:03E2H         LINE#         168
+  C:03E6H         LINE#         169
+  C:03E6H         LINE#         170
+  -------         ENDPROC       _GPIO_WRITELOW
+  -------         PROC          _GPIO_READPORT
+  D:0007H         SYMBOL        GPIOx
+  C:041EH         LINE#         178
+  C:041EH         LINE#         179
+  C:041EH         LINE#         180
+  C:0421H         LINE#         181
+  C:0421H         LINE#         182
+  C:0424H         LINE#         183
+  C:0424H         LINE#         184
+  C:0427H         LINE#         185
+  C:0427H         LINE#         186
+  C:042AH         LINE#         187
+  C:042AH         LINE#         189
+  C:042AH         LINE#         190
+  C:042CH         LINE#         191
+  C:042CH         LINE#         192
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  08/30/2023  11:56:08  PAGE 6
+
+
+  -------         ENDPROC       _GPIO_READPORT
+  -------         PROC          _GPIO_READPIN
+  D:0007H         SYMBOL        GPIOx
+  D:0005H         SYMBOL        PortPins
+  -------         DO            
+  D:0006H         SYMBOL        ret
+  -------         ENDDO         
+  C:03B6H         LINE#         201
+  C:03B6H         LINE#         202
+  C:03B6H         LINE#         203
+  C:03B6H         LINE#         205
+  C:03B9H         LINE#         206
+  C:03B9H         LINE#         207
+  C:03BEH         LINE#         208
+  C:03BEH         LINE#         209
+  C:03C1H         LINE#         210
+  C:03C1H         LINE#         211
+  C:03C4H         LINE#         212
+  C:03C6H         LINE#         213
+  C:03C9H         LINE#         215
+  C:03CCH         LINE#         217
+  C:03CCH         LINE#         219
+  C:03CCH         LINE#         220
+  C:03D0H         LINE#         221
+  C:03D0H         LINE#         222
+  -------         ENDPROC       _GPIO_READPIN
+  -------         ENDMOD        SC92F8003_GPIO
+
+  -------         MODULE        MAIN
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0080H         PUBLIC        P0
+  D:0090H         PUBLIC        P1
+  D:00A0H         PUBLIC        P2
+  D:00A8H         PUBLIC        IE
+  D:00B8H         PUBLIC        IP
+  C:0143H         PUBLIC        main
+  D:0098H         PUBLIC        SCON
+  D:0088H         PUBLIC        TCON
+  C:0362H         SYMBOL        _?ix1000
+  C:0315H         SYMBOL        _delay_us
+  D:00C8H         PUBLIC        T2CON
+  C:0392H         PUBLIC        ACT_INIT
+  C:020EH         PUBLIC        _WRITE_BYTES
+  D:00D0H         PUBLIC        PSW
+  C:030DH         SYMBOL        L?0038
+  C:030FH         SYMBOL        L?0039
+  -------         PROC          L?0037
+  -------         ENDPROC       L?0037
+  C:030DH         SYMBOL        L?0038
+  C:030FH         SYMBOL        L?0039
+  -------         PROC          _DELAY_US
+  D:003FH         SYMBOL        us
+  -------         DO            
+  D:0043H         SYMBOL        i
+  -------         ENDDO         
+  C:0315H         LINE#         25
+  C:031DH         LINE#         26
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  08/30/2023  11:56:08  PAGE 7
+
+
+  C:031DH         LINE#         30
+  C:0330H         LINE#         31
+  C:0330H         LINE#         32
+  C:033AH         LINE#         33
+  C:0347H         LINE#         34
+  C:0361H         LINE#         38
+  -------         ENDPROC       _DELAY_US
+  -------         PROC          ACT_INIT
+  C:0392H         LINE#         41
+  C:0392H         LINE#         42
+  C:0392H         LINE#         43
+  C:039BH         LINE#         44
+  C:039EH         LINE#         45
+  C:03A5H         LINE#         46
+  C:03AAH         LINE#         47
+  C:03AFH         LINE#         48
+  -------         ENDPROC       ACT_INIT
+  -------         PROC          _WRITE_BYTES
+  D:0047H         SYMBOL        src
+  D:004AH         SYMBOL        len
+  -------         DO            
+  D:004BH         SYMBOL        i
+  D:004CH         SYMBOL        value
+  -------         ENDDO         
+  C:020EH         LINE#         52
+  C:0216H         LINE#         53
+  C:0219H         LINE#         56
+  C:0222H         LINE#         57
+  C:022CH         LINE#         58
+  C:0237H         LINE#         59
+  C:023AH         LINE#         61
+  C:0246H         LINE#         63
+  C:024FH         LINE#         64
+  C:0258H         LINE#         65
+  C:025DH         LINE#         67
+  C:0260H         LINE#         69
+  C:0267H         LINE#         71
+  C:026AH         LINE#         72
+  C:026DH         LINE#         74
+  C:0274H         LINE#         76
+  C:027DH         LINE#         77
+  C:0287H         LINE#         78
+  C:0291H         LINE#         79
+  C:0294H         LINE#         81
+  C:0294H         LINE#         82
+  C:029DH         LINE#         83
+  C:02A8H         LINE#         84
+  C:02AAH         LINE#         85
+  C:02ADH         LINE#         86
+  -------         ENDPROC       _WRITE_BYTES
+  -------         PROC          MAIN
+  -------         DO            
+  D:0008H         SYMBOL        i
+  D:000AH         SYMBOL        lowTime
+  D:000CH         SYMBOL        cmd
+  D:000DH         SYMBOL        Count
+  D:000EH         SYMBOL        datas
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  08/30/2023  11:56:08  PAGE 8
+
+
+  D:003EH         SYMBOL        ret
+  -------         ENDDO         
+  C:0143H         LINE#         90
+  C:0143H         LINE#         91
+  C:0143H         LINE#         92
+  C:0148H         LINE#         94
+  C:014CH         LINE#         95
+  C:015DH         LINE#         96
+  C:0160H         LINE#         98
+  C:0169H         LINE#         100
+  C:0169H         LINE#         101
+  C:0169H         LINE#         102
+  C:0172H         LINE#         103
+  C:0172H         LINE#         104
+  C:0172H         LINE#         105
+  C:017BH         LINE#         106
+  C:0181H         LINE#         107
+  C:0181H         LINE#         108
+  C:0181H         LINE#         109
+  C:0181H         LINE#         110
+  C:0181H         LINE#         113
+  C:0186H         LINE#         114
+  C:0186H         LINE#         115
+  C:0186H         LINE#         116
+  C:018FH         LINE#         117
+  C:0193H         LINE#         118
+  C:0193H         LINE#         119
+  C:0193H         LINE#         120
+  C:0193H         LINE#         121
+  C:019BH         LINE#         122
+  C:01A0H         LINE#         123
+  C:01A2H         LINE#         132
+  C:01ADH         LINE#         133
+  C:01ADH         LINE#         134
+  C:01B0H         LINE#         135
+  C:01B3H         LINE#         136
+  C:01B5H         LINE#         137
+  C:01B5H         LINE#         139
+  C:01B7H         LINE#         140
+  C:01BDH         LINE#         141
+  C:01C8H         LINE#         142
+  C:01CBH         LINE#         143
+  C:01CBH         LINE#         145
+  C:01D1H         LINE#         146
+  C:01D3H         LINE#         147
+  C:01DAH         LINE#         148
+  C:01E2H         LINE#         149
+  C:01F0H         LINE#         150
+  C:01F3H         LINE#         151
+  C:01F3H         LINE#         152
+  C:01F8H         LINE#         153
+  C:01FFH         LINE#         154
+  C:0204H         LINE#         155
+  C:020BH         LINE#         156
+  C:020BH         LINE#         162
+  C:020BH         LINE#         164
+  -------         ENDPROC       MAIN
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  08/30/2023  11:56:08  PAGE 9
+
+
+  -------         ENDMOD        MAIN
+
+  -------         MODULE        ?C?COPY
+  C:00D3H         PUBLIC        ?C?COPY
+  -------         ENDMOD        ?C?COPY
+
+  -------         MODULE        ?C?CLDPTR
+  C:00F9H         PUBLIC        ?C?CLDPTR
+  -------         ENDMOD        ?C?CLDPTR
+
+  -------         MODULE        ?C?ULCMP
+  C:0112H         PUBLIC        ?C?ULCMP
+  -------         ENDMOD        ?C?ULCMP
+
+  -------         MODULE        ?C?LLDIIDATA
+  C:012CH         PUBLIC        ?C?LLDIIDATA
+  C:0123H         PUBLIC        ?C?LLDIIDATA1
+  C:0125H         PUBLIC        ?C?LLDIIDATA8
+  -------         ENDMOD        ?C?LLDIIDATA
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?GPIO_DEINIT?SC92F8003_GPIO
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_GPIO_WRITE?SC92F8003_GPIO
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_GPIO_READPORT?SC92F8003_GPIO
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_WRITE_BYTES?MAIN
+
+Program Size: data=78.0 xdata=0 code=1081
+LINK/LOCATE RUN COMPLETE.  4 WARNING(S),  0 ERROR(S)
