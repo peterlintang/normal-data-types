@@ -74,7 +74,7 @@ int isDataUrc(const char *pData) {
 
 static int isOk(char *data, int len)
 {
-        if (strcmp(data, "OK") == 0)
+        if (strncmp(data, "OK", strlen("OK")) == 0)
                         return 1;
         else
                         return 0;
@@ -82,10 +82,116 @@ static int isOk(char *data, int len)
 
 static int isError(char *data, int len)
 {
-        if (strcmp(data, "ERROR") == 0)
+        if (strncmp(data, "ERROR", strlen("ERROR")) == 0)
                         return 1;
         else
                         return 0;
+}
+
+int BtContext::parse2(char data)
+{
+	static char responseBuf[260] = { 0 };
+	static int responseLen = 0;
+	static int begin_cr = 0;
+	static int begin_lf = 0;
+	static int end_cr = 0;
+	static int end_lf = 0;
+
+	responseBuf[responseLen++] = data;
+
+	if (responseBuf[0] != CR)
+	{
+		responseLen = 0;
+		fprintf(stdout, "%s wrong format %02x\n", __func__, responseBuf[0]);
+		return -1;
+	}
+
+	if (responseLen < 2)
+	{
+//		fprintf(stdout, "%s wrong format %02x, len: %d\n", __func__, responseBuf[0], responseLen);
+		return 0;
+	}
+
+	if (responseBuf[0] == CR && responseBuf[1] == LF && responseLen <= 2)
+	{
+		begin_cr = 1;
+		begin_lf = 1;
+		return 0;
+	}
+
+	if (responseBuf[responseLen - 1] == LF && responseBuf[responseLen - 2] == CR)
+	{
+		end_cr = 1;
+		end_lf = 1;
+
+		char tmp = '\0';
+
+#ifdef DEBUG
+		fprintf(stdout, "%s: %s\n", __func__, responseBuf);
+		fprintf(stdout, "%s: %d\n", __func__, responseLen );
+		for (int i = 0; i < mDataBufLen; i++)
+		{
+			fprintf(stdout, "%02x ", mDataBufPtr[i]);
+			if ((i + 1) % 16 == 0)
+				fprintf(stdout, "\n");
+		}
+		fprintf(stdout, "\n");
+#endif
+
+		if (isEvent(responseBuf + 2, responseLen) == 1)
+		{
+			int i;
+
+			for (i = 0; i < BT_EVENTS_NUM; i++)
+			{
+				if (strncmp(responseBuf + 3, btEvents[i].name, strlen(btEvents[i].name)) == 0)
+					btEvents[i].callback(btEvents[i].name, responseBuf + 2, responseLen - 4);
+			}
+		}
+		else if((isOk(responseBuf + 2, responseLen) == 1) || (isError(responseBuf + 2, responseLen) == 1))
+		{
+			pthread_mutex_lock(&btLock);
+
+			memcpy(mDataBufPtr + mDataBufLen , responseBuf + 2, responseLen - 4);
+			mDataBufLen += responseLen - 4;
+			mDataBufPtr[mDataBufLen ] = '\0';
+#ifdef DEBUG
+			fprintf(stdout, "%s: %s\n", __func__, mDataBufPtr);
+			fprintf(stdout, "%s: %d\n", __func__, mDataBufLen );
+			for (int i = 0; i < mDataBufLen; i++)
+			{
+				fprintf(stdout, "%02x ", mDataBufPtr[i]);
+				if ((i + 1) % 16 == 0)
+					fprintf(stdout, "\n");
+			}
+			fprintf(stdout, "\n");
+#endif
+			pthread_cond_broadcast(&btCond);
+
+			pthread_mutex_unlock(&btLock);
+		}
+		else
+		{
+			pthread_mutex_lock(&btLock);
+			memcpy(mDataBufPtr + mDataBufLen , responseBuf + 2 , responseLen - 4);
+			mDataBufLen += responseLen - 4;
+			memcpy(mDataBufPtr + mDataBufLen , &tmp, 1);
+			mDataBufLen += 1;
+			pthread_mutex_unlock(&btLock);
+		}
+
+		memset(responseBuf, 0, 260);
+		printf("%s, %d: responseLen: %d\n", __func__, __LINE__, responseLen);
+		responseLen = 0;
+		begin_cr = 0;
+		begin_lf = 0;
+		end_cr = 0;
+		end_lf = 0;
+
+		return 0;
+	}
+
+	return 1;
 }
 
 int BtContext::parse(char data)
@@ -116,6 +222,7 @@ int BtContext::parse(char data)
 		if (data == LF)
 		{
 			begin_lf = 1;
+			printf("%s, %d: responseLen: %d\n", __func__, __LINE__, responseLen);
 			responseLen = 0;
 			return 0;
 		}
@@ -125,6 +232,7 @@ int BtContext::parse(char data)
 			begin_cr = 0;
 			return -1;
 		}
+
 	}
 	else if (begin_cr == 1 && begin_lf == 1)
 	{
@@ -133,6 +241,7 @@ int BtContext::parse(char data)
 			if (data == CR)
 			{
 				end_cr = 1;
+				responseBuf[responseLen++] = data;
 				return 0;
 			}
 		}
@@ -155,7 +264,15 @@ int BtContext::parse(char data)
 				fprintf(stdout, "\n");
 				*/
 #ifdef DEBUG
-				fprintf(stdout, ">> %s\n", responseBuf);
+				fprintf(stdout, ">> %p\n", responseBuf);
+				fprintf(stdout, "before call: %d \n", responseLen);
+				for (int i = 0; i < responseLen; i++)
+				{
+					fprintf(stdout, "%02x ", responseBuf[i]);
+					if ((i + 1) % 16 == 0)
+						fprintf(stdout, "\n");
+				}
+				fprintf(stdout, "\n");
 #endif
 				if (isEvent(responseBuf, responseLen) == 1)
 				{
@@ -201,7 +318,8 @@ int BtContext::parse(char data)
 					pthread_mutex_unlock(&btLock);
 				}
 
-
+				memset(responseBuf, 0, 260);
+				printf("%s, %d: responseLen: %d\n", __func__, __LINE__, responseLen);
 				responseLen = 0;
 				begin_cr = 0;
 				begin_lf = 0;
@@ -222,7 +340,7 @@ int BtContext::parse(char data)
 			return -1;
 		}
 		responseBuf[responseLen++] = data;
-
+#if 0
 		if (strncmp(responseBuf, "+GATTDATA=", strlen("+GATTDATA=")) == 0)
 		{
 			int ret = 0;
@@ -241,6 +359,7 @@ int BtContext::parse(char data)
 				return -1;
 			}
 		}
+#endif
 
 
 		return 0;
@@ -256,6 +375,7 @@ int BtContext::parse(char data)
 	return 0;
 }
 
+
 /**
  * 功能：解析协议
  * 参数：data 待解析数据，
@@ -268,7 +388,7 @@ int BtContext::parseCodes(char *data, int len)
 	for (i = 0; i < len; i++)
 	{
 //printf("%s: i: %d, data: %02x\n", __func__, i, data[i]);
-		parse(data[i]);
+		parse2(data[i]);
 	}
 
 	return 0;
@@ -652,6 +772,7 @@ int BtContext::readGattData(char *buf, int len)
 	ret = read(mUartID, &c, 1);	// data len
 	if (ret < 0)
 	{
+		printf("get data len failed\n");
 		return -1;
 	}
 
@@ -663,7 +784,10 @@ int BtContext::readGattData(char *buf, int len)
 
 	ret = read(mUartID, &c, 1);	// for ,
 	if (ret < 0)
+	{
+		printf("get , failed\n");
 		return -1;
+	}
 
 	buf[1] = c;
 //	fprintf(stdout, "%02x %02x %c\n", c, buf[1], c);
@@ -673,12 +797,15 @@ int BtContext::readGattData(char *buf, int len)
 	{
 		ret = read(mUartID, buf + 2 + recv_len, left);
 		if (ret < 0)
+		{
+			printf("get data failed left:%d, recv:%d\n", left, recv_len);
 			return -1;
+		}
 		recv_len += ret;
 		left -= ret;
 	}
 
-	fprintf(stdout, "%s: %d\n", __func__, need_len + 2);
+//	fprintf(stdout, "%s: %d\n", __func__, need_len + 2);
 	return need_len + 2;
 }
 
@@ -695,15 +822,16 @@ bool BtContext::threadLoop()
 
     if (mIsOpen) 
 	{
-        readNum = read(mUartID, buffer, 1);
+        readNum = read(mUartID, buffer, 230);
         if (readNum <= 0)
         {
             Thread::sleep(50);
             return true;
         }
 
-#if 0
+#if 1
 //      fprintf(stdout, "ttyS2 rx %d, %s", readNum, buffer);
+        printf("raw data:\n");
       for (int i = 0; i < readNum; i++)
       {
     	  fprintf(stdout, "%02x ", buffer[i]);

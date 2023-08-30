@@ -40,6 +40,7 @@ protected:
     readyToRun();
     int readGattData(char *buf, int len);
     int parse(char data);
+    int parse2(char data);
     int parseCodes(char *data, int len);
     virtual bool threadLoop();
 
