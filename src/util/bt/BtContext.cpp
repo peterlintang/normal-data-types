@@ -22,7 +22,7 @@
 // #include "CommDef.h"
 // #include "ProtocolData.h"
 
-#define DEBUG
+//#define BT_DEBUG
 #define UART_DATA_BUF_LEN 16384 // 16KB
 
 volatile AtStat at_sending = AtStIdle;
@@ -126,12 +126,12 @@ int BtContext::parse2(char data)
 
 		char tmp = '\0';
 
-#ifdef DEBUG
-		fprintf(stdout, "%s: %s\n", __func__, responseBuf);
+#ifdef BT_DEBUG
+		fprintf(stdout, ">>: %s\n", __func__, responseBuf);
 		fprintf(stdout, "%s: %d\n", __func__, responseLen );
-		for (int i = 0; i < mDataBufLen; i++)
+		for (int i = 0; i < responseLen; i++)
 		{
-			fprintf(stdout, "%02x ", mDataBufPtr[i]);
+			fprintf(stdout, "%02x ", responseBuf[i]);
 			if ((i + 1) % 16 == 0)
 				fprintf(stdout, "\n");
 		}
@@ -155,17 +155,6 @@ int BtContext::parse2(char data)
 			memcpy(mDataBufPtr + mDataBufLen , responseBuf + 2, responseLen - 4);
 			mDataBufLen += responseLen - 4;
 			mDataBufPtr[mDataBufLen ] = '\0';
-#ifdef DEBUG
-			fprintf(stdout, "%s: %s\n", __func__, mDataBufPtr);
-			fprintf(stdout, "%s: %d\n", __func__, mDataBufLen );
-			for (int i = 0; i < mDataBufLen; i++)
-			{
-				fprintf(stdout, "%02x ", mDataBufPtr[i]);
-				if ((i + 1) % 16 == 0)
-					fprintf(stdout, "\n");
-			}
-			fprintf(stdout, "\n");
-#endif
 			pthread_cond_broadcast(&btCond);
 
 			pthread_mutex_unlock(&btLock);
@@ -181,7 +170,6 @@ int BtContext::parse2(char data)
 		}
 
 		memset(responseBuf, 0, 260);
-		printf("%s, %d: responseLen: %d\n", __func__, __LINE__, responseLen);
 		responseLen = 0;
 		begin_cr = 0;
 		begin_lf = 0;
@@ -263,7 +251,7 @@ int BtContext::parse(char data)
 				}
 				fprintf(stdout, "\n");
 				*/
-#ifdef DEBUG
+#ifdef BT_DEBUG
 				fprintf(stdout, ">> %p\n", responseBuf);
 				fprintf(stdout, "before call: %d \n", responseLen);
 				for (int i = 0; i < responseLen; i++)
@@ -293,7 +281,7 @@ int BtContext::parse(char data)
 //					memcpy(mDataBufPtr + mDataBufLen , &tmp, 1);
 //					mDataBufLen += 1;
 					mDataBufPtr[mDataBufLen ] = '\0';
-#ifdef DEBUG
+#ifdef BT_DEBUG
 					fprintf(stdout, "%s: %s\n", __func__, mDataBufPtr);
 					fprintf(stdout, "%s: %d\n", __func__, mDataBufLen );
 					for (int i = 0; i < mDataBufLen; i++)
@@ -559,7 +547,7 @@ int BtContext::sendAt(const char *pData,
     send_buf[len + 1] = '\n';
     send_buf[len + 2] = '\0';
 
-#ifdef DEBUG
+#ifdef BT_DEBUG
     fprintf(stdout, "<< %s\n", send_buf);
     for (int i = 0; i < len + 2; i++)
     {
@@ -606,7 +594,7 @@ int BtContext::sendAt(const char *pData,
 
 	if (strncmp(mDataBufPtr + mDataBufLen - strlen(OK), OK, strlen(OK)) == 0)
 	{
-#ifdef DEBUG
+#ifdef BT_DEBUG
 		fprintf(stdout, "cmd response: %s, len: %d\n", mDataBufPtr, mDataBufLen);
 		for (int i = 0; i < mDataBufLen; i++)
 		{
@@ -640,7 +628,7 @@ int BtContext::sendAt(const char *pData,
 				memcpy(pValue, mDataBufPtr + strlen(urc) + 1, copy_len);
 				pValue[copy_len] = '\0';
 
-#ifdef DEBUG
+#ifdef BT_DEBUG
 				fprintf(stdout, "%s pValue: %s, len: %d\n", __func__, pValue, copy_len);
 				for (int i = 0; i < copy_len; i++)
 				{
@@ -829,7 +817,7 @@ bool BtContext::threadLoop()
             return true;
         }
 
-#if 1
+#ifdef BT_DEBUG
 //      fprintf(stdout, "ttyS2 rx %d, %s", readNum, buffer);
         printf("raw data:\n");
       for (int i = 0; i < readNum; i++)

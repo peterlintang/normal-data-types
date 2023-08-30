@@ -6,6 +6,7 @@
 #include "BtContext.h"
 #include "bt1026.h"
 
+#define BT_DEBUG
 char at_urc_kw[32] = "";       // AT命令期望关键字 +kw
 char at_urc_values[1024] = ""; // AT命令响应值
 
@@ -147,19 +148,19 @@ int BtSetName(char *name, int length)
 }
 
 // 透传数据回调(不需要用户注册)
-#define BT_RECV_BUF_LEN        (1024 * 1024)
+#define BT_RECV_BUF_LEN	(1024 * 2)
 static char recv_buf[BT_RECV_BUF_LEN] = {0};
 static int recv_cmd = 0;
 static int recv_len = 0;
 static int recv_need = 0;
+FILE *test_fp = NULL;
 int gattdata_process(char *buf, int len, void *priv)
 {
 #define HEAD_FLAG 0xFF
     int i;
     char *p = NULL;
     static unsigned char crc = 0;
-#define DEBUG
-#ifdef DEBUG
+#ifdef BT_DEBUG
     fprintf(stdout, "len: %d,%s\n", len,buf);
     for (i = 0; i < len; i++)
     {
@@ -169,7 +170,11 @@ int gattdata_process(char *buf, int len, void *priv)
     }
     fprintf(stdout, "\n");
 #endif
-    logi("%s:%d",__func__,__LINE__);
+    if (len <= 0)
+    {
+    	return 0;
+    }
+
     p = buf;
     if (recv_need == 0)
     {
@@ -202,6 +207,37 @@ int gattdata_process(char *buf, int len, void *priv)
     {
         if (crc == checksumBCC((unsigned char *)recv_buf + 6, recv_len - 6))
         {
+#ifdef BT_DEBUG
+        	char file_name[256] = { 0 };
+        	static int count = 0;
+        	count ++;
+
+        	snprintf(file_name, 256, "/mnt/data%d.txt", count);
+            fprintf(stdout, "%s open file %s\n", __func__, file_name);
+            test_fp = fopen(file_name, "w+");
+            fprintf(stdout, "%s open file %p\n", __func__, test_fp);
+
+
+            if (test_fp)
+            {
+            	int ret = fwrite(recv_buf + 6, sizeof(char), recv_len - 6, test_fp);
+            	fprintf(stdout, "write %d data\n", ret);
+            }
+            else
+            	fprintf(stderr, "%s write data error\n", __func__);
+
+
+
+            if (test_fp)
+        	{
+        		fclose(test_fp);
+        		test_fp = NULL;
+        	}
+        	else
+        	{
+        		fprintf(stderr, "%s erro file no open", __func__);
+        	}
+#endif
             logi("checksum success!!!\n");
             on_ble_data(recv_cmd, recv_buf + 6, recv_len - 6);
         }
@@ -210,7 +246,7 @@ int gattdata_process(char *buf, int len, void *priv)
             loge("checksum error, recv_len = %d,%02x\n",recv_len,p[5]);
         }
 
-#ifdef DEBUG
+#ifdef BT_DEBUG
 
         for (i = 0; i < recv_len; i++)
         {
@@ -842,16 +878,6 @@ int ble_send_data(int cmd, uint8_t *pdata, short datalen, int timeout)
             return -1;
         }
         //usleep(100 * 1);
-        // printf("\n");
-        // for(int j = 0; j < buf_idx + blk_len; j++)
-        // {
-        //     printf("%02x ",buf[j]);
-        //     if((j+1) % 16 ==0)
-        //     {
-        //             printf("\n");
-        //     }
-        // }
-        // printf("\n");
     }
 
     return datalen;
