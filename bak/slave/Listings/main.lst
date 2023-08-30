@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   MAIN                                                              08/30/2023 11:56:08 PAGE 1   
+C51 COMPILER V9.60.7.0   MAIN                                                              08/30/2023 14:52:08 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
@@ -23,7 +23,7 @@ line level    source
   13          #define tPDL  60//-240
   14          
   15          #define tSLOT 60//60-120
-  16          #define tLOW1 1//1-15
+  16          #define tLOW1 15//1-15
   17          #define tREC  1//1-
   18          #define tLOW0 60//60-120<tSLOT
   19          
@@ -62,7 +62,7 @@ line level    source
   52          void WRITE_BYTES(const unsigned char * src, unsigned char len){
   53   1        unsigned char i = 0;
   54   1        char value;
-C51 COMPILER V9.60.7.0   MAIN                                                              08/30/2023 11:56:08 PAGE 2   
+C51 COMPILER V9.60.7.0   MAIN                                                              08/30/2023 14:52:08 PAGE 2   
 
   55   1        
   56   1          DQ_IN;
@@ -104,7 +104,7 @@ line level    source
   92   1        unsigned int i = 0;
   93   1        unsigned int lowTime;
   94   1        unsigned char cmd = 0, Count = 0;
-  95   1        unsigned char datas[48] = { 0 };  
+  95   1        unsigned char datas[10] = { 0 };  
   96   1        BitStatus ret = 0;
   97   1        
   98   1        GPIO_Init(GPIO1,GPIO_PIN_3,GPIO_MODE_OUT_PP);
@@ -117,100 +117,112 @@ line level    source
  105   3            ret = GPIO_ReadPin(GPIO1,DQ_PIN);
  106   3            if (ret != 1) 
  107   3            {
- 108   4              break;
- 109   4            }
- 110   3          }
- 111   2      //      while( GPIO_ReadPin(GPIO1,DQ_PIN) == 1 );
- 112   2            
- 113   2          lowTime = 0;
- 114   2          while (1)
- 115   2          {
- 116   3            ret = GPIO_ReadPin(GPIO1, DQ_PIN);
-C51 COMPILER V9.60.7.0   MAIN                                                              08/30/2023 11:56:08 PAGE 3   
+ 108   4      //        GPIO_WriteHigh(GPIO1,GPIO_PIN_3);
+ 109   4              break;
+ 110   4            }
+ 111   3          }
+ 112   2      //      while( GPIO_ReadPin(GPIO1,DQ_PIN) == 1 );
+ 113   2            
+ 114   2          lowTime = 0;
+ 115   2          while (1)
+ 116   2          {
+C51 COMPILER V9.60.7.0   MAIN                                                              08/30/2023 14:52:08 PAGE 3   
 
- 117   3            if (ret != 0)
- 118   3            {
- 119   4              break;
- 120   4            }
- 121   3            lowTime++;
- 122   3            delay_us(1);
- 123   3          }
- 124   2          /*
- 125   2            lowTime = 0;
- 126   2            while( GPIO_ReadPin(GPIO1,DQ_PIN) == 0 ){
- 127   2            lowTime++;
- 128   2            delay_us(1);
- 129   2          }
- 130   2          */
- 131   2          
- 132   2            if( lowTime > tRSTL )
- 133   2              {
- 134   3            Count = 0;
- 135   3            ACT_INIT();
- 136   3            continue;
- 137   3          }
- 138   2      
- 139   2            Count++;
- 140   2          cmd>>=1;
- 141   2            if( lowTime < tLOW1 ){
- 142   3            cmd |= 0x80 ;
- 143   3            }
- 144   2      
- 145   2          if( Count == 8 ){
- 146   3            Count = 0;
- 147   3            datas[i] = cmd;
- 148   3            i++;
- 149   3            if (i >= 48) i = 0;
- 150   3            if (cmd = 0x10)
-*** WARNING C276 IN LINE 150 OF main.c: constant in condition expression
- 151   3            {
- 152   4            delay_us(100);
- 153   4            GPIO_WriteHigh(GPIO1,GPIO_PIN_3);
- 154   4            delay_us(100);
- 155   4            GPIO_WriteLow(GPIO1,GPIO_PIN_3); 
- 156   4            }
- 157   3            /*
- 158   3            if( cmd == datas[0] ){
- 159   3              WRITE_BYTES( datas + 1, 8 );
- 160   3            }
- 161   3            */
- 162   3          }
- 163   2      
- 164   2        }
- 165   1        
- 166   1        /*
- 167   1        uint16_t i,j;
- 168   1        
- 169   1        GPIO_Init(GPIO1,DQ_PIN,GPIO_MODE_OUT_PP); //将P14设置为强推挽输出
- 170   1      
- 171   1        while(1)
- 172   1        {
- 173   1          GPIO_WriteHigh(GPIO1,DQ_PIN);     //P14写高
- 174   1          for(i=0;i<600 * 1;i++)              //延时一段时间
- 175   1          {
- 176   1            for(j=0;j<300;j++);
- 177   1          }
-C51 COMPILER V9.60.7.0   MAIN                                                              08/30/2023 11:56:08 PAGE 4   
+ 117   3            ret = GPIO_ReadPin(GPIO1, DQ_PIN);
+ 118   3            if (ret != 0)
+ 119   3            {
+ 120   4      //        GPIO_WriteLow(GPIO1,GPIO_PIN_3); 
+ 121   4              break;
+ 122   4            }
+ 123   3            lowTime++;
+ 124   3            delay_us(1);
+ 125   3          }
+ 126   2          /*
+ 127   2            lowTime = 0;
+ 128   2            while( GPIO_ReadPin(GPIO1,DQ_PIN) == 0 ){
+ 129   2            lowTime++;
+ 130   2            delay_us(1);
+ 131   2          }
+ 132   2          */
+ 133   2          
+ 134   2            if( lowTime > tRSTL )
+ 135   2            {
+ 136   3              Count = 0;
+ 137   3      //        GPIO_WriteHigh(GPIO1,GPIO_PIN_3);
+ 138   3              ACT_INIT();
+ 139   3      //        GPIO_WriteLow(GPIO1,GPIO_PIN_3); 
+ 140   3              continue;
+ 141   3            }
+ 142   2            
+ 143   2            Count++;
+ 144   2            cmd>>=1;
+ 145   2            if( lowTime < tLOW1 ){
+ 146   3              cmd |= 0x80 ;
+ 147   3              GPIO_WriteHigh(GPIO1,GPIO_PIN_3);
+ 148   3            }
+ 149   2            else if (lowTime > tLOW0)
+ 150   2            {
+ 151   3              GPIO_WriteLow(GPIO1,GPIO_PIN_3); 
+ 152   3            }
+ 153   2      
+ 154   2          if( Count == 8 )
+ 155   2          {
+ 156   3            Count = 0;
+ 157   3            datas[i] = cmd;
+ 158   3            i++;
+ 159   3            if (i >= 10) i = 0;
+ 160   3            /*
+ 161   3            if (cmd == 0x10)
+ 162   3            {
+ 163   3              delay_us(100);
+ 164   3              GPIO_WriteHigh(GPIO1,GPIO_PIN_3);
+ 165   3              delay_us(100);
+ 166   3              GPIO_WriteLow(GPIO1,GPIO_PIN_3); 
+ 167   3            }
+ 168   3            */
+ 169   3            cmd = 0x00;
+ 170   3            /*
+ 171   3            if( cmd == datas[0] ){
+ 172   3              WRITE_BYTES( datas + 1, 8 );
+ 173   3            }
+ 174   3            */
+ 175   3          }
+ 176   2      
+ 177   2        }
+ 178   1        
+C51 COMPILER V9.60.7.0   MAIN                                                              08/30/2023 14:52:08 PAGE 4   
 
- 178   1          GPIO_WriteLow(GPIO1,DQ_PIN);      //P14写低
- 179   1          for(i=0;i<600 * 1;i++)              //延时一段时间
- 180   1          {
- 181   1            for(j=0;j<300;j++);
- 182   1          }
- 183   1        }
- 184   1        */
- 185   1      }
+ 179   1        /*
+ 180   1        uint16_t i,j;
+ 181   1        
+ 182   1        GPIO_Init(GPIO1,DQ_PIN,GPIO_MODE_OUT_PP); //将P14设置为强推挽输出
+ 183   1      
+ 184   1        while(1)
+ 185   1        {
+ 186   1          GPIO_WriteHigh(GPIO1,DQ_PIN);     //P14写高
+ 187   1          for(i=0;i<600 * 1;i++)              //延时一段时间
+ 188   1          {
+ 189   1            for(j=0;j<300;j++);
+ 190   1          }
+ 191   1          GPIO_WriteLow(GPIO1,DQ_PIN);      //P14写低
+ 192   1          for(i=0;i<600 * 1;i++)              //延时一段时间
+ 193   1          {
+ 194   1            for(j=0;j<300;j++);
+ 195   1          }
+ 196   1        }
+ 197   1        */
+ 198   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    484    ----
-   CONSTANT SIZE    =     48    ----
+   CODE SIZE        =    490    ----
+   CONSTANT SIZE    =     10    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =   ----      69
+   DATA SIZE        =   ----      31
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.
 
 
-C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

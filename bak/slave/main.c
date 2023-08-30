@@ -13,7 +13,7 @@
 #define tPDL	60//-240
 
 #define tSLOT	60//60-120
-#define tLOW1	1//1-15
+#define tLOW1	15//1-15
 #define tREC	1//1-
 #define tLOW0	60//60-120<tSLOT
 
@@ -92,7 +92,7 @@ void main(void)
 	unsigned int i = 0;
 	unsigned int lowTime;
 	unsigned char cmd = 0, Count = 0;
-	unsigned char datas[48] = { 0 };	
+	unsigned char datas[10] = { 0 };	
 	BitStatus ret = 0;
 	
 	GPIO_Init(GPIO1,GPIO_PIN_3,GPIO_MODE_OUT_PP);
@@ -105,6 +105,7 @@ void main(void)
 			ret = GPIO_ReadPin(GPIO1,DQ_PIN);
 			if (ret != 1) 
 			{
+//				GPIO_WriteHigh(GPIO1,GPIO_PIN_3);
 				break;
 			}
 		}
@@ -116,6 +117,7 @@ void main(void)
 			ret = GPIO_ReadPin(GPIO1, DQ_PIN);
 			if (ret != 0)
 			{
+//				GPIO_WriteLow(GPIO1,GPIO_PIN_3); 
 				break;
 			}
 			lowTime++;
@@ -130,30 +132,41 @@ void main(void)
 		*/
 		
     	if( lowTime > tRSTL )
-        {
-			Count = 0;
-			ACT_INIT();
-			continue;
-		}
-
+			{
+				Count = 0;
+//				GPIO_WriteHigh(GPIO1,GPIO_PIN_3);
+				ACT_INIT();
+//				GPIO_WriteLow(GPIO1,GPIO_PIN_3); 
+				continue;
+			}
+			
     	Count++;
-		cmd>>=1;
+			cmd>>=1;
     	if( lowTime < tLOW1 ){
-			cmd |= 0x80 ;
+				cmd |= 0x80 ;
+				GPIO_WriteHigh(GPIO1,GPIO_PIN_3);
     	}
+			else if (lowTime > tLOW0)
+			{
+				GPIO_WriteLow(GPIO1,GPIO_PIN_3); 
+			}
 
-		if( Count == 8 ){
+		if( Count == 8 )
+		{
 			Count = 0;
 			datas[i] = cmd;
 			i++;
-			if (i >= 48) i = 0;
-			if (cmd = 0x10)
+			if (i >= 10) i = 0;
+			/*
+			if (cmd == 0x10)
 			{
-			delay_us(100);
-			GPIO_WriteHigh(GPIO1,GPIO_PIN_3);
-			delay_us(100);
-			GPIO_WriteLow(GPIO1,GPIO_PIN_3); 
+				delay_us(100);
+				GPIO_WriteHigh(GPIO1,GPIO_PIN_3);
+				delay_us(100);
+				GPIO_WriteLow(GPIO1,GPIO_PIN_3); 
 			}
+			*/
+			cmd = 0x00;
 			/*
 			if( cmd == datas[0] ){
 				WRITE_BYTES( datas + 1, 8 );

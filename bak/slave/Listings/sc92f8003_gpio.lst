@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   SC92F8003_GPIO                                                    08/30/2023 11:56:08 PAGE 1   
+C51 COMPILER V9.60.7.0   SC92F8003_GPIO                                                    08/30/2023 14:52:08 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE SC92F8003_GPIO
@@ -62,7 +62,7 @@ line level    source
   51   3            P0CON &= ~PortPins;
   52   3            P0PH  |= PortPins;
   53   3          }
-C51 COMPILER V9.60.7.0   SC92F8003_GPIO                                                    08/30/2023 11:56:08 PAGE 2   
+C51 COMPILER V9.60.7.0   SC92F8003_GPIO                                                    08/30/2023 14:52:08 PAGE 2   
 
   54   2          if(GPIO_Mode == GPIO_MODE_OUT_PP) //推挽输出
   55   2          {
@@ -126,7 +126,7 @@ line level    source
  113   1        {
  114   2          P0 = PortVal;
  115   2        }
-C51 COMPILER V9.60.7.0   SC92F8003_GPIO                                                    08/30/2023 11:56:08 PAGE 3   
+C51 COMPILER V9.60.7.0   SC92F8003_GPIO                                                    08/30/2023 14:52:08 PAGE 3   
 
  116   1        if(GPIOx == GPIO1)
  117   1        {
@@ -190,7 +190,7 @@ line level    source
  175          *入口参数：GPIOx  选择操作的GPIO口（P0,P1,P2）
  176          *出口参数：uint8_t  返回Px的值
  177          **************************************************/
-C51 COMPILER V9.60.7.0   SC92F8003_GPIO                                                    08/30/2023 11:56:08 PAGE 4   
+C51 COMPILER V9.60.7.0   SC92F8003_GPIO                                                    08/30/2023 14:52:08 PAGE 4   
 
  178          uint8_t GPIO_ReadPort(GPIO_TypeDef GPIOx)
  179          {
