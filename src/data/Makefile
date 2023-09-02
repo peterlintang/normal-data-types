@@ -55,7 +55,8 @@ DATA_SRCS := ./ap.c			\
 		./aes/cfb.c		\
 		./aes/ofb.c		\
 		./aes/pcbc.c		\
-		./aes/aes.c		
+		./aes/aes.c		\
+		./mysql.c
 
 
 DATA_OBJS := ./ap.o			\
@@ -102,7 +103,8 @@ DATA_OBJS := ./ap.o			\
 		./aes/cfb.o		\
 		./aes/ofb.o		\
 		./aes/pcbc.o		\
-		./aes/aes.o		
+		./aes/aes.o		\
+		./mysql.o
 
 
 all: $(LIBS)

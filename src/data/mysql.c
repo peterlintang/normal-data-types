@@ -1,24 +1,18 @@
-#include <corenova/source-stub.h>
 
-THIS = {
-	.version     = "2.0",
-	.author      = "Peter K. Lee <saint@corenova.com>",
-	.description = "Provides API to MySQL Database.",
-	.implements  = LIST ("MySQL","Database")
-};
 
-#include <corenova/data/db/mysql.h>
-#include <corenova/data/database.h>
+
+#include "mysql.h"
 
 /*//////// MODULE CODE //////////////////////////////////////////*/
+extern my_bool my_init(void);
 
 void CONSTRUCTOR __mysql_init__ () {
 	my_init ();					/* make it thread safe! */
 }
 
-static MYSQL *
-_connect (char *host, char *user, char *pass, char *dbname,
-		  uint32_t port, char *socket, uint32_t flags) {
+MYSQL *MODULE_FUN_NAME(MySql, connect)(char *host, char *user, char *pass, char *dbname,
+						uint32_t port, char *socket, uint32_t flags)
+{
 	MYSQL *conn = mysql_init(NULL);
 	if (!conn) return NULL;
 	
@@ -47,13 +41,13 @@ _connect (char *host, char *user, char *pass, char *dbname,
 	return (conn);
 }
 
-static void
-_close (MYSQL *conn) {
+void MODULE_FUN_NAME(MySql, close)(MYSQL *conn) 
+{
 	if (conn) mysql_close (conn);
 }
 
-static int32_t
-_query (MYSQL *conn, const char *sql) {
+int32_t MODULE_FUN_NAME(MySql, query)(MYSQL *conn, const char *sql) 
+{
 	int32_t affected_rows;
 
 //	DEBUGP(DMSG,"query","%s",sql);
@@ -76,8 +70,8 @@ _query (MYSQL *conn, const char *sql) {
   Either returns number of rows retrieved, or number of rows affected (if
   SELECT)
 */
-static int32_t
-_execute (MYSQL *conn, const char *query, MYSQL_RES **result) {
+int32_t MODULE_FUN_NAME(MySql, execute)(MYSQL *conn, const char *query, MYSQL_RES **result) 
+{
 	MODULE_LOCK ();
 	int32_t affectedRows = I (MySQL)->query (conn,query);
 	MYSQL_RES *res = (affectedRows != -1)?I (MySQL)->getResult (conn):NULL;
@@ -96,8 +90,8 @@ _execute (MYSQL *conn, const char *query, MYSQL_RES **result) {
 	}
 }
 
-static int32_t                                                                                                                                              
-_executeFunc (MYSQL *conn, const char *funcname, MYSQL_RES **result, va_list ap) { 
+int32_t MODULE_FUN_NAME(MySql, executeFunc)(MYSQL *conn, const char *funcname, MYSQL_RES **result, va_list ap) 
+{ 
 
         char *param = NULL;
                                                                                                                                                              
@@ -136,8 +130,8 @@ _executeFunc (MYSQL *conn, const char *funcname, MYSQL_RES **result, va_list ap)
 
 }
 
-static int32_t
-_executeFunc2 (MYSQL *conn, const char *funcname, MYSQL_RES **result, char **argv, int32_t argc) { 
+int32_t MODULE_FUN_NAME(MySql, executeFunc2)(MYSQL *conn, const char *funcname, MYSQL_RES **result, char **argv, int32_t argc) 
+{ 
 
         char stmtBuffer[DB_QUERY_MAXLEN];
                                                                                                                                                              
@@ -174,15 +168,15 @@ _executeFunc2 (MYSQL *conn, const char *funcname, MYSQL_RES **result, char **arg
 
 }
 
-static int32_t
-_executeFunc3 (MYSQL *conn, const char *funcname, MYSQL_RES **result, char **argv, char **type, int32_t argc) { 
+int32_t MODULE_FUN_NAME(MySql, executeFunc3)(MYSQL *conn, const char *funcname, MYSQL_RES **result, char **argv, char **type, int32_t argc) 
+{ 
 
     return _executeFunc2(conn, funcname, result, argv, argc);
 
 }
 
-static int32_t                                                                                                                                              
-_executeProc (MYSQL *conn, const char *procname, MYSQL_RES **result, va_list ap) { 
+int32_t MODULE_FUN_NAME(MySql, executeProc)(MYSQL *conn, const char *procname, MYSQL_RES **result, va_list ap) 
+{ 
 
         char *param = NULL;
                                                                                                                                                              
@@ -209,13 +203,13 @@ _executeProc (MYSQL *conn, const char *procname, MYSQL_RES **result, va_list ap)
 
 }
 
-static MYSQL_RES *
-_getResult (MYSQL *conn) {
+MYSQL_RES *MODULE_FUN_NAME(MySql, getResult)(MYSQL *conn) 
+{
 	return mysql_store_result (conn);
 }
 
-static void
-_freeResult (MYSQL_RES *result) {
+void MODULE_FUN_NAME(MySql, freeResult)(MYSQL_RES *result) 
+{
 	if (result)
 		mysql_free_result (result);
 }
@@ -223,26 +217,26 @@ _freeResult (MYSQL_RES *result) {
 /*
   Can find out if a result should be expected.
 */
-static int32_t
-_countFields (MYSQL *conn) {
+int32_t MODULE_FUN_NAME(MySql, countFields)(MYSQL *conn) 
+{
 	return mysql_field_count (conn);
 }
 
-static int32_t
-_numRows (MYSQL_RES *result) {
+int32_t MODULE_FUN_NAME(MySql, numRows)(MYSQL_RES *result) 
+{
 	return (long int) mysql_num_rows (result);
 }
 
-static MYSQL_ROW
-_getRow (MYSQL_RES *result) {
+MYSQL_ROW  MODULE_FUN_NAME(MySql, getRow)(MYSQL_RES *result) 
+{
 	return mysql_fetch_row(result);
 }
 
 #define TIMESTAMP_BUFFER_LEN 32
 static char TimestampBuffer[TIMESTAMP_BUFFER_LEN];
 
-static char *
-_timestamp (struct timeval *tv) {
+char *MODULE_FUN_NAME(MySql, timestamp)(struct timeval *tv) 
+{
 	char *tstamp = NULL;
 	MODULE_LOCK ();
 	if (TIMESTAMP_BUFFER_LEN >
@@ -253,8 +247,8 @@ _timestamp (struct timeval *tv) {
 	return tstamp;
 }
 
-static char *
-_escapeString (MYSQL *conn, const char *string) {
+char *MODULE_FUN_NAME(MySql, escapeString)(MYSQL *conn, const char *string) 
+{
 	char *eString = NULL;
 	if (conn) {
 		if (string) {
@@ -272,8 +266,8 @@ _escapeString (MYSQL *conn, const char *string) {
 	return eString;
 }
 
-static int32_t
-_snprintf (MYSQL *conn, char *str, size_t size, const char *format,...) {
+int32_t MODULE_FUN_NAME(MySql, snprintf)(MYSQL *conn, char *str, size_t size, const char *format,...) 
+{
 	va_list ap;
 	va_start (ap,format);
 	return I (MySQL)->vsnprintf (conn,str,size,format,ap);
@@ -281,8 +275,8 @@ _snprintf (MYSQL *conn, char *str, size_t size, const char *format,...) {
 
 #define FORMAT_STRING_MAXLEN 32
 
-static int32_t
-_vsnprintf (MYSQL *conn, char *str, size_t size, const char *format, va_list ap) {
+int32_t MODULE_FUN_NAME(MySql, vsnprintf)(MYSQL *conn, char *str, size_t size, const char *format, va_list ap) 
+{
 	const char *origFormat = format;
 	uint32_t idx = 0;
 	char formatBuffer[FORMAT_STRING_MAXLEN];
@@ -371,26 +365,6 @@ _vsnprintf (MYSQL *conn, char *str, size_t size, const char *format, va_list ap)
 	str[idx] = '\0';			/* terminate string */
 	return idx;
 }
-
-IMPLEMENT_INTERFACE (MySQL) = {
-	.connect       = _connect,
-	.close         = _close,
-	.query         = _query,
-	.execute       = _execute,
-	.executeProc   = _executeProc,
-	.executeFunc   = _executeFunc,
-	.executeFunc2  = _executeFunc2,
-	.executeFunc3  = _executeFunc3,
-	.getResult     = _getResult,
-	.freeResult    = _freeResult,
-	.countFields   = _countFields,
-	.numRows       = _numRows,
-	.getRow        = _getRow,
-	.timestamp     = _timestamp,
-	.escapeString  = _escapeString,
-	.snprintf      = _snprintf,
-	.vsnprintf     = _vsnprintf
-};
 
 
 /***** Database Interface Implementation *****/
@@ -606,3 +580,9 @@ IMPLEMENT_INTERFACE (Database) = {
 	.timeString   = timeString,
 	.destroy      = databaseDestroy
 };
+
+
+
+
+
+
