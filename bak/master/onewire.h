@@ -3,8 +3,11 @@
 //#include <stdint.h>
 
 #define 	DQ_PIN	GPIO_PIN_4
-#define	  DQ_OUT	GPIO_Init(GPIO1,DQ_PIN,GPIO_MODE_OUT_PP)
-#define   DQ_IN		GPIO_Init(GPIO1,DQ_PIN,GPIO_MODE_IN_PU)
+#define	  DQ_OUT	do { P1CON |= DQ_PIN; } while (0)
+#define   DQ_IN		do { P1CON &= ~DQ_PIN; P1PH |= DQ_PIN;} while (0)
+#define 	DQ_PIN_HIGH	(P1 |= DQ_PIN)
+#define 	DQ_PIN_LOW	(P1 &= ~DQ_PIN)
+#define		DQ_PIN_VALUE	(P1 & DQ_PIN)
 
 #define tRSTL	480//-
 #define tRSTH	480//-
@@ -25,9 +28,9 @@
 #include "sc92f8003_gpio.h"
 
 extern unsigned char ops_onewire_reset(void);
-extern int ops_onewire_read(void *buff,int size);
-extern int ops_onewire_write(void *buff,int size);
-void delayus(uint32_t us);
+extern int ops_onewire_read(void *buff,int len);
+extern int ops_onewire_write(void *buff,int len);
+void delayus(uint16_t us);
 
 extern void onewire_init(void);
 
