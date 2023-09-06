@@ -37,6 +37,7 @@ void main(void)
 		ops_onewire_reset();
 		
 		ops_onewire_write(&cmd, 1);
+//		i = 50; while (i--);
 		ops_onewire_read(&value, 1);
 		if (value != cmd)
 		{
