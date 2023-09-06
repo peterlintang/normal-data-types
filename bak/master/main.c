@@ -34,7 +34,7 @@ void main(void)
 	{
 		DQ_OUT;
 		
-//		ops_onewire_reset();
+		ops_onewire_reset();
 		
 		ops_onewire_write(&cmd, 1);
 		ops_onewire_read(&value, 1);
@@ -53,5 +53,6 @@ void main(void)
 		  GPIO_WriteLow(GPIO1,GPIO_PIN_3); 
 		}
 		cmd++;
+		
 	}	
 }
