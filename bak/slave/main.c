@@ -1,6 +1,7 @@
 
 #include "sc92f8003_gpio.h"
 #include "sc92f8003_timer0.h"
+#include "sc92f8003_timer1.h"
 
 #define   DQ_PIN  GPIO_PIN_4
 #define   DQ_OUT  do { P1CON |= DQ_PIN; } while (0)
@@ -156,6 +157,16 @@ void Timer0Init(uint16_t us)
 //	TIM0_Cmd(ENABLE);								//使能Timer0计数
 }
 
+uint16_t time1_value = 0;
+void Timer1Init(uint16_t us)
+{
+	time1_value = (2 << 16) - 16 * us;
+	TIM1_TimeBaseInit(TIM1_PRESSEL_FSYS_D1,TIM1_MODE_TIMER);
+	TIM1_WorkMode1Config(time1_value);
+	TIM1_ITConfig(ENABLE, LOW);
+	TIM1_Cmd(ENABLE);
+}
+
 uint16_t lowTime = 0;
 unsigned char charge_status = CHARGE_STATUS_DEFAULT;
 unsigned char battery_status = BATTERY_STATUS_DEFAULT;
@@ -168,14 +179,14 @@ void process_charge_status(void)
 	switch (charge_status)
 	{
 		case CHARGE_STATUS_CHARGING:
-			GPIO_WriteHigh(GPIO1, GPIO_PIN_3);
+//			GPIO_WriteHigh(GPIO1, GPIO_PIN_3);
 		break;
 		
 		case CHARGE_STATUS_NOT_CHARGING:
 		break;
 		
 		case CHARGE_STATUS_CHARGING_FULL:
-			GPIO_WriteLow(GPIO1, GPIO_PIN_3);
+//			GPIO_WriteLow(GPIO1, GPIO_PIN_3);
 		break;
 		
 		default:
@@ -273,7 +284,8 @@ void main(void)
 	
 	init_gpio();
 	Timer0Init(1);
-//	enableInterrupts();
+	Timer1Init(1000);
+	enableInterrupts();
 	
 	DQ_PIN_HIGH;
 	DQ_IN;

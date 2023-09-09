@@ -50,9 +50,23 @@ void EXTI1Interrupt()		interrupt 2
 
 }
 
+extern uint16_t time1_value;
+uint16_t time1_count = 0;
+unsigned char time1_flag = 0;
 void Timer1Interrupt()		interrupt 3
 {
-
+	TIM1_Mode1SetReloadCounter(time1_value);
+	time1_count++;
+	
+	if (time1_count % 1000 == 0)
+	{
+		time1_flag = !time1_flag;
+	}
+	
+	if (time1_flag == 1)
+		GPIO_WriteHigh(GPIO1, GPIO_PIN_3);
+	else
+		GPIO_WriteLow(GPIO1, GPIO_PIN_3);
 }
 
 void UART0Interrupt()		interrupt 4
