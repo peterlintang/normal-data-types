@@ -158,9 +158,13 @@ void Timer0Init(uint16_t us)
 }
 
 uint16_t time1_value = 0;
+uint8_t time1_value_tl1;
+uint8_t time1_value_th1;
 void Timer1Init(uint16_t us)
 {
 	time1_value = (2 << 16) - 16 * us;
+	time1_value_tl1 = time1_value & 0x00ff;
+	time1_value_th1 = time1_value >> 8;
 	TIM1_TimeBaseInit(TIM1_PRESSEL_FSYS_D1,TIM1_MODE_TIMER);
 	TIM1_WorkMode1Config(time1_value);
 	TIM1_ITConfig(ENABLE, LOW);
@@ -174,8 +178,17 @@ unsigned char mode_status = MODE_STATUS_DEFAULT;
 unsigned char speed_status = SPEED_STATUS_DEFAULT;
 unsigned char filter_status = FILTER_STATUS_DEFAULT;
 
-void process_charge_status(void)
+void process_charge_status(unsigned char recv_data)
 {
+	unsigned char status = 0;
+	
+	status = GET_CHARGE_STATUS(recv_data);
+	
+	if (charge_status == status)
+		return ;
+	else
+		charge_status = status;
+	
 	switch (charge_status)
 	{
 		case CHARGE_STATUS_CHARGING:
@@ -194,8 +207,17 @@ void process_charge_status(void)
 	}
 }
 
-void process_battery_status(void)
+void process_battery_status(unsigned char recv_data)
 {
+	unsigned char status = 0;
+	
+	status = GET_BATTERY_STATUS(recv_data);
+
+	if (battery_status == status)
+		return ;
+	else
+		battery_status = status;
+	
 	switch (battery_status)
 	{
 		case BATTERY_STATUS_LOW:
@@ -212,8 +234,17 @@ void process_battery_status(void)
 	}
 }
 
-void process_mode_status(void)
+void process_mode_status(unsigned char recv_data)
 {
+	unsigned char status = 0;
+	
+	status = GET_MODE_STATUS(recv_data);
+	
+	if (mode_status == status)
+		return ;
+	else
+		mode_status = status;
+	
 	switch (mode_status)
 	{
 		case MODE_STATUS_HARD_SOLEPLATE:
@@ -229,8 +260,17 @@ void process_mode_status(void)
 	}
 }
 
-void process_speed_status(void)
+void process_speed_status(unsigned char recv_data)
 {
+	unsigned char status = 0;
+	
+	status = GET_SPEED_STATUS(recv_data);
+
+	if (speed_status == status)
+		return ;
+	else
+		speed_status = status;
+	
 	switch (speed_status)
 	{
 		case SPEED_STATUS_LOW:
@@ -250,8 +290,17 @@ void process_speed_status(void)
 	}
 }
 
-void process_filter_status(void)
+void process_filter_status(unsigned char recv_data)
 {
+	unsigned char status = 0;
+	
+	status = GET_FILTER_STATUS(recv_data);		
+	
+	if (filter_status == status)
+		return ;
+	else
+		filter_status = status;
+	
 	switch (filter_status)
 	{
 		case FILTER_STATUS_DIRTY:
@@ -293,12 +342,12 @@ void main(void)
 	while (1)
 	{
 		DQ_IN;
-
+				
 		while (DQ_PIN_VALUE != 0)
 		{
 			;
 		}
-    
+		
 		TL0 = 1;	
 		TH0 = 0;		
 		TR0 = 1;	
@@ -317,6 +366,7 @@ void main(void)
 		
     if( lowTime > tRSTL )
 		{
+			disableInterrupts();
 			Count = 0;
 			recv_data = 0;
 			ACT_INIT();
@@ -335,30 +385,30 @@ void main(void)
 		
 		if (Count == 8)
 		{
+//			WRITE_BYTES(&recv_data, 1);
 			if (recv_data == CMD_REPORT_STATUS)
 			{
 			}
 			else
-			{
-				charge_status = GET_CHARGE_STATUS(recv_data);
-				battery_status = GET_BATTERY_STATUS(recv_data);
-				mode_status = GET_MODE_STATUS(recv_data);
-				speed_status = GET_SPEED_STATUS(recv_data);
-				filter_status = GET_FILTER_STATUS(recv_data);		
+			{								
 				
-				process_charge_status();
-				process_battery_status();
-				process_mode_status();
-				process_speed_status();
-				process_filter_status();
+				process_charge_status(recv_data);
+				process_battery_status(recv_data);
+				process_mode_status(recv_data);
+				process_speed_status(recv_data);
+				process_filter_status(recv_data);
+				
 			}
 			
 			Count = 0;
-		//	recv_data = 0x00;
 			
-		
-			WRITE_BYTES(&recv_data, 1);
+			if (recv_data != 0xa5)
+				GPIO_WriteHigh(GPIO1, GPIO_PIN_3);
+			else
+				GPIO_WriteLow(GPIO1, GPIO_PIN_3);
+			
 			recv_data = 0x00;
+			enableInterrupts();
 			
 		}
 

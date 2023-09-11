@@ -37,23 +37,25 @@ void main(void)
 		ops_onewire_reset();
 		
 		ops_onewire_write(&cmd, 1);
+
 //		i = 50; while (i--);
-		ops_onewire_read(&value, 1);
-		if (value != cmd)
+//		ops_onewire_read(&value, 1);
+//		if (value != cmd)
 		{
 			unsigned char j, k;
-		  k = 230; while (k--)
+		  k = 250; while (k--)
 			{
-				j = 230; while (j--) ;
+				j = 250; while (j--) ;
 			}
 		  GPIO_WriteHigh(GPIO1,GPIO_PIN_3);
-		  k = 230; while (k--)
+		  k = 250; while (k--)
 			{
-				j = 230; while (j--) ;
+				j = 250; while (j--) ;
 			}
 		  GPIO_WriteLow(GPIO1,GPIO_PIN_3); 
 		}
-		cmd++;
-		
+		delayus(200);
+//		cmd++;
+
 	}	
 }

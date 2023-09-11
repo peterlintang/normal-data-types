@@ -34,8 +34,8 @@ extern uint16_t lowTime;
 unsigned char flag = 0;
 void Timer0Interrupt()		interrupt 1
 {
-	TIM0_Mode0SetReloadCounter(time0_value);
-	lowTime++;
+//	TIM0_Mode0SetReloadCounter(time0_value);
+//	lowTime++;
 	/*
 	if (flag)
 		DQ_PIN_HIGH;
@@ -51,12 +51,17 @@ void EXTI1Interrupt()		interrupt 2
 }
 
 extern uint16_t time1_value;
+extern uint8_t time1_value_tl1;
+extern uint8_t time1_value_th1;
 uint16_t time1_count = 0;
 unsigned char time1_flag = 0;
 void Timer1Interrupt()		interrupt 3
 {
-	TIM1_Mode1SetReloadCounter(time1_value);
+	TL1 = time1_value_tl1;
+	TH1 = time1_value_th1;
+//	TIM1_Mode1SetReloadCounter(time1_value);
 	time1_count++;
+//	return ;
 	
 	if (time1_count % 1000 == 0)
 	{
@@ -64,9 +69,13 @@ void Timer1Interrupt()		interrupt 3
 	}
 	
 	if (time1_flag == 1)
-		GPIO_WriteHigh(GPIO1, GPIO_PIN_3);
+	{
+//		GPIO_WriteHigh(GPIO1, GPIO_PIN_3);
+	}
 	else
-		GPIO_WriteLow(GPIO1, GPIO_PIN_3);
+	{
+//		GPIO_WriteLow(GPIO1, GPIO_PIN_3);
+	}
 }
 
 void UART0Interrupt()		interrupt 4
