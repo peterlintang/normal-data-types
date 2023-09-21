@@ -13,7 +13,7 @@
 #include "gps.h"
 #include "utils/Log.h"
 
-static int exit_flag = 0;
+static int exit_flag = 1;
 static struct gps_info location_info;
 static pthread_mutex_t  gps_info_lock;
 
@@ -242,12 +242,24 @@ static int gps_disable_loc(int fd)
 
 int gps_get_loc(struct gps_info *info)
 {
+	if (exit_flag)
+		return -1;
 	pthread_mutex_lock(&gps_info_lock);
+
 	info->valid = location_info.valid;
 	strncpy(info->latitude, location_info.latitude, 32);
 	strncpy(info->north_south, location_info.north_south, 2);
 	strncpy(info->longitude, location_info.longitude, 32);
 	strncpy(info->east_west, location_info.east_west, 2);
+
+	info->la_degree = location_info.la_degree;
+	info->la_minute = location_info.la_minute;
+	info->la_second = location_info.la_second;
+
+	info->lo_degree = location_info.lo_degree;
+	info->lo_minute = location_info.lo_minute;
+	info->lo_second = location_info.lo_second;
+
 	pthread_mutex_unlock(&gps_info_lock);
 
 	return 0;
@@ -303,6 +315,26 @@ int gps_get_loc(int fd, char *result, int len)
 
 #define GPS_DEVICE_UART1	"/dev/ttyUSB1"
 #define GPS_DEVICE_UART2	"/dev/ttyUSB2"
+
+static int transform(char *a, char *b, struct gps_info *info)
+{
+	double fa = 0.0;
+	double fb = 0.0;
+
+	fa = atof(a);
+	fb = atof(b);
+
+	info->la_degree = (int)fa / 100;
+	info->lo_degree =  (int)fb / 100;
+
+	info->la_minute =  (int)(fa - (int)fa / 100 * 100);
+	info->lo_minute = (int)(fb - (int)fb / 100 * 100);
+
+	info->la_second = (int)((fa - ((int)fa / 100 * 100 + (int)(fa - (int)fa / 100 * 100))) * 60);
+	info->lo_second = (int)((fb - ((int)fb / 100 * 100 + (int)(fb - (int)fb / 100 * 100))) * 60);
+
+	return 0;
+}
 
 static int process_gps(char *buf, int ret)
 {
@@ -396,6 +428,7 @@ static int process_gps(char *buf, int ret)
 			strncpy(location_info.north_south, north_south, 2);
 			strncpy(location_info.longitude, longitude, 32);
 			strncpy(location_info.east_west, east_west, 2);
+			transform(location_info.latitude, location_info.longitude, &location_info);
 			pthread_mutex_unlock(&gps_info_lock);
 			LOGD("new info valid: %d, latitude: %s, north_south: %s, longitude: %s, east_west: %s\n", 
 					location_info.valid,
@@ -449,7 +482,7 @@ static void *(gps_thread)(void *noused)
 			break;
 		}
 
-		if (count < 20)
+		if (count < 30)
 			continue;
 		else
 		{
@@ -494,6 +527,7 @@ int gps_init(void)
 	int ret = 0;
 	pthread_t pid = 0;
 
+	exit_flag = 0;
 	memset(&location_info, 0, sizeof(location_info));
 	pthread_mutex_init(&gps_info_lock, NULL);
 
