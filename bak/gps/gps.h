@@ -6,13 +6,13 @@ struct gps_info {
 	int valid;				// 0 : gps info is not valid, 1: gps info valid;
 	int la_degree;
 	int la_minute;
-	int la_second;
+	double la_second;
 	char latitude[32]; 		//	latitude 纬度
 	char north_south[2];	// N： 北纬，  S:南纬
 
 	int lo_degree;
 	int lo_minute;
-	int lo_second;
+	double lo_second;
 	char longitude[32];		// longitude 经度
 	char east_west[2];		// E:东经，  W:西经
 };

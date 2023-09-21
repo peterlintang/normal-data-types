@@ -330,8 +330,8 @@ static int transform(char *a, char *b, struct gps_info *info)
 	info->la_minute =  (int)(fa - (int)fa / 100 * 100);
 	info->lo_minute = (int)(fb - (int)fb / 100 * 100);
 
-	info->la_second = (int)((fa - ((int)fa / 100 * 100 + (int)(fa - (int)fa / 100 * 100))) * 60);
-	info->lo_second = (int)((fb - ((int)fb / 100 * 100 + (int)(fb - (int)fb / 100 * 100))) * 60);
+	info->la_second = (double)((fa - ((int)fa / 100 * 100 + (int)(fa - (int)fa / 100 * 100))) * 60);
+	info->lo_second = (double)((fb - ((int)fb / 100 * 100 + (int)(fb - (int)fb / 100 * 100))) * 60);
 
 	return 0;
 }
