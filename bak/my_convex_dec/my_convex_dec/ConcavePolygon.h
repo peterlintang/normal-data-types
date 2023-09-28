@@ -80,6 +80,8 @@ struct Vertex
     {
         Vec2 edge1 = v2.position-v1.position;
         Vec2 edge2 = v3.position-v2.position;
+	printf("%s: (%f, %f) (%f, %f) (%f, %f)\n", __func__, v1.position.x, v1.position.y, v2.position.x, v2.position.y, v3.position.x, v3.position.y);
+	printf("%s: (%f, %f) (%f, %f)\n", __func__, edge1.x, edge1.y, edge2.x, edge2.y);
 
         return Vec2::cross(edge1, edge2);
     }
@@ -329,12 +331,17 @@ class ConcavePolygon
 
     void convexDecomp(VertexArray const & _vertices)
     {
+	for (int i = 0; i < _vertices.size(); i++)
+	{
+		printf("%s: i: %d, (%f %f)\n", __func__, i, _vertices[i].position.x, _vertices[i].position.y);
+	}
         if(subPolygons.size() > 0)
         {
             return;
         }
 
         int reflexIndex = findFirstReflexVertex(_vertices);
+	printf("%s reflexIndex: %d\n", __func__, reflexIndex);
         if(reflexIndex == -1)
             return;
 
@@ -391,6 +398,7 @@ class ConcavePolygon
             float handedness = Vertex::getHandedness(_vertices[mod(i-1, _vertices.size())],
                                                      _vertices[i],
                                                      _vertices[mod(i+1, _vertices.size())]);
+	    printf("%s: handedness: %f, i: %d, %d, %d\n", __func__, handedness, i, mod(i - 1, _vertices.size()), mod(i + 1, _vertices.size()));
             if(handedness < 0.0f)
                 return i;
         }
@@ -411,7 +419,7 @@ class ConcavePolygon
                                 Vec2 const & origin,
                                 int const & maxVertsToKeep)
     {
-	printf("%s: \n", __func__);
+	printf("%s: %d %d\n", __func__, maxVertsToKeep, (int)input.size());
         if(maxVertsToKeep >= (int)input.size())
             return input;
 
@@ -460,6 +468,7 @@ class ConcavePolygon
             tempSegment.finalPos = _vertices[mod(i+1, _vertices.size())].position;
 
             std::pair<bool, Vec2 > intersectionResult = LineSegment::intersects(segment, tempSegment);
+	    printf("%s: i: %d, status: %d (%f %f)\n", __func__, i, intersectionResult.first, intersectionResult.second.x, intersectionResult.second.y);
 
             if(intersectionResult.first == true)
             {
@@ -538,6 +547,14 @@ public:
 
         VertexArray leftVerts;
         VertexArray rightVerts;
+        for(int i=0; i<(int)vertices.size(); ++i)
+	{
+		printf("%s: i: %d, (%f %f)\n", __func__, i, vertices[i].position.x, vertices[i].position.y);
+	}
+	for (auto it = slicedVertices.begin(); it != slicedVertices.end(); it++)
+	{
+		printf("%s:  %d (%f, %f)\n", __func__, it->first, it->second.position.x, it->second.position.y);
+	}
 
         for(int i=0; i<(int)vertices.size(); ++i)
         {
@@ -546,21 +563,22 @@ public:
             auto it = slicedVertices.begin();
 
             float perpDistance = std::abs(Vec2::cross(relativePosition, segment.direction()));
+	    printf("11111: (%f %f) (%f) %d\n", relativePosition.x, relativePosition.y,  perpDistance, slicedVertices.find(i)==slicedVertices.end() );
 
             if( perpDistance > TOLERANCE ||
               ( perpDistance <= TOLERANCE && (slicedVertices.find(i)==slicedVertices.end()) )
             )
             {
-                //std::cout << relCrossProd << ", i: " << i << "\n";
+                std::cout << ", i: " << i << "\n";
                 if((i > it->first) && (i <= (++it)->first))
                 {
                     leftVerts.push_back(vertices[i]);
-                    //std::cout << i << " leftVertAdded\n";
+                    printf("i: %d, (%f %f) %s\n", i, vertices[i].position.x, vertices[i].position.y, " leftVertAdded");
                 }
                 else
                 {
                     rightVerts.push_back(vertices[i]);
-                    //std::cout << i << " rightVertAdded\n";
+                    printf("i: %d, (%f %f) %s\n", i, vertices[i].position.x, vertices[i].position.y, " rightVertAdded");
                 }
 
             }

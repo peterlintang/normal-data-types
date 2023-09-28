@@ -106,6 +106,8 @@ float Vertex_getHandedness(struct Vertex *v1,
 	edge1.y = v2->position.y - v1->position.y;
 	edge2.x = v3->position.x - v2->position.x;
 	edge2.y = v3->position.y - v2->position.y;
+	printf("%s: (%f, %f) (%f, %f) (%f, %f)\n", __func__, v1->position.x, v1->position.y, v2->position.x, v2->position.y, v3->position.x, v3->position.y);
+	printf("%s: (%f, %f) (%f, %f)\n", __func__, edge1.x, edge1.y, edge2.x, edge2.y);
 
 	return Vec2_cross(&edge1, &edge2);
 }
@@ -411,12 +413,17 @@ int _getBestVertexToConnect(int *indices, int indices_num,
 
 void _convexDecomp(struct Vertex *_vertices, int vertices_num, struct ConcavePolygon *polygon)
 {
+		for (int i = 0; i < vertices_num; i++)
+		{
+			printf("%s: i: %d, (%f, %f)\n", __func__, i, _vertices[i].position.x, _vertices[i].position.y);
+		}
         if(polygon->subPolygons_num > 0)
         {
             return;
         }
 
         int reflexIndex = findFirstReflexVertex(_vertices, vertices_num);
+	printf("%s: reflexIndex: %d\n", __func__, reflexIndex );
         if(reflexIndex == -1)
             return;
 
@@ -476,11 +483,20 @@ void _convexDecomp(struct Vertex *_vertices, int vertices_num, struct ConcavePol
 
 int findFirstReflexVertex(struct Vertex *_vertices, int vertices_num)
 {
-	for(unsigned int i = 0; i < vertices_num; ++i)
+	for(int i = 0; i < vertices_num; ++i)
 	{
+		struct Vertex *v1;
+		struct Vertex *v2;
+		struct Vertex *v3;
 		float handedness = Vertex_getHandedness(&(_vertices[mod(i-1, vertices_num)]),
                                                      &(_vertices[i]),
                                                      &(_vertices[mod(i + 1, vertices_num)]));
+		v1 = &_vertices[mod(i-1, vertices_num)];
+		v2 = &_vertices[(i)];
+		v3 = &_vertices[mod(i+1, vertices_num)];
+		printf("%s: (%f, %f) (%f, %f) (%f, %f)\n", __func__, v1->position.x, v1->position.y, v2->position.x, v2->position.y, v3->position.x, v3->position.y);
+		printf("%s: handedness: %f, i: %d, %d, %d, \n", __func__, handedness, 
+				i, mod(i-1, vertices_num), mod(i + 1, vertices_num));
 		if(handedness < 0.0f)
 			return i;
 	}
@@ -498,11 +514,13 @@ int cullByDistance(struct Vertex *input, int *input_map, int input_num,
 					struct Vec2 *origin, int maxVertsToKeep,
 					struct Vertex *output, int *output_map, int *output_num)
 {
+		printf("%s: %d %d\n", __func__, maxVertsToKeep, input_num);
 	if(maxVertsToKeep >= input_num)
 	{
 		for (int i = 0; i < input_num; i++)
 		{
 			output[i] = input[i];
+			output_map[i] = input_map[i];
 		}
 		*output_num = input_num;
 		return 0;
@@ -517,13 +535,14 @@ int cullByDistance(struct Vertex *input, int *input_map, int input_num,
 		tmp.y = input[i].position.y = origin->y;
 		sliceVertices[i].position = input[i].position;
 		sliceVertices[i].index = input_map[i];
+		printf("%s: index: %d\n", __func__, input_map[i]);
 		sliceVertices[i].distanceToSlice = Vec2_square(&tmp);
 	}
 
 
-	for(unsigned int i = 1; i < sliceVertices_num ; ++i)
+	for(int i = 1; i < sliceVertices_num ; ++i)
 	{
-		for(unsigned int j = i; j > 0 && sliceVertices[j].distanceToSlice < sliceVertices[j-1].distanceToSlice; --j)
+		for(int j = i; j > 0 && sliceVertices[j].distanceToSlice < sliceVertices[j-1].distanceToSlice; --j)
 		{
 			struct SliceVertex tmp;
 
@@ -543,9 +562,9 @@ int cullByDistance(struct Vertex *input, int *input_map, int input_num,
 
 	sliceVertices_num = maxVertsToKeep;
 
-	for(unsigned int i = 1; i < sliceVertices_num; ++i)
+	for(int i = 1; i < sliceVertices_num; ++i)
 	{
-		for(unsigned int j = i; j > 0 && sliceVertices[j].index < sliceVertices[j-1].index; --j)
+		for(int j = i; j > 0 && sliceVertices[j].index < sliceVertices[j-1].index; --j)
 		{
 			struct SliceVertex tmp;
 
@@ -563,10 +582,11 @@ int cullByDistance(struct Vertex *input, int *input_map, int input_num,
 		}
 	}
 
-	for(unsigned int i=0; i < sliceVertices_num; ++i)
+	for(int i=0; i < sliceVertices_num; ++i)
 	{
 		output[i].position = sliceVertices[i].position;
 		output_map[i] = sliceVertices[i].index;
+		printf("%s: i: %d, (%f %f %d)\n", __func__, i, output[i].position.x, output[i].position.y, output_map[i]);
 	}
 
 	*output_num = sliceVertices_num;
@@ -582,7 +602,7 @@ int verticesAlongLineSegment(struct LineSegment *segment,
 	struct LineSegment tempSegment;
 	int index = 0;
 
-	for(unsigned int i = 0; i < _vertices_num; ++i)
+	for(int i = 0; i < _vertices_num; ++i)
 	{
 		int status = 0;
 		struct Vec2 v = { 0 };
@@ -591,6 +611,7 @@ int verticesAlongLineSegment(struct LineSegment *segment,
 		tempSegment.finalPos = _vertices[mod(i + 1, _vertices_num)].position;
 
 		intersects(segment, &tempSegment, &status, &v);
+		printf("%s: i: %d, status: %d (%f %f)\n", __func__, i, status, v.x, v.y);
 
 		if (status == 1)
 		{
@@ -599,6 +620,8 @@ int verticesAlongLineSegment(struct LineSegment *segment,
 			index++;
 		}
 	}
+	
+	*out_vertices_num = index;
 
 	return 0;
 }
@@ -622,7 +645,7 @@ int ConcavePolygon(struct ConcavePolygon *polygon, struct Vertex *_vertices, int
 	polygon->subPolygons[1] = NULL;
 
 	if(_vertices_num > 2)
-		if(checkIfRightHanded(polygon) == 1)
+		if(checkIfRightHanded(polygon) == 0)
 			flipPolygon(polygon);
 	return 0;
 }
@@ -716,6 +739,11 @@ void slicePolygon2(struct ConcavePolygon *Poly, struct LineSegment *segment)
 							out_vertices, out_vertices_map, 
 							&out_vertices_num);
 
+	for(int i = 0; i < out_vertices_num; ++i)
+	{
+			printf("%s 222: %d (%f %f)\n", __func__, 
+							out_vertices_map[i], out_vertices[i].position.x, out_vertices[i].position.y);
+	}
 
 	struct Vertex out_vertices2[out_vertices_num];
 	int out_vertices_map2[out_vertices_num];
@@ -728,10 +756,20 @@ void slicePolygon2(struct ConcavePolygon *Poly, struct LineSegment *segment)
 	if(out_vertices_num2 < 2)
 		return;
 
-	struct Vertex leftVerts[out_vertices_num2];
+	struct Vertex leftVerts[Poly->vertices_num];
 	int leftVerts_num = 0;
-	struct Vertex rightVerts[out_vertices_num2];
+	struct Vertex rightVerts[Poly->vertices_num];
 	int rightVerts_num = 0;
+
+	for(int i = 0; i < Poly->vertices_num; ++i)
+	{
+			printf("%s: i: %d, (%f %f)\n", __func__, i, Poly->vertices[i].position.x, Poly->vertices[i].position.y);
+	}
+	for(int i = 0; i < out_vertices_num2 ; ++i)
+	{
+			printf("%s: %d (%f %f)\n", __func__, 
+							out_vertices_map2[i], out_vertices2[i].position.x, out_vertices2[i].position.y);
+	}
 
 	for(int i = 0; i < Poly->vertices_num; ++i)
 	{
@@ -743,24 +781,33 @@ void slicePolygon2(struct ConcavePolygon *Poly, struct LineSegment *segment)
 		float perpDistance = fabs(Vec2_cross(&relativePosition, &v_dir));
 
 		int find_result = _slicedVertices_find(out_vertices2, out_vertices_map2, out_vertices_num2, i);
+		printf("11111: (%f %f) (%f) %d, l r: %d %d\n", 
+						relativePosition.x, relativePosition.y, perpDistance, 
+						find_result, leftVerts_num, rightVerts_num);
 		if( perpDistance > TOLERANCE ||
 				( perpDistance <= TOLERANCE && (find_result == -1)))
 		{
+				printf("i: %d\n", i);
 			if((i > out_vertices_map2[0]) && (i <= out_vertices_map2[1]))
 			{
 				leftVerts[leftVerts_num++] = Poly->vertices[i];
+				printf("i: %d, (%f %f) addleft\n", i, Poly->vertices[i].position.x, Poly->vertices[i].position.y);
 			}
 			else
 			{
 				rightVerts[rightVerts_num++] = Poly->vertices[i];
+				printf("i: %d, (%f %f) addright\n", i, Poly->vertices[i].position.x, Poly->vertices[i].position.y);
 			}
 
 		}
 
 		if(find_result != -1)
 		{
-			rightVerts[rightVerts_num++] = out_vertices2[i];
-			leftVerts[leftVerts_num++] = out_vertices2[i];
+			rightVerts[rightVerts_num++] = out_vertices2[find_result];
+			leftVerts[leftVerts_num++] = out_vertices2[find_result];
+			printf("helllo i: %d (%f %f)\n", i, 
+							out_vertices[find_result].position.x,
+							out_vertices[find_result].position.y);
 		}
 	}
 
