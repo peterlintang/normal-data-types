@@ -1,0 +1,73 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+CONCAVE_POLY_H	ConcavePolygon.h	2;"	d
+ConcavePolygon	ConcavePolygon.c	/^int ConcavePolygon(struct ConcavePolygon *polygon, struct Vertex *_vertices, int _vertices_num)$/;"	f
+ConcavePolygon	ConcavePolygon.h	/^struct ConcavePolygon$/;"	s
+LineSegment	ConcavePolygon.h	/^struct LineSegment$/;"	s
+LineSegment_add	ConcavePolygon.c	/^int LineSegment_add(struct LineSegment *ls, struct LineSegment *s2, struct LineSegment *out)$/;"	f
+LineSegment_direction	ConcavePolygon.c	/^struct Vec2 LineSegment_direction(struct LineSegment *lineSeg) $/;"	f
+LineSegment_normalisedDirection	ConcavePolygon.c	/^struct Vec2 LineSegment_normalisedDirection(struct LineSegment *lineSeg)$/;"	f
+LineSegment_set	ConcavePolygon.c	/^int LineSegment_set(struct LineSegment *lineSeg,$/;"	f
+SliceVertex	ConcavePolygon.h	/^struct SliceVertex$/;"	s
+SliceVertex_set	ConcavePolygon.c	/^int SliceVertex_set(struct SliceVertex *sliceVer, struct Vec2 *_position)$/;"	f
+Vec2	ConcavePolygon.h	/^struct Vec2$/;"	s
+Vec2_add	ConcavePolygon.c	/^struct Vec2 Vec2_add(struct Vec2 *v, struct Vec2 *v1) $/;"	f
+Vec2_cross	ConcavePolygon.c	/^float Vec2_cross(struct Vec2 *v1, struct Vec2 *v2)$/;"	f
+Vec2_div	ConcavePolygon.c	/^struct Vec2 Vec2_div(struct Vec2 *v, float f)$/;"	f
+Vec2_dot	ConcavePolygon.c	/^float Vec2_dot(struct Vec2 *v1, struct Vec2 *v2)$/;"	f
+Vec2_getSignedArea	ConcavePolygon.c	/^float Vec2_getSignedArea(struct Vec2 *v1,$/;"	f
+Vec2_length	ConcavePolygon.c	/^float Vec2_length(struct Vec2 *v)$/;"	f
+Vec2_multiply	ConcavePolygon.c	/^struct Vec2 Vec2_multiply(struct Vec2 *v, float f) $/;"	f
+Vec2_norm	ConcavePolygon.c	/^struct Vec2 Vec2_norm(struct Vec2 *v)$/;"	f
+Vec2_square	ConcavePolygon.c	/^float Vec2_square(struct Vec2 *v)$/;"	f
+Vec2_sub	ConcavePolygon.c	/^struct Vec2 Vec2_sub(struct Vec2 *v, struct Vec2 *v1) $/;"	f
+Vertex	ConcavePolygon.h	/^struct Vertex$/;"	s
+Vertex_getHandedness	ConcavePolygon.c	/^float Vertex_getHandedness(struct Vertex *v1,$/;"	f
+Vertex_set	ConcavePolygon.c	/^int Vertex_set(struct Vertex *VXposition, struct Vec2 *_position)$/;"	f
+_checkIfRightHanded	ConcavePolygon.c	/^int _checkIfRightHanded(struct Vertex *_verts, int num)$/;"	f
+_checkVisibility	ConcavePolygon.c	/^int _checkVisibility(struct Vec2 *originalPosition,$/;"	f
+_convexDecomp	ConcavePolygon.c	/^void _convexDecomp(struct Vertex *_vertices, int vertices_num, struct ConcavePolygon *polygon)$/;"	f
+_findVerticesInCone	ConcavePolygon.c	/^int _findVerticesInCone(struct LineSegment *ls1,$/;"	f
+_flipPolygon	ConcavePolygon.c	/^void _flipPolygon(struct Vertex *_verts, int num)$/;"	f
+_getBestVertexToConnect	ConcavePolygon.c	/^int _getBestVertexToConnect(int *indices, int indices_num,$/;"	f
+_isVertexInCone	ConcavePolygon.c	/^int _isVertexInCone(struct LineSegment *ls1,$/;"	f
+_slicedVertices_find	ConcavePolygon.c	/^static int _slicedVertices_find(struct Vertex *vertexs, int *vertexs_map, int vertexs_num, int index)$/;"	f	file:
+checkIfRightHanded	ConcavePolygon.c	/^int checkIfRightHanded(struct ConcavePolygon *polygon)$/;"	f
+convert_concave_polygon	con_ext.c	/^int convert_concave_polygon(float *x, float *y, int num, float ***pox, float ***poy, int *pnum, int **precords)$/;"	f
+convexDecomp	ConcavePolygon.c	/^void convexDecomp(struct ConcavePolygon *Poly)$/;"	f
+count	con_ext.c	/^static int count = 0;$/;"	v	file:
+cullByDistance	ConcavePolygon.c	/^int cullByDistance(struct Vertex *input, int *input_map, int input_num,$/;"	f
+distanceToSlice	ConcavePolygon.h	/^    float distanceToSlice;$/;"	m	struct:SliceVertex
+drawPolygon	con_ext.c	/^void drawPolygon(struct ConcavePolygon *poly)$/;"	f
+finalPos	ConcavePolygon.h	/^    struct Vec2 finalPos;$/;"	m	struct:LineSegment	typeref:struct:LineSegment::Vec2
+findFirstReflexVertex	ConcavePolygon.c	/^int findFirstReflexVertex(struct Vertex *_vertices, int vertices_num)$/;"	f
+flipPolygon	ConcavePolygon.c	/^void flipPolygon(struct ConcavePolygon *polygon)$/;"	f
+getNumberSubPolys	ConcavePolygon.c	/^int getNumberSubPolys(struct ConcavePolygon *Poly)$/;"	f
+getPoint	ConcavePolygon.c	/^struct Vec2 getPoint(struct ConcavePolygon *Poly, unsigned int index)$/;"	f
+getPointCount	ConcavePolygon.c	/^int getPointCount(struct ConcavePolygon *Poly)$/;"	f
+getSubPolygon	ConcavePolygon.c	/^struct ConcavePolygon *getSubPolygon(struct ConcavePolygon *Poly, int subPolyIndex)$/;"	f
+getTotalSubPolys	ConcavePolygon.c	/^int getTotalSubPolys(struct ConcavePolygon *Poly)$/;"	f
+getVertices	ConcavePolygon.c	/^struct Vertex *getVertices(struct ConcavePolygon *Poly)$/;"	f
+get_polygons_allVertices	con_ext.c	/^void get_polygons_allVertices(struct ConcavePolygon *poly, float **ox, float **oy, int *num, int *records, int max)$/;"	f
+index	ConcavePolygon.h	/^    int index;$/;"	m	struct:SliceVertex
+intersects	ConcavePolygon.c	/^int intersects(struct LineSegment *s1, struct LineSegment *s2, int *status, struct Vec2 *v)$/;"	f
+main	main.c	/^int main(int argc, char *argv[])$/;"	f
+mod	ConcavePolygon.c	/^int mod(int x, int m)$/;"	f
+position	ConcavePolygon.h	/^    struct Vec2 position;$/;"	m	struct:SliceVertex	typeref:struct:SliceVertex::Vec2
+position	ConcavePolygon.h	/^    struct Vec2 position;$/;"	m	struct:Vertex	typeref:struct:Vertex::Vec2
+reset	ConcavePolygon.c	/^void reset(struct ConcavePolygon *Poly)$/;"	f
+returnLowestLevelPolys	ConcavePolygon.c	/^void returnLowestLevelPolys(struct ConcavePolygon *Poly, struct ConcavePolygon **PolyArray, int *PolyArrayNum)$/;"	f
+slicePolygon	ConcavePolygon.c	/^void slicePolygon(struct ConcavePolygon *polygon, int vertex1, int vertex2)$/;"	f
+slicePolygon2	ConcavePolygon.c	/^void slicePolygon2(struct ConcavePolygon *Poly, struct LineSegment *segment)$/;"	f
+startPos	ConcavePolygon.h	/^    struct Vec2 startPos;$/;"	m	struct:LineSegment	typeref:struct:LineSegment::Vec2
+subPolygons	ConcavePolygon.h	/^	struct ConcavePolygon *subPolygons[2];$/;"	m	struct:ConcavePolygon	typeref:struct:ConcavePolygon::ConcavePolygon
+subPolygons_num	ConcavePolygon.h	/^	int subPolygons_num;$/;"	m	struct:ConcavePolygon
+vertices	ConcavePolygon.h	/^	struct Vertex *vertices;$/;"	m	struct:ConcavePolygon	typeref:struct:ConcavePolygon::Vertex
+verticesAlongLineSegment	ConcavePolygon.c	/^int verticesAlongLineSegment(struct LineSegment *segment,$/;"	f
+vertices_num	ConcavePolygon.h	/^	int vertices_num;$/;"	m	struct:ConcavePolygon
+x	ConcavePolygon.h	/^    double x;$/;"	m	struct:Vec2
+y	ConcavePolygon.h	/^    double y;$/;"	m	struct:Vec2

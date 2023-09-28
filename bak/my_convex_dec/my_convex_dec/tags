@@ -1,0 +1,125 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+CONCAVE_POLY_H	ConcavePolygon.h	2;"	d
+CONCAVE_POLY_H	tmp/ConcavePolygon.h	2;"	d
+ConcavePolygon	ConcavePolygon.h	/^    ConcavePolygon() {}$/;"	f	class:cxd::ConcavePolygon
+ConcavePolygon	ConcavePolygon.h	/^    ConcavePolygon(VertexArray const & _vertices) : vertices{_vertices}$/;"	f	class:cxd::ConcavePolygon
+ConcavePolygon	ConcavePolygon.h	/^class ConcavePolygon$/;"	c	namespace:cxd
+ConcavePolygon	tmp/ConcavePolygon.h	/^struct ConcavePolygon$/;"	s
+IntArray	ConcavePolygon.h	/^    typedef std::vector<int > IntArray;$/;"	t	class:cxd::ConcavePolygon
+LineSegment	ConcavePolygon.h	/^    LineSegment() {}$/;"	f	struct:cxd::LineSegment
+LineSegment	ConcavePolygon.h	/^    LineSegment(Vec2 const & _startPos,$/;"	f	struct:cxd::LineSegment
+LineSegment	ConcavePolygon.h	/^struct LineSegment$/;"	s	namespace:cxd
+LineSegment	tmp/ConcavePolygon.h	/^struct LineSegment$/;"	s
+LineSegment_add	tmp/ConcavePolygon.c	/^int LineSegment_add(struct LineSegment *ls, struct LineSegment *s2, struct LineSegment *out)$/;"	f
+LineSegment_direction	tmp/ConcavePolygon.c	/^struct Vec2 LineSegment_direction(struct LineSegment *lineSeg) $/;"	f
+LineSegment_normalisedDirection	tmp/ConcavePolygon.c	/^struct Vec2 LineSegment_normalisedDirection(struct LineSegment *lineSeg)$/;"	f
+LineSegment_set	tmp/ConcavePolygon.c	/^int LineSegment_set(struct LineSegment *lineSeg,$/;"	f
+PolygonArray	ConcavePolygon.h	/^    typedef std::vector<ConcavePolygon > PolygonArray;$/;"	t	class:cxd::ConcavePolygon
+SliceVertex	ConcavePolygon.h	/^    SliceVertex() {}$/;"	f	struct:cxd::SliceVertex
+SliceVertex	ConcavePolygon.h	/^    SliceVertex(Vec2 const & _position) : Vertex{_position} {}$/;"	f	struct:cxd::SliceVertex
+SliceVertex	ConcavePolygon.h	/^struct SliceVertex : public Vertex$/;"	s	namespace:cxd
+SliceVertex	tmp/ConcavePolygon.h	/^struct SliceVertex$/;"	s
+SliceVertex_set	tmp/ConcavePolygon.c	/^int SliceVertex_set(struct SliceVertex *sliceVer, struct Vec2 *_position)$/;"	f
+Vec2	ConcavePolygon.h	/^struct Vec2$/;"	s	namespace:cxd
+Vec2	tmp/ConcavePolygon.h	/^struct Vec2$/;"	s
+Vec2_add	tmp/ConcavePolygon.c	/^struct Vec2 Vec2_add(struct Vec2 *v, struct Vec2 *v1) $/;"	f
+Vec2_cross	tmp/ConcavePolygon.c	/^float Vec2_cross(struct Vec2 *v1, struct Vec2 *v2)$/;"	f
+Vec2_div	tmp/ConcavePolygon.c	/^struct Vec2 Vec2_div(struct Vec2 *v, float f)$/;"	f
+Vec2_dot	tmp/ConcavePolygon.c	/^float Vec2_dot(struct Vec2 *v1, struct Vec2 *v2)$/;"	f
+Vec2_getSignedArea	tmp/ConcavePolygon.c	/^float Vec2_getSignedArea(struct Vec2 *v1,$/;"	f
+Vec2_length	tmp/ConcavePolygon.c	/^float Vec2_length(struct Vec2 *v)$/;"	f
+Vec2_multiply	tmp/ConcavePolygon.c	/^struct Vec2 Vec2_multiply(struct Vec2 *v, float f) $/;"	f
+Vec2_norm	tmp/ConcavePolygon.c	/^struct Vec2 Vec2_norm(struct Vec2 *v)$/;"	f
+Vec2_square	tmp/ConcavePolygon.c	/^float Vec2_square(struct Vec2 *v)$/;"	f
+Vec2_sub	tmp/ConcavePolygon.c	/^struct Vec2 Vec2_sub(struct Vec2 *v, struct Vec2 *v1) $/;"	f
+Vertex	ConcavePolygon.h	/^    Vertex() {}$/;"	f	struct:cxd::Vertex
+Vertex	ConcavePolygon.h	/^    Vertex(Vec2 const & _position) : position{_position} {}$/;"	f	struct:cxd::Vertex
+Vertex	ConcavePolygon.h	/^struct Vertex$/;"	s	namespace:cxd
+Vertex	tmp/ConcavePolygon.h	/^struct Vertex$/;"	s
+VertexArray	ConcavePolygon.h	/^    typedef std::vector<Vertex > VertexArray;$/;"	t	class:cxd::ConcavePolygon
+VertexIntMap	ConcavePolygon.h	/^    typedef std::map<int, Vertex> VertexIntMap;$/;"	t	class:cxd::ConcavePolygon
+VertexIntPair	ConcavePolygon.h	/^    typedef std::pair<int, Vertex> VertexIntPair;$/;"	t	class:cxd::ConcavePolygon
+Vertex_getHandedness	tmp/ConcavePolygon.c	/^float Vertex_getHandedness(struct Vertex *v1,$/;"	f
+Vertex_set	tmp/ConcavePolygon.c	/^int Vertex_set(struct Vertex *VXposition, struct Vec2 *_position)$/;"	f
+checkIfRightHanded	ConcavePolygon.h	/^    bool checkIfRightHanded()$/;"	f	class:cxd::ConcavePolygon
+checkIfRightHanded	ConcavePolygon.h	/^    bool checkIfRightHanded(VertexArray & _verts)$/;"	f	class:cxd::ConcavePolygon
+checkVisibility	ConcavePolygon.h	/^    bool checkVisibility(Vec2 const & originalPosition,$/;"	f	class:cxd::ConcavePolygon
+convert_concave_polygon	con_ext.cpp	/^int convert_concave_polygon(float *x, float *y, int num, float ***pox, float ***poy, int *pnum, int **precords)$/;"	f
+convert_concave_polygon	tmp/con_ext.cpp	/^int convert_concave_polygon(float *x, float *y, int num, float ***pox, float ***poy, int *pnum, int **precords)$/;"	f
+convexDecomp	ConcavePolygon.h	/^    void convexDecomp()$/;"	f	class:cxd::ConcavePolygon
+convexDecomp	ConcavePolygon.h	/^    void convexDecomp(VertexArray const & _vertices)$/;"	f	class:cxd::ConcavePolygon
+count	con_ext.cpp	/^static int count = 0;$/;"	v	file:
+count	main.cpp	/^static int count = 0;$/;"	v	file:
+count	tmp/con_ext.cpp	/^static int count = 0;$/;"	v	file:
+cross	ConcavePolygon.h	/^    static float cross(Vec2 const & v1, Vec2 const & v2)$/;"	f	struct:cxd::Vec2
+cullByDistance	ConcavePolygon.h	/^    VertexIntMap cullByDistance(VertexIntMap const & input,$/;"	f	class:cxd::ConcavePolygon
+cxd	ConcavePolygon.h	/^namespace cxd$/;"	n
+direction	ConcavePolygon.h	/^    Vec2 direction() const$/;"	f	struct:cxd::LineSegment
+distanceToSlice	ConcavePolygon.h	/^    float distanceToSlice;$/;"	m	struct:cxd::SliceVertex
+distanceToSlice	tmp/ConcavePolygon.h	/^    float distanceToSlice;$/;"	m	struct:SliceVertex
+dot	ConcavePolygon.h	/^    static float dot(Vec2 const & v1, Vec2 const & v2)$/;"	f	struct:cxd::Vec2
+drawPolygon	con_ext.cpp	/^void drawPolygon(ConcavePolygon const & poly)$/;"	f
+drawPolygon	main.cpp	/^void drawPolygon(ConcavePolygon const & poly)$/;"	f
+drawPolygon	tmp/con_ext.cpp	/^void drawPolygon(ConcavePolygon const & poly)$/;"	f
+drawVertices	main.cpp	/^void drawVertices(std::vector<Vertex > const & vertices)$/;"	f
+finalPos	ConcavePolygon.h	/^    Vec2 finalPos;$/;"	m	struct:cxd::LineSegment
+finalPos	tmp/ConcavePolygon.h	/^    struct Vec2 finalPos;$/;"	m	struct:LineSegment	typeref:struct:LineSegment::Vec2
+findFirstReflexVertex	ConcavePolygon.h	/^    int findFirstReflexVertex(VertexArray const & _vertices)$/;"	f	class:cxd::ConcavePolygon
+findVerticesInCone	ConcavePolygon.h	/^    IntArray findVerticesInCone(LineSegment const & ls1,$/;"	f	class:cxd::ConcavePolygon
+flipPolygon	ConcavePolygon.h	/^    void flipPolygon()$/;"	f	class:cxd::ConcavePolygon
+flipPolygon	ConcavePolygon.h	/^    void flipPolygon(VertexArray & _verts)$/;"	f	class:cxd::ConcavePolygon
+getBestVertexToConnect	ConcavePolygon.h	/^    int getBestVertexToConnect(IntArray const & indices,$/;"	f	class:cxd::ConcavePolygon
+getHandedness	ConcavePolygon.h	/^    static float getHandedness(Vertex const & v1,$/;"	f	struct:cxd::Vertex
+getNumberSubPolys	ConcavePolygon.h	/^    int getNumberSubPolys() const$/;"	f	class:cxd::ConcavePolygon
+getPoint	ConcavePolygon.h	/^    Vec2 getPoint(unsigned int index) const$/;"	f	class:cxd::ConcavePolygon
+getPointCount	ConcavePolygon.h	/^    int getPointCount() const$/;"	f	class:cxd::ConcavePolygon
+getSignedArea	ConcavePolygon.h	/^    static float getSignedArea(Vec2 const & v1,$/;"	f	struct:cxd::Vec2
+getSubPolygon	ConcavePolygon.h	/^    ConcavePolygon const & getSubPolygon(int subPolyIndex) const$/;"	f	class:cxd::ConcavePolygon
+getTotalSubPolys	ConcavePolygon.h	/^    int getTotalSubPolys() const$/;"	f	class:cxd::ConcavePolygon
+getVertices	ConcavePolygon.h	/^    VertexArray const & getVertices() const$/;"	f	class:cxd::ConcavePolygon
+get_polygons_allVertices	con_ext.cpp	/^void get_polygons_allVertices(ConcavePolygon const & poly, float **ox, float **oy, int *num, int *records, int max)$/;"	f
+get_polygons_allVertices	tmp/con_ext.cpp	/^void get_polygons_allVertices(ConcavePolygon const & poly, float **ox, float **oy, int *num, int *records, int max)$/;"	f
+index	ConcavePolygon.h	/^    int index;$/;"	m	struct:cxd::SliceVertex
+index	tmp/ConcavePolygon.h	/^    int index;$/;"	m	struct:SliceVertex
+intersects	ConcavePolygon.h	/^    static std::pair<bool, Vec2> intersects(LineSegment s1, LineSegment s2)$/;"	f	struct:cxd::LineSegment
+intersects	tmp/ConcavePolygon.c	/^int intersects(struct LineSegment *s1, struct LineSegment *s2, int *status, struct Vec2 *v)$/;"	f
+isVertexInCone	ConcavePolygon.h	/^    bool isVertexInCone(LineSegment const & ls1,$/;"	f	class:cxd::ConcavePolygon
+length	ConcavePolygon.h	/^    static float length(Vec2 const & v)$/;"	f	struct:cxd::Vec2
+main	main.c	/^int main(int argc, char *argv[])$/;"	f
+main	main.cpp	/^int main()$/;"	f
+main	tmp/main.c	/^int main(int argc, char *argv[])$/;"	f
+mod	ConcavePolygon.h	/^    int mod(int x, int m)$/;"	f	class:cxd::ConcavePolygon
+norm	ConcavePolygon.h	/^    static Vec2 norm(Vec2 const & v)$/;"	f	struct:cxd::Vec2
+normalisedDirection	ConcavePolygon.h	/^    Vec2 normalisedDirection()$/;"	f	struct:cxd::LineSegment
+operator *	ConcavePolygon.h	/^    Vec2 operator * (float const & f) const$/;"	f	struct:cxd::Vec2
+operator +	ConcavePolygon.h	/^    LineSegment operator + (LineSegment const & ls)$/;"	f	struct:cxd::LineSegment
+operator +	ConcavePolygon.h	/^    Vec2 operator + (Vec2 const & v1) const$/;"	f	struct:cxd::Vec2
+operator -	ConcavePolygon.h	/^    Vec2 operator - (Vec2 const & v1) const$/;"	f	struct:cxd::Vec2
+operator /	ConcavePolygon.h	/^    Vec2 operator \/ (float const & f) const$/;"	f	struct:cxd::Vec2
+position	ConcavePolygon.h	/^    Vec2 position;$/;"	m	struct:cxd::Vertex
+position	tmp/ConcavePolygon.h	/^    struct Vec2 position;$/;"	m	struct:SliceVertex	typeref:struct:SliceVertex::Vec2
+position	tmp/ConcavePolygon.h	/^    struct Vec2 position;$/;"	m	struct:Vertex	typeref:struct:Vertex::Vec2
+reset	ConcavePolygon.h	/^    void reset()$/;"	f	class:cxd::ConcavePolygon
+returnLowestLevelPolys	ConcavePolygon.h	/^    void returnLowestLevelPolys(std::vector<ConcavePolygon > & returnArr)$/;"	f	class:cxd::ConcavePolygon
+scaleVerts	main.cpp	/^void scaleVerts(std::vector<Vertex > & verts, float amount)$/;"	f
+slicePolygon	ConcavePolygon.h	/^    void slicePolygon(LineSegment segment)$/;"	f	class:cxd::ConcavePolygon
+slicePolygon	ConcavePolygon.h	/^    void slicePolygon(int vertex1, int vertex2)$/;"	f	class:cxd::ConcavePolygon
+square	ConcavePolygon.h	/^    static float square(Vec2 const & v)$/;"	f	struct:cxd::Vec2
+startPos	ConcavePolygon.h	/^    Vec2 startPos;$/;"	m	struct:cxd::LineSegment
+startPos	tmp/ConcavePolygon.h	/^    struct Vec2 startPos;$/;"	m	struct:LineSegment	typeref:struct:LineSegment::Vec2
+subPolygons	ConcavePolygon.h	/^    PolygonArray subPolygons;$/;"	m	class:cxd::ConcavePolygon
+subPolygons	tmp/ConcavePolygon.h	/^	struct ConcavePolygon *subPolygons;$/;"	m	struct:ConcavePolygon	typeref:struct:ConcavePolygon::ConcavePolygon
+subPolygons_num	tmp/ConcavePolygon.h	/^	int subPolygons_num;$/;"	m	struct:ConcavePolygon
+vertices	ConcavePolygon.h	/^    VertexArray vertices;$/;"	m	class:cxd::ConcavePolygon
+vertices	tmp/ConcavePolygon.h	/^	struct Vertex *vertices;$/;"	m	struct:ConcavePolygon	typeref:struct:ConcavePolygon::Vertex
+verticesAlongLineSegment	ConcavePolygon.h	/^    VertexIntMap verticesAlongLineSegment(LineSegment const & segment,$/;"	f	class:cxd::ConcavePolygon
+vertices_num	tmp/ConcavePolygon.h	/^	int vertices_num;$/;"	m	struct:ConcavePolygon
+x	ConcavePolygon.h	/^    double x;$/;"	m	struct:cxd::Vec2
+x	tmp/ConcavePolygon.h	/^    double x;$/;"	m	struct:Vec2
+y	ConcavePolygon.h	/^    double y;$/;"	m	struct:cxd::Vec2
+y	tmp/ConcavePolygon.h	/^    double y;$/;"	m	struct:Vec2
