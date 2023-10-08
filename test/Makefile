@@ -25,4 +25,5 @@ all:
 	gcc -g dijkstra-test.c -o dijkstra-test -I../include -I../include/pic -I../include/data -I../include/algorithm ../src/algorithm/libalgorithm.a ../src/data/libdatatype.a ../src/pic/libcommunicate.a -lrt -lpthread
 	gcc -g ud-client-test.c -o ud-client-test -I../include -I../include/pic -I../include/data -I../include/algorithm ../src/algorithm/libalgorithm.a ../src/data/libdatatype.a ../src/pic/libcommunicate.a -lrt -lpthread
 	gcc -g ud-server-test.c -o ud-server-test -I../include -I../include/pic -I../include/data -I../include/algorithm ../src/algorithm/libalgorithm.a ../src/data/libdatatype.a ../src/pic/libcommunicate.a -lrt -lpthread
+	gcc test_quark.c ../src/util/libutil.a -I../include/util/
 clean:
