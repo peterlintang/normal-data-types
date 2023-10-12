@@ -29,17 +29,21 @@ int draw_polygon(lv_obj_t *canvas,
 	int i = 0;
 	int ret = 0;
 	lv_draw_rect_dsc_t polygon_dsc;
-//	lv_draw_line_dsc_t line_dsc;
+	lv_draw_line_dsc_t line_dsc;
 
 	lv_draw_rect_dsc_init(&polygon_dsc);
 	polygon_dsc.bg_color = bg_color;
-/*
-	polygon_dsc.bg_grad_color = bg_color;
-	polygon_dsc.outline_color = bg_color;
-	polygon_dsc.border_color = bg_color;
-	polygon_dsc.bg_grad_color = bg_color;
-	polygon_dsc.shadow_color = bg_color;
-*/
+	polygon_dsc.border_side = LV_BORDER_SIDE_NONE;
+	polygon_dsc.border_opa = LV_OPA_0;
+	polygon_dsc.outline_opa = LV_OPA_0;
+	polygon_dsc.shadow_opa = LV_OPA_0;
+
+	polygon_dsc.bg_grad_color = lv_color_hex(0x00FF00);
+	polygon_dsc.outline_color = lv_color_hex(0x00FF00);
+	polygon_dsc.border_color = lv_color_hex(0x00FF00);
+	polygon_dsc.bg_grad_color = lv_color_hex(0x00FF00);
+	polygon_dsc.shadow_color = lv_color_hex(0x00FF00);
+
 	x = (float *)app_mem_malloc(points_num * sizeof(float));
 	y = (float *)app_mem_malloc(points_num * sizeof(float));
 
@@ -92,6 +96,10 @@ int draw_polygon(lv_obj_t *canvas,
 		}
 //		printf("%s %d: i: %d, begin\n", __func__, __LINE__, i);
 		lv_canvas_draw_polygon(canvas, poly_points, records[i], &polygon_dsc);
+		lv_draw_line_dsc_init(&line_dsc);
+		line_dsc.color = bg_color;
+		line_dsc.width = 2;
+		lv_canvas_draw_line(canvas, poly_points, records[i], &line_dsc);
 //		printf("%s %d: i: %d, end\n", __func__, __LINE__, i);
 		app_mem_free(poly_points);
 		poly_points = NULL;
@@ -333,7 +341,7 @@ int draw_hole_map(lv_obj_t *canvas, cJSON *hole)
 	caculate_screen_scale_xy(240, 240, gps_points, points_num, &scale_xy);
 
 
-	draw_hole_map_poly_by_type(canvas, hole, &scale_xy, "perimeter", lv_color_hex(0x000000));
+	draw_hole_map_poly_by_type(canvas, hole, &scale_xy, "perimeter", lv_color_hex(0x0000ff));
 	draw_hole_map_poly_by_type(canvas, hole, &scale_xy, "teebox", lv_color_hex(0x00ff00));
 	draw_hole_map_poly_by_type(canvas, hole, &scale_xy, "green", lv_color_hex(0x00ff00));
 	draw_hole_map_poly_by_type(canvas, hole, &scale_xy, "fairway", lv_color_hex(0x003333));
@@ -342,7 +350,7 @@ int draw_hole_map(lv_obj_t *canvas, cJSON *hole)
 	draw_hole_map_cycle_by_type(canvas, hole, &scale_xy, "greencenter", 2, lv_color_hex(0xff0000));
 	draw_hole_map_cycle_by_type(canvas, hole, &scale_xy, "teeboxcenter", 2, lv_color_hex(0xff0000));
 
-	draw_hole_map_line_by_type(canvas, hole, &scale_xy, "centralpath", 3, lv_color_hex(0xff0000));
+	draw_hole_map_line_by_type(canvas, hole, &scale_xy, "centralpath", 3, lv_color_hex(0xff00ff));
 	
 	app_mem_free(gps_points);
 	gps_points = NULL;
