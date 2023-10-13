@@ -331,7 +331,7 @@ int draw_hole_map_line_by_type(
 		lv_draw_line_dsc_t line_dsc;
 		lv_draw_line_dsc_init(&line_dsc);
 		line_dsc.color = color;
-		line_dsc.width = 3;
+		line_dsc.width = width;
 		lv_canvas_draw_line(canvas, polygonPoints, points_num, &line_dsc);
 
 		app_mem_free(screen_points);
@@ -362,7 +362,7 @@ int draw_hole_map(lv_obj_t *canvas, cJSON *hole, struct screen_scale_xy *scale_x
 	draw_hole_map_cycle_by_type(canvas, hole, scale_xy, "teeboxcenter", 3, start, lv_color_hex(0xff0000));
 	
 	printf("%s draw %s\n", __func__, "centralpath");
-	draw_hole_map_line_by_type(canvas, hole, scale_xy, "centralpath", 3, start, lv_color_hex(0xff00ff));
+	draw_hole_map_line_by_type(canvas, hole, scale_xy, "centralpath", 1, start, lv_color_hex(0xff00ff));
 	
 	return 0;
 }
