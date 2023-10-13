@@ -47,6 +47,10 @@ int convert_points_gps_to_screen(struct screen_scale_xy *scale_xy,
 				struct screen_point *screen_points, 
 				int points_num);
 
+int cjson_map_get_type_count(cJSON* map, char* type);
+
+char *cjson_map_get_points_by_type_index(cJSON* map, char* type, int index);
+
 #endif // end of PARSE_GEO_H__
    
 

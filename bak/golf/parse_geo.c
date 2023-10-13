@@ -226,6 +226,73 @@ int convert_points_gps_to_screen(struct screen_scale_xy *scale_xy,
 	return 0;
 }
 
+int cjson_map_get_type_count(cJSON* map, char* type)
+{
+	cJSON* pnode = NULL;
+	cJSON* node = NULL;
+	cJSON* shapecount = NULL;
+
+	pnode = cJSON_GetObjectItem(map, "vectorGPSObject");
+	node = cJSON_GetObjectItem(pnode, type);
+	if (node == NULL)
+		return -1;
+
+	shapecount = cJSON_GetObjectItem(node, "shapecount");
+	if (shapecount == NULL)
+		return -1;
+
+	return shapecount->valueint;
+}
+
+char *cjson_map_get_points_by_type_index(cJSON* map, char* type, int index)
+{
+	cJSON* node = NULL;
+	cJSON* shapecount = NULL;
+	cJSON* shapes = NULL;
+	cJSON* shape = NULL;
+	cJSON* shape_num = NULL;
+	cJSON* points = NULL;
+	cJSON* vectorGPSObject = NULL;
+
+
+	vectorGPSObject = cJSON_GetObjectItem(map, "vectorGPSObject");
+	node = cJSON_GetObjectItem(vectorGPSObject, type);
+	if (node == NULL)
+		return NULL;
+
+	shapecount = cJSON_GetObjectItem(node, "shapecount");
+	if (shapecount == NULL)
+		return NULL;
+
+
+	if (index >= shapecount->valueint)
+	{
+		printf("index: %d, count: %d\n", index, shapecount->valueint);
+		return NULL;
+	}
+
+	shapes = cJSON_GetObjectItem(node, "shapes");
+	if (shapes == NULL)
+		return NULL;
+
+	shape = cJSON_GetObjectItem(shapes, "shape");
+	if (shape == NULL)
+		return NULL;
+
+	shape_num = cJSON_GetArrayItem(shape, index);
+	if (shape_num == NULL)
+		return NULL;
+
+	points = cJSON_GetObjectItem(shape_num, "points");
+	if (points == NULL)
+		return NULL;
+
+	return points->valuestring;
+}
+
+
+
+
 #if 0
 int main(int argc, char *argv[])
 {
