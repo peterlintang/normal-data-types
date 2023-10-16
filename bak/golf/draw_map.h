@@ -44,8 +44,8 @@ int draw_hole_map(lv_obj_t *canvas, cJSON *hole, struct screen_scale_xy* scale_x
 
 int draw_holes_map(lv_obj_t* canvas, cJSON* map, struct screen_scale_xy* scale_xy, lv_point_t* start);
 
-int draw_map_poly_by_type(lv_obj_t* canvas, cJSON* map, struct screen_scale_xy* scale_xy, char* type, lv_color_t color);
-int draw_map_cycle_by_type(lv_obj_t* canvas, cJSON* map, struct screen_scale_xy* scale_xy, char* type, lv_point_t* start, int r, lv_color_t color);
+int draw_map_poly_by_type(lv_obj_t* canvas, cJSON* map, struct screen_scale_xy* scale_xy, char* type, lv_point_t* start, lv_color_t color);
+int draw_map_cycle_by_type(lv_obj_t* canvas, cJSON* map, struct screen_scale_xy* scale_xy, char* type, int r, lv_point_t* start, lv_color_t color);
 int draw_map_line_by_type(lv_obj_t* canvas, cJSON* map, struct screen_scale_xy* scale_xy, char* type, int width, lv_point_t* start, lv_color_t color);
 
 int draw_map(lv_obj_t* canvas, cJSON* map, lv_point_t *start);

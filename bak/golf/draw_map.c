@@ -273,7 +273,7 @@ int draw_hole_map_cycle_by_type(
 		lv_draw_arc_dsc_t arc_dsc;
 		lv_draw_arc_dsc_init(&arc_dsc);
 		arc_dsc.color = color;
-		arc_dsc.width = 3;
+		arc_dsc.width = 1;
 		lv_canvas_draw_arc(canvas, polygonPoints[0].x, polygonPoints[0].y, r, 0, 3600, &arc_dsc);
 
 		app_mem_free(screen_points);
@@ -424,6 +424,10 @@ int draw_map_line_by_type(lv_obj_t* canvas, cJSON* map, struct screen_scale_xy *
 	return draw_hole_map_line_by_type(canvas, vectorGPSObject, scale_xy, type, 3, start, color);
 }
 
+
+/*
+ *画整幅图时，建议perimeter不用画 
+ */
 int draw_map(lv_obj_t* canvas, cJSON* map, lv_point_t *start)
 {
 	char* p = NULL;
