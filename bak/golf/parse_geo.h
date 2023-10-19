@@ -8,8 +8,8 @@
 #include "cJSON.h"
 
 struct gps_point {
-	float x;
-	float y;
+	double x;
+	double y;
 };
 
 struct screen_point {
@@ -20,12 +20,12 @@ struct screen_point {
 struct screen_scale_xy {
 	int height;
 	int width;
-	float scaleX;
-	float scaleY;
-	float min_longitude;
-	float max_longitude;
-	float min_latitude;
-	float max_latitude;
+	double scaleX;
+	double scaleY;
+	double min_longitude;
+	double max_longitude;
+	double min_latitude;
+	double max_latitude;
 };
 
 int cjson_hole_get_type_count(cJSON *hole, char *type);

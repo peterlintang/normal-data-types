@@ -16,9 +16,9 @@ int verticesAlongLineSegment(struct LineSegment *segment,
 							struct Vertex *out_vertices, int *out_vertices_map, 
 							int *out_vertices_num);
 
-float Vec2_length(struct Vec2 *v)
+double Vec2_length(struct Vec2 *v)
 {
-	return sqrtf(v->x * v->x + v->y * v->y);
+	return sqrt(v->x * v->x + v->y * v->y);
 }
 
 struct Vec2 Vec2_norm(struct Vec2 *v)
@@ -35,17 +35,17 @@ struct Vec2 Vec2_norm(struct Vec2 *v)
 	return nv;
 }
 
-float Vec2_dot(struct Vec2 *v1, struct Vec2 *v2)
+double Vec2_dot(struct Vec2 *v1, struct Vec2 *v2)
 {
 	return v1->x * v2->x + v1->y * v2->y;
 }
 
-float Vec2_square(struct Vec2 *v)
+double Vec2_square(struct Vec2 *v)
 {
 	return Vec2_dot(v,v);
 }
 
-float Vec2_cross(struct Vec2 *v1, struct Vec2 *v2)
+double Vec2_cross(struct Vec2 *v1, struct Vec2 *v2)
 {
 	return v1->x * v2->y - v1->y * v2->x;
 }
@@ -67,7 +67,7 @@ struct Vec2 Vec2_add(struct Vec2 *v, struct Vec2 *v1)
 	return nv;
 }
 
-struct Vec2 Vec2_multiply(struct Vec2 *v, float f) 
+struct Vec2 Vec2_multiply(struct Vec2 *v, double f) 
 {
 	struct Vec2 nv;
 
@@ -76,7 +76,7 @@ struct Vec2 Vec2_multiply(struct Vec2 *v, float f)
 	return nv;
 }
 
-struct Vec2 Vec2_div(struct Vec2 *v, float f)
+struct Vec2 Vec2_div(struct Vec2 *v, double f)
 {
 	struct Vec2 nv;
 	nv.x = v->x / f;
@@ -84,7 +84,7 @@ struct Vec2 Vec2_div(struct Vec2 *v, float f)
 	return nv;
 }
 
-float Vec2_getSignedArea(struct Vec2 *v1,
+double Vec2_getSignedArea(struct Vec2 *v1,
 						struct Vec2 *v2)
 {
 	return (v2->x - v1->x) * (v2->y + v1->y);
@@ -98,7 +98,7 @@ int Vertex_set(struct Vertex *VXposition, struct Vec2 *_position)
 	return 0;
 }
 
-float Vertex_getHandedness(struct Vertex *v1,
+double Vertex_getHandedness(struct Vertex *v1,
 							struct Vertex *v2,
 							struct Vertex *v3)
 {
@@ -169,7 +169,7 @@ int LineSegment_add(struct LineSegment *ls, struct LineSegment *s2, struct LineS
 
 int intersects(struct LineSegment *s1, struct LineSegment *s2, int *status, struct Vec2 *v)
 {
-	const float TOLERANCE = 1e-2;
+	const double TOLERANCE = 1e-15;
 
 	struct Vec2 p1 = s1->startPos;
 	struct Vec2 p2 = s2->startPos;
@@ -185,7 +185,7 @@ int intersects(struct LineSegment *s1, struct LineSegment *s2, int *status, stru
 	}
 
 	struct Vec2 tmp5 = Vec2_sub(&p2, &p1); 
-	float t1 = Vec2_cross(&tmp5, &d2) / Vec2_cross(&d1, &d2);
+	double t1 = Vec2_cross(&tmp5, &d2) / Vec2_cross(&d1, &d2);
 
 	if((t1 < (0.0f - TOLERANCE)) || (t1 > (1.0f + TOLERANCE)))
 	{
@@ -200,7 +200,7 @@ int intersects(struct LineSegment *s1, struct LineSegment *s2, int *status, stru
 
 	struct Vec2 tmp2 = Vec2_sub(&pIntersect, &p2);
 	struct Vec2 tmp3 = Vec2_sub(&(s2->finalPos), &p2);
-	float t2 = Vec2_dot(&tmp2, &tmp3);
+	double t2 = Vec2_dot(&tmp2, &tmp3);
 
 	struct Vec2 tmp4 = Vec2_sub(&(s2->finalPos), &p2);
 	if(t2 < (0.0f-TOLERANCE) || t2 / Vec2_square(&tmp4) >= 1.0f - TOLERANCE)
@@ -251,9 +251,9 @@ int _checkIfRightHanded(struct Vertex *_verts, int num)
 	if(num < 3)
 		return 0;
 
-	float signedArea = 0.0f;
+	double signedArea = 0.0f;
 
-	for(unsigned int i=0; i < num; ++i)
+	for(int i=0; i < num; ++i)
 	{
 		signedArea += Vec2_getSignedArea(&(_verts[i].position),
 							&(_verts[mod(i + 1, num)].position));
@@ -276,8 +276,8 @@ int _isVertexInCone(struct LineSegment *ls1,
 
 		struct Vec2 tmp1 = LineSegment_direction(ls1);
 		struct Vec2 tmp2 = LineSegment_direction(ls2);
-        float ls1Product = Vec2_cross(&relativePos, &tmp1);
-        float ls2Product = Vec2_cross(&relativePos, &tmp2);
+        double ls1Product = Vec2_cross(&relativePos, &tmp1);
+		double ls2Product = Vec2_cross(&relativePos, &tmp2);
 
 #ifdef CON_DEBUG	
 		SYS_LOG_INF("%s (%f %f), (%f %f)\n", __func__, vert->position.x, vert->position.y, origin->x, origin->y);
@@ -406,13 +406,13 @@ int _getBestVertexToConnect(int *indices, int indices_num,
             }
 
 
-            float minDistance = 1e+15;
+			double minDistance = 1e+15;
             int closest = indices[0];
             for(unsigned int i=0; i < indices_num; ++i)
             {
                 int index = indices[i];
 				struct Vec2 v = Vec2_sub(&(polygonVertices[index].position), (origin));
-                float currDistance = Vec2_square(&v);
+				double currDistance = Vec2_square(&v);
                 if(currDistance < minDistance)
                 {
                     minDistance = currDistance;
@@ -505,7 +505,7 @@ void _convexDecomp(struct Vertex *_vertices, int vertices_num, struct ConcavePol
             slicePolygon2(polygon, &newLine);
         }
 
-        for(unsigned int i = 0; i < polygon->subPolygons_num; ++i)
+        for(int i = 0; i < polygon->subPolygons_num; ++i)
         {
 			_convexDecomp(polygon->subPolygons[i]->vertices, polygon->subPolygons[i]->vertices_num, (polygon->subPolygons[i]));
         }
@@ -520,7 +520,7 @@ int findFirstReflexVertex(struct Vertex *_vertices, int vertices_num)
 		struct Vertex *v1;
 		struct Vertex *v2;
 		struct Vertex *v3;
-		float handedness = Vertex_getHandedness(&(_vertices[mod(i-1, vertices_num)]),
+		double handedness = Vertex_getHandedness(&(_vertices[mod(i-1, vertices_num)]),
                                                      &(_vertices[i]),
                                                      &(_vertices[mod(i + 1, vertices_num)]));
 		v1 = &_vertices[mod(i-1, vertices_num)];
@@ -804,7 +804,7 @@ void slicePolygon2(struct ConcavePolygon *Poly, struct LineSegment *segment)
 		return;
 	}
 
-	const float TOLERANCE = 1e-5;
+	const double TOLERANCE = 1e-15;
 
 //	struct Vertex out_vertices[Poly->vertices_num];
 //	int out_vertices_map[Poly->vertices_num];
@@ -909,7 +909,7 @@ void slicePolygon2(struct ConcavePolygon *Poly, struct LineSegment *segment)
 		relativePosition.y = Poly->vertices[i].position.y - segment->startPos.y;
 
 		struct Vec2 v_dir = LineSegment_direction(segment);
-		float perpDistance = fabs(Vec2_cross(&relativePosition, &v_dir));
+		double perpDistance = fabs(Vec2_cross(&relativePosition, &v_dir));
 
 		int find_result = _slicedVertices_find(out_vertices2, out_vertices_map2, out_vertices_num2, i);
 #ifdef CON_DEBUG	
@@ -1055,7 +1055,7 @@ void returnLowestLevelPolys(struct ConcavePolygon *Poly, struct ConcavePolygon *
 
 void reset(struct ConcavePolygon *Poly)
 {
-	printf("%s %d: free poly %d\n", __func__, __LINE__, Poly->subPolygons_num);
+//	printf("%s %d: free poly %d\n", __func__, __LINE__, Poly->subPolygons_num);
 	if(Poly->subPolygons_num > 0)
 	{
 		reset((Poly->subPolygons[0]));

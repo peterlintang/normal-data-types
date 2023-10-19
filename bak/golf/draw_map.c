@@ -12,18 +12,18 @@
 #include "draw_map.h"
 
 
-extern int convert_concave_polygon(float* x, float* y, int num, float*** pox, float*** poy, int* pnum, int** precords);
+extern int convert_concave_polygon(double* x, double* y, int num, double*** pox, double*** poy, int* pnum, int** precords);
 
 
 
 int draw_polygon(lv_obj_t *canvas, 
-		lv_point_t *points, int points_num, 
+		lv_point_t * points, int points_num,
 		lv_color_t bg_color, lv_color_t line_color)
 {
-	float *x = NULL;
-	float *y = NULL;
-	float **ox = NULL;
-	float **oy = NULL;
+	double *x = NULL;
+	double *y = NULL;
+	double **ox = NULL;
+	double **oy = NULL;
 	int num = 0;
 	int *records = NULL;
 	int i = 0;
@@ -33,6 +33,9 @@ int draw_polygon(lv_obj_t *canvas,
 
 	lv_draw_rect_dsc_init(&polygon_dsc);
 	polygon_dsc.bg_color = bg_color;
+	/*
+	polygon_dsc.bg_main_color_stop = 0x00;
+	polygon_dsc.bg_grad_color_stop = 0x00;
 	
 	polygon_dsc.border_side = LV_BORDER_SIDE_NONE;
 	polygon_dsc.border_opa = LV_OPA_0;
@@ -43,22 +46,33 @@ int draw_polygon(lv_obj_t *canvas,
 	polygon_dsc.outline_width = 0;
 	polygon_dsc.shadow_width = 0;
 
-	polygon_dsc.bg_grad_color = lv_color_hex(0x00FF00);
-	polygon_dsc.outline_color = lv_color_hex(0x00FF00);
-	polygon_dsc.border_color = lv_color_hex(0x00FF00);
-	polygon_dsc.bg_grad_color = lv_color_hex(0x00FF00);
-	polygon_dsc.shadow_color = lv_color_hex(0x00FF00);
-	
-
+	polygon_dsc.bg_grad_color = lv_color_hex(0x000000);
+	polygon_dsc.outline_color = lv_color_hex(0x000000);
+	polygon_dsc.border_color = lv_color_hex(0x000000);
+	polygon_dsc.bg_grad_color = lv_color_hex(0x000000);
+	polygon_dsc.shadow_color = lv_color_hex(0x000000);
+	*/
+#ifdef DEBUG_DRAW_MAP			
+	for (int i = 0; i < points_num; i++)
+	{
+		printf("%s %d: %d, %d\n", __func__, __LINE__, points[i].x, points[i].y);
+	}
+#endif
+	/*
 //	lv_canvas_draw_polygon(canvas, points, points_num, &polygon_dsc);
+	lv_draw_line_dsc_init(&line_dsc);
+	line_dsc.color = lv_color_hex(0xa3e21b);
+	line_dsc.width = 3;
+	lv_canvas_draw_line(canvas, points, points_num, &line_dsc);
 //	return 0;
+	*/
 
-	x = (float *)app_mem_malloc(points_num * sizeof(float));
-	y = (float *)app_mem_malloc(points_num * sizeof(float));
+	x = (double *)app_mem_malloc(points_num * sizeof(double));
+	y = (double *)app_mem_malloc(points_num * sizeof(double));
 
 	if (x == NULL || y == NULL)
 	{
-		printf("%s %d: malloc %d * %d bytes failed\n", __func__, __LINE__, points_num, sizeof(float));
+		printf("%s %d: malloc %d * %d bytes failed\n", __func__, __LINE__, points_num, sizeof(double));
 		app_mem_free(x);
 		app_mem_free(y);
 		return -1;
@@ -85,13 +99,13 @@ int draw_polygon(lv_obj_t *canvas,
 	x = NULL;
 	y = NULL;
 
-	printf("%s: num: %d\n", __func__, num);
+//	printf("%s: num: %d\n", __func__, num);
 	for (i = 0; i < num; i++)
 	{
 		int j = 0;
 		lv_point_t *poly_points = NULL;
 
-		printf("%s: i: %d, record: %d\n", __func__, i, records[i]);
+//		printf("%s: i: %d, record: %d\n", __func__, i, records[i]);
 
 		poly_points = (lv_point_t *)app_mem_malloc(records[i] * sizeof(lv_point_t));
 		if (poly_points == NULL)
@@ -103,20 +117,26 @@ int draw_polygon(lv_obj_t *canvas,
 
 		for (j = 0; j < records[i]; j++)
 		{
-			poly_points[j].x = ox[i][j];
-			poly_points[j].y = oy[i][j];
+			poly_points[j].x = (lv_coord_t)ox[i][j];
+			poly_points[j].y = (lv_coord_t)oy[i][j];
 		}
-//		printf("%s %d: i: %d, begin\n", __func__, __LINE__, i);
+#ifdef DEBUG_DRAW_MAP		
+		printf("%s %d: i: %d, records: %d, begin\n", __func__, __LINE__, i, records[i]);
 		for (int k = 0; k < records[i]; k++)
 		{
 			printf("%d, %d\n", poly_points[k].x, poly_points[k].y);
 		}
+#endif	
 		lv_canvas_draw_polygon(canvas, poly_points, records[i], &polygon_dsc);
+		
+		printf("draw line \n");
 		lv_draw_line_dsc_init(&line_dsc);
 		line_dsc.color = bg_color;
+//		line_dsc.color = lv_color_hex(0xff0000);
 		line_dsc.width = 2;
 		lv_canvas_draw_line(canvas, poly_points, records[i], &line_dsc);
 //		printf("%s %d: i: %d, end\n", __func__, __LINE__, i);
+		
 		app_mem_free(poly_points);
 		poly_points = NULL;
 	}
@@ -190,26 +210,22 @@ int draw_hole_map_poly_by_type(
 //		SYS_LOG_INF("%s: type: %s, points num: %d, i: %d\n", __func__, type, points_num, i);
 
 		convert_points_gps_to_screen(scale_xy, gps_points, screen_points, points_num);
+
 		for (int i = 0; i < points_num; i++)
 		{
 			polygonPoints[i].x = screen_points[i].x + start->x;
 			polygonPoints[i].y = screen_points[i].y + start->y;
-			/*
-			memset(tmp, 0, 256);
-			snprintf(tmp, 256, "type: %s, i: %d, %.12f, %.12f, %d, %d\n", type, i, gps_points[i].x, gps_points[i].y, polygonPoints[i].x, polygonPoints[i].y);
-			printf("%s: %s\n", __func__, tmp);
+			
+//			memset(tmp, 0, 256);
+#ifdef DEBUG_DRAW_MAP		
+			printf("type: %s, i: %d, %.12f, %.12f, %d, %d\n", type, i, gps_points[i].x, gps_points[i].y, polygonPoints[i].x, polygonPoints[i].y);
+#endif
+			//			printf("%s: %s\n", __func__, tmp);
 //			SYS_LOG_INF("%s: %s\n", __func__, tmp);
-			*/
+			
 		}
 
-		if (strcmp(type, "bunker") == 0 && i == 2)
-		{
-			for (int j = 0; j < points_num; j++)
-				printf("%s: j: %d, %d, %d\n", __func__, j, polygonPoints[j].x, polygonPoints[j].y);
-//			continue;
-		}
 
-		//		printf("%s: begin draw polygon\n", __func__);
 		ret = draw_polygon(canvas, polygonPoints, points_num, bg_color, lv_color_hex(0x000000));
 		if (ret == -1)
 		{
@@ -382,7 +398,7 @@ int draw_holes_map(lv_obj_t* canvas, cJSON* map, struct screen_scale_xy* scale_x
 	printf("%s: hole count: %d\n", __func__, count);
 	for (i = 0; i < count; i++)
 	{
-		printf("%s: 11111111111111111111111111111111111111111111111111111draw %d hole\n", __func__, i);
+//		printf("%s: 11111111111111111111111111111111111111111111111111111draw %d hole\n", __func__, i);
 	//	if (i == 4) continue;
 	//	if (i == 8) continue;
 		hole = cjson_get_hole_by_id(map, i);

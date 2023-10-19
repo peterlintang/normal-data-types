@@ -29,10 +29,10 @@ void drawPolygon(struct ConcavePolygon *poly)
     }
 }
 
-void get_polygons_allVertices(struct ConcavePolygon *poly, float **ox, float **oy, int *num, int *records, int max)
+void get_polygons_allVertices(struct ConcavePolygon *poly, double **ox, double **oy, int *num, int *records, int max)
 {
-	float *x = NULL;
-	float *y = NULL;
+	double *x = NULL;
+	double *y = NULL;
 
     if(getNumberSubPolys(poly) > 0)
     {
@@ -43,11 +43,11 @@ void get_polygons_allVertices(struct ConcavePolygon *poly, float **ox, float **o
     {
 
 
-    x = (float *)app_mem_malloc(poly->vertices_num * sizeof(float));
-    y = (float *)app_mem_malloc(poly->vertices_num * sizeof(float));
+    x = (double *)app_mem_malloc(poly->vertices_num * sizeof(double));
+    y = (double *)app_mem_malloc(poly->vertices_num * sizeof(double));
 	if (x == NULL || y == NULL)
 	{
-		printf("%s %d: malloc %d * %d bytes failed\n", __func__, __LINE__, poly->vertices_num, sizeof(float));
+		printf("%s %d: malloc %d * %d bytes failed\n", __func__, __LINE__, poly->vertices_num, sizeof(double));
 		app_mem_free(x);
 		app_mem_free(y);
 		return;
@@ -67,12 +67,12 @@ void get_polygons_allVertices(struct ConcavePolygon *poly, float **ox, float **o
 }
 
 
-int convert_concave_polygon(float *x, float *y, int num, float ***pox, float ***poy, int *pnum, int **precords)
+int convert_concave_polygon(double *x, double *y, int num, double ***pox, double ***poy, int *pnum, int **precords)
 {
 	int total = 0;
 	int index = 0;
-	float **ox = NULL;
-	float **oy = NULL;
+	double **ox = NULL;
+	double **oy = NULL;
 	int *records = NULL;
 //	struct Vertex verts[num];
 	struct Vertex *verts = NULL;
@@ -92,17 +92,17 @@ int convert_concave_polygon(float *x, float *y, int num, float ***pox, float ***
 
 	struct ConcavePolygon poly;
 
-	printf("%s %d: init poly\n", __func__, __LINE__);
+//	printf("%s %d: init poly\n", __func__, __LINE__);
 	ConcavePolygon(&poly, verts, num);
 	convexDecomp(&poly);
 	total = getTotalSubPolys(&poly);
 //	fprintf(stdout, "%s total: %d\n", __func__, total);
-	ox = (float **)app_mem_malloc(total * sizeof(float *));
-	oy = (float **)app_mem_malloc(total * sizeof(float *));
+	ox = (double **)app_mem_malloc(total * sizeof(double *));
+	oy = (double **)app_mem_malloc(total * sizeof(double *));
 	records = (int *)app_mem_malloc(total * sizeof(int));
 	if (ox == NULL || oy == NULL || records == NULL)
 	{
-		printf("%s %d: malloc %d * %d bytes failed\n", __func__, __LINE__, total, sizeof(float *));
+		printf("%s %d: malloc %d * %d bytes failed\n", __func__, __LINE__, total, sizeof(double *));
 		app_mem_free(verts);
 		app_mem_free(ox);
 		app_mem_free(oy);

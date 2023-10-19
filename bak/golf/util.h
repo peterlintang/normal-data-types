@@ -8,7 +8,7 @@
 
 #include "cJSON.h"
 
-float compute_angle_by_2points(int x1, int y1, int x2, int y2);
+double compute_angle_by_2points(int x1, int y1, int x2, int y2);
 
 
 int get_hole_angle(cJSON *hole, struct screen_scale_xy *scale_xy);

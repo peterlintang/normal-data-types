@@ -17,7 +17,7 @@
 
 
 
-extern int convert_concave_polygon(float* x, float* y, int num, float*** pox, float*** poy, int* pnum, int** precords);
+extern int convert_concave_polygon(double* x, double* y, int num, double*** pox, double*** poy, int* pnum, int** precords);
 
 
 

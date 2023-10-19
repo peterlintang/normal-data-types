@@ -9,11 +9,11 @@
 #include <ui_manager.h>
 
 
-float compute_angle_by_2points(int x1, int y1, int x2, int y2)
+double compute_angle_by_2points(int x1, int y1, int x2, int y2)
 {
-        float x = 0.0f;
-        float y = 0.0f;
-        float angle = 0.0f;
+        double x = 0.0f;
+        double y = 0.0f;
+        double angle = 0.0f;
 
         x = (x1 - x2);
         y = (y1 - y2);
@@ -33,7 +33,7 @@ int get_hole_angle(cJSON *hole, struct screen_scale_xy *scale_xy)
 	char *p = NULL;
 	lv_point_t start;
 	lv_point_t end;
-	float angle = 0.0f;
+	double angle = 0.0f;
 
 	p = cjson_hole_get_points_by_type_index(hole, "teeboxcenter", 0);
 	ret = parse_points(p, &gps_points, &points_num);

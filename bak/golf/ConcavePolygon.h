@@ -17,7 +17,7 @@ struct Vertex
 struct SliceVertex
 {
     int index;
-    float distanceToSlice;
+    double distanceToSlice;
     struct Vec2 position;
 };
 

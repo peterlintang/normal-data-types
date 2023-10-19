@@ -148,8 +148,8 @@ int parse_points(char *str, struct gps_point **opoints, int *pnum)
 		start = p;
 		p = strchr(start, ' ');
 		end = strchr(start, ',');
-		points[i].x = strtof(start, NULL);
-		points[i].y = strtof(p + 1, NULL);
+		points[i].x = strtod(start, NULL);
+		points[i].y = strtod(p + 1, NULL);
 /*
 		SYS_LOG_INF("11: %s\n", start);
 		SYS_LOG_INF("11: %s\n", p);
@@ -174,10 +174,10 @@ int caculate_screen_scale_xy(int width, int height,
 			struct gps_point *gps_points, int points_num, 
 			struct screen_scale_xy *scale_xy)
 {
-	float min_longitude = 0.0f;
-	float max_longitude = 0.0f;
-	float min_latitude = 0.0f;
-	float max_latitude = 0.0f;
+	double min_longitude = 0.0f;
+	double max_longitude = 0.0f;
+	double min_latitude = 0.0f;
+	double max_latitude = 0.0f;
 
 	int i = 0;
 
