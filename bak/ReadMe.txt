@@ -16,3 +16,6 @@ lvgl
 git@github.com:lvgl/lvgl.git
 
 git@github.com:mjjq/ConvexDecomposition.git
+
+zip
+git@github.com:kuba--/zip.git
