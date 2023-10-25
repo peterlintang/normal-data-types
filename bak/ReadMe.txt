@@ -22,3 +22,10 @@ git@github.com:kuba--/zip.git
 
 manhaf
 https://blog.csdn.net/qq_42034205/article/details/101710602
+
+7z
+git@github.com:peterlintang/unarr.git
+
+git@github.com:peterlintang/LearningMasteringAlgorithms-C.git
+
+git@github.com:peterlintang/HaffmanArchivator.git
