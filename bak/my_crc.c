@@ -17,7 +17,9 @@ unsigned char calculate_crc(unsigned char *str, int len)
 
 int main(int argc, char *argv[])
 {
-	char str[] = "PAIR001,003,0";
+//	char str[] = "PAIR066,1,0,0,0,0,0";
+//	char str[] = "PAIR680,0";
+	char str[] = "PAIR730,0";
 	int len = 0;
 	unsigned char crc = 0;
 
@@ -33,3 +35,4 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+
