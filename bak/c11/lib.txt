@@ -1,0 +1,16 @@
+
+<assert.h>
+NDEBUG
+assert(scalar expression)
+static_assert();
+
+<complex.h>
+complex
+imaginary
+I
+cacos
+casin
+catan
+ccos
+csin
+ctan

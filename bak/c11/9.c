@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
 	printf("hello world: %s\n", COMBINE(TO_, STRING)(111));
 	printf("hello world: %s\n", TO_STRING((111 hash_hash dd)));
 	printf("hello world: %s\n", IN_BETWEEN((111 hash_hash dd)));
+	printf("%%\n");
 	return 0;
 }
 
