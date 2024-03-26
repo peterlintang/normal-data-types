@@ -5,6 +5,7 @@
 
 int main(int argc, char *argv[])
 {
+#pragma STDC FENV_ACCESS ON
 	const int a = 0;
 	int * const p = &a;
 	volatile int b = 11;
