@@ -1,0 +1,3 @@
+
+zhuan huan tu xiang fen bian lv
+convert -resize 600×600 src.jpg dst.jpg
