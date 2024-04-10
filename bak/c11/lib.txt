@@ -355,7 +355,13 @@ _ _alignas_is_defined
 _ _alignof_is_defined
 
 <stdarg.h>
+va_list
+va_start
+va_arg
+va_end
+va_copy
 
+<stdatomic.h>
 
 
 
