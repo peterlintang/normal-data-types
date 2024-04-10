@@ -12,6 +12,7 @@ int main(int argc, char *argv[])
 	fra = frexp(exp2(2.0), &x);
 	fprintf(stdout, "%.12f %d\n", fra, x);
 	fprintf(stdout, "%d\n", ilogb(5.5));
+	fprintf(stdout, "%f\n", log2(4));
 	return 0;
 }
 
