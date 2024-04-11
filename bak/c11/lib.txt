@@ -351,8 +351,8 @@ int raise(int sig)
 <stdalign.h>
 alignas = _Alignas 
 alignof = _Alignof 
-_ _alignas_is_defined
-_ _alignof_is_defined
+__alignas_is_defined
+__alignof_is_defined
 
 <stdarg.h>
 va_list
@@ -362,6 +362,9 @@ va_end
 va_copy
 
 <stdatomic.h>
+atomic_int
+ATOMIC_VAR_INIT()
+atomic_init(volatile A *obj, C value)
 
 
 
