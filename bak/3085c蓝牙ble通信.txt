@@ -1,0 +1,8 @@
+定义一个ble_reg_manager，并设置link_cb连接断开会连接上时会回调，
+定义一个bt_gatt_attr属性数组，添加属性描述，
+设置ble_reg_manager中的attrs和attr_count
+调用bt_manager_ble_service_reg注册ble_reg_manager，
+这个调用需要在main函数中收到MSG_BT_ENGINE_READY后注册，
+
+发送数据可通过bt_manager_ble_send_data发送， 
+接收数据在属性性质里可设置接收数据回调函数

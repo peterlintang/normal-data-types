@@ -1,0 +1,620 @@
+方案配置 文档
+1. prj.conf -- 编译阶段配置好
+2. nvram -- 动态配置
+
+zephyr/boards/arm/ats3085c_dvb_watch_ext_nor_max/board.h  硬件配置相关
+zephyr/boards/arm/ats3085c_dvb_watch_ext_nor_max/board.c
+zephyr/boards/arm/ats3085c_dvb_watch_ext_nor_max/board_cfg.h
+
+application/bt_watch/   板级相关但与硬件无关的配置
+
+Kconfig文件配置  确定相关内容是否编译进来
+
+最终的配置文件存放在application/bt_watch/outdir/ats3085c_dvb_watch_ext_nor_max/zephyr/.config
+依.config生成autoconf.h，代码可引用此头文件
+
+动态配置
+application下nvram.prop
+zephyr/boards/下nvram.prop
+键=值 方式
+dbg nvdump查看
+system set_config 修改
+
+sdk 系统相关配置
+1. 线程栈大小
+2. 线程优先级
+3. 低电提醒/关机配置
+LOWPOWER_LEVEL
+应用相关配置
+CONFIG_BT_MAIN_APP
+CONFIG_LAUNCHER_APP
+CONFIG_CLOCK_DEF_PEFR_PERIOD
+CONFIG_BT_CALL_APP
+CONFIG_BT_PLAYER
+CONFIG_LCMUSIC_APP
+CONFIG_BT_TRANSMIT
+CONFIG_CARD_READER_APP
+CONFIG_ALARM_APP
+CONFIG_BT_VENDOR
+CONFIG_BT_LOG_SERVICE
+CONFIG_TOOL
+CONFIG_TOOLASET
+ota升级功能配置
+CONFIG_OTA_UPGRADE
+CONFIG_OTA_APP
+CONFIG_OTA_BACKGROUND
+CONFIG_OTA_FOREGROUND
+CONFIG_OTA_BACKEND_SDCARD
+CONFIG_OTA_BACKEND_BLUETOOTH
+CONFIG_OTA_RECOVERY
+CONFIG_OTA_BACKEND_TEMP_PART
+CONFIG_OTA_MUTIPLE_STORAGE
+4. ui显示相关配置
+CONFIG_LV_MEM_SIZE_KILOBYTES
+CONFIG_LVGL_VDB_SIZE
+CONFIG_RES_MEM_POOL_MAX_BLOCK_NUMBER
+CONFIG_RES_MEM_POOL_SCENE_MAX_BLOCK_NUMBER
+CONFIG_RES_MEM_POOL_SMALL_MAX_BLOCK_NUMBER
+CONFIG_BITMAP_PER_FONT_CACHE_SIZE
+CONFIG_BITMAP_FONT_CACHE_POOL_SIZE
+CONFIG_BITMAP_FONT_MAX_OPENED_FONT
+CONFIG_BITMAP_FONT_SUPPORT_EMOJI
+CONFIG_UI_MEM_BLOCK_SIZE
+CONFIG_UI_MEM_NUMBER_BLOCKS
+CONFIG_GUI_TEXT_IMG_CACHE_SIZE
+CONFIG_VIEW_CACHE_LEVEL
+CONFIG_VIEW_STACK_LEVEL
+串口
+act
+蓝牙
+media
+。。。
+
+
+定义一个ble_reg_manager，并设置link_cb连接断开会连接上时会回调，
+定义一个bt_gatt_attr属性数组，添加属性描述，
+设置ble_reg_manager中的attrs和attr_count
+调用bt_manager_ble_service_reg注册ble_reg_manager，
+这个调用需要在main函数中收到MSG_BT_ENGINE_READY后注册，
+
+发送数据可通过bt_manager_ble_send_data发送， 
+接收数据在属性性质里可设置接收数据回调函数
+
+应用系统主要基于消息msg进行交互，
+主要task：main launcher， 还有后台服务如ui_service, sensor_service, bt service, media service
+launcher之类的是前台应用，所有的前台应用共用一个栈，所以一个时刻只能由一个前台应用活跃， 前台应用还有bt call，music player之类的；
+
+main app前台常驻应用：负责处理系统消息和系统事件
+launcher默认前台应用：负责处理前台ui消息以及前台按键（当前前台激活应用处理，不一定是launcher）
+app_manager_active_app激活前台应用
+app_switch切换前台应用
+应用退出：主动，被动，需释放占用的资源
+
+应用间采用mailbox消息通信， 单对单方式，可同步异步发送
+
+CONFIG_NUM_MBOX_ASYNC_MSGS定义异步消息的数量
+send_async_msg(char *receiver, struct app_msg *msg)	发送消息
+receive_msg(struct app_msg *msg, int timeout)		接收消息
+
+消息msg有发送者，消息类型，消息cmd，以及消息参数，回调等信息，
+消息msg定义如下
+struct app_msg
+{
+	uint16_t sender;		发送者id
+	uint8_t type;			消息类型
+	uint8_t cmd;			消息cmd
+	uint8_t reserve;		保留，用户可用
+	uint8_t __pad[3];
+	union {				传递的参数
+		char content[];
+		short short_content[];
+		int value;
+		void *ptr;
+	};
+	MSG_CALLBACK callback;		回调函数，消息处理完后调用（如果实现的话）
+	struct k_sem *sync_sem;		同步用
+};
+
+
+应用级定时器 thread timer(当前线程）精度不高，
+thread_timer_init
+thread_timer_start
+thread_timer_handle_expired 线程中调用，会检查timer是否超时，若超时则执行定时器回调函数
+thread_timer_next_timeout
+thread_timer_stop
+thread_timer_is_running
+thread_timer_next_timeout
+
+stream 机制:
+int stream_attach(io_stream_t origin, io_stream_t attach_stream, int attach_type)
+attach_type: MODE_IN, 读origin原始流时写入attach流
+		MODE_OUT, 写origin流时写入到attach流
+一个stream最多可以attach两个流
+int stream_detach(io_stream_t origin, io_stream_t detach_stream)
+
+设置流观察者，stream数据发生改变（有读写操作）时，通知观察者
+int stream_set_observer(io_stream_t handle, void *observer, stream_observer_notify notify, u8_t type)
+
+io_stream_t stream_create(const stream_ops_t *ops, void *init_param)
+....
+framework/base/include/utils/stream/stream.h具体见
+
+ui
+事件先上报main app， main app转发给ui service， ui service再转前端应用， 见ATS308x_zs308A 应用开发文档19页
+main app中接收到MSG_KEY_INPUT, 调用system_input_event_handle处理，在system_input_event_handle中调用
+ui_manager_dispatch_key_event将key 事件转发ui service
+
+
+main进程（task）处理的消息类型
+MSG_BAT_CHARGE_EVENT 	电源管理  cmd: BAT_CHG_EVENT_DC5V_IN BAT_CHG_EVENT_DC5V_OUT转发给当前前台应用
+MSG_SYS_EVENT		系统事件 SYS_EVENT_BATTERY_TOO_LOW 电量低关机, SYS_EVENT_BATTERY_LOW 转发前台应用
+			其他的 system_bluetooth_event_handle（蓝牙事件） 
+			sys_event_process（sys_event_map映射 转ui service）两函数处理
+MSG_SR_INPUT		sr输入?? 转前台应用
+MSG_TTS_EVENT		语音播报事件 TTS_EVENT_START_PLAY 从链表取播放内容，然后media play语音播报
+MSG_KEY_INPUT		转发ui service或前台应用
+MSG_INPUT_EVENT		调用system_key_event_handle处理
+MSG_HOTPLUG_EVENT	热插拔 system_hotplug_event_handle处理
+MSG_VOLUME_CHANGED_EVENT 音量事件
+MSG_REBOOT		重启  重启系统
+MSG_POWER_OFF		关机
+MSG_NO_POWER		转发main MSG_SYS_EVENT事件，或蓝牙 TWS_UI_EVENT
+MSG_BT_ENGINE_READY	蓝牙模块ready， 开启相关的蓝牙服务
+MSG_START_APP		运行应用（应该是前端的app）
+MSG_EXIT_APP		退出应用(应该是前端的app)
+MSG_BLE_ANCS_AMS_SERVICE ble的什么事件 ancs ams service？是什么？ 调用bt_manager_ble_ancs_ams_handle处理
+MSG_APP_BLE_SUPER_BQB	ble super bqb ？	测试蓝牙什么东西的
+MSG_APP_TOOL_INIT	不知道是什么工具？
+MSG_BT_PAIRING_EVENT	蓝牙配对
+MSG_BT_DEVICE_ERROR	蓝牙出错重启蓝牙
+
+MSG_BT/BLE		蓝牙相关的。。。没写全，具体看代码
+
+TTS 语音播报
+1. 系统定义好系统事件的tts播报， system_tts_policy指定ui消息与tts对应关系, 
+framework/system/include/sys_event_type.h
+framework/system/include/sys_event.h
+application/bt_watch/src/main/system_event_map.c
+application/bt_watch/src/main/system_tts_policy.c
+struct tts_config_t user_tts_config
+未找到具体处理的地方
+
+2. 用户自己调用方式播放
+int tts_manager_play(u8_t *tts_name, u32_t mode)
+
+
+media开发
+
+
+
+
+ui 开发 view的proc在ui service线程中被调用
+ui_view_create	创建view
+ui_view_delete	销毁view
+
+view与应用交互
+1. 避免在其他线程调用gui的api，建议使用ui_view_paint出发view，并在相应回调中更新数据与view
+	内部无锁，避免不同线程访问相同资源出现不同步；
+2. presenter进行数据交互
+	参考launcher/main_view.c
+
+
+
+
+zephyr通信/同步方式
+0. clock 时间相关
+0. k_timer 定时器
+0. polling k_poll可以监控多个资源
+1. semaphores 信号量
+2. mutexes 互斥量
+3. condvar 条件变量
+4. event 事件
+5. 队列
+6. queues 队列
+7. fifos 先进先出队列
+8. lifos 后进先出队列
+9. message queues消息队列
+10. mailboxes 邮箱
+11. pipes 管道
+12. stacks 栈
+
+
+两类线程
+cooperative thread  线程priority是一个负数，当其运行时，除非线程本身进行操作让自己进入unready，否则一直运行；
+		优先级由CONFIG_NUM_COOP_PRIORITIES ... -1， 一般用于设备驱动或性能攸关的工作， 或互斥但不需要kernel object就能实现的
+preemptible thread  线程priority是一个正数，当其运行时，当cooperative 线程或优先级更高/等同的preemptible线程准备好时（ready）， 
+			当前preemptible线程可能被挂起；时间攸关一般用优先级较高的priority
+		优先级由 0 ... CONFIG_NUM_PREEMPT_PRIORITIES - 1
+meta-irq priorities 一般用不到，中断处理后回到应用代码前会调用到
+
+线程的优先级可以在运行时改变（how?）
+
+创建线程时选项
+K_ESSENTIAL	线程终止或中止时提示fatal system error
+K_SSE_REGS	x86架构提示线程使用cpu sse寄存器
+K_FP_REGS	线程使用浮点寄存器
+K_USER		用户线程（使能了CONFIG_USERSPACE),用户模式
+K_INHERIT_PERMS	如果使能了CONFIG_USERSPACE，线程继承父线程所有kernel object的权限
+
+CONFIG_THREAD_CUSTOM_DATA 线程私有数据
+k_thread_custom_data_set
+k_thread_custom_data_get
+
+线程相关接口
+k_thread_join   等待线程终止
+k_thread_abort 中止线程
+k_thread_suspend 挂起线程，不会再被调度，除非有线程调用k_thread_resume 恢复
+k_thread_resume恢复线程调度
+K_KERNEL_STACK K_THREAD_STACK用于线程堆栈的创建，有对齐要求，所以使用这两个接口代码移植性好些
+K_THREAD_STACK_DEFINE K_KERNEL_STACK_DEFINE K_THREAD_STACK_SIZEOF
+k_thread_create 运行时创建一个线程
+K_THREAD_DEFINE编译时创建一个线程
+k_thread_user_mode_enter 线程由super进入user mode
+k_yield 线程放弃cpu并将自己放到相同优先级队列可执行队列尾端
+k_sleep 休眠指定时间，其他所有的可执行线程都可执行
+k_wakeup 唤醒其他sleep的线程
+k_busy_wait 循环等待，短时间适合
+k_sched_lock 禁止调度（preemtible thread） ， 线程调用k_sched_lock后允许当前线程performs an action that makes it unready， 当再次调度到这个线程后， non-preemptible恢复
+k_sched_unlock 允许调度
+k_cpu_idle 	make cpu idle
+k_cpu_atomic_idle
+
+zephyr 系统线程
+Main thread
+Idle thread
+
+获取设备句柄
+device_get_binding(CONFIG_UART_CONSOLE_ON_DEV_NAME)
+
+
+工作队列
+	定义工作队列
+		struct k_work_q 
+		k_work_queue_init
+		k_work_queue_start
+		k_work_queue_drain	堵塞队列直到队列中没有work， workqueue thread resubmitted可以， 其他submit不行；
+		k_work_queue_unplug	解除堵塞
+
+	work
+		struct k_work
+		k_work_init
+		K_WORK_DEFINE
+		k_work_submit		提交work到work queue
+		k_work_submit_to_queue
+		k_work_busy_get  	返回0表示work 未被schedule， submit， executed
+		k_work_is_pending 	返回true 如果work被scheduled， queued， running
+		k_work_flush		刷新work，直到work 完成， 如果work没有pending， 直接返回
+		k_work_cancel		try to prevent work item from being executed
+		k_work_cancel_sync	会堵塞
+		struct k_work_sync	最好不要在stack中申请
+	delay work
+		struct k_work_delayable
+		k_work_init_delayable
+		k_work_schedule
+		k_work_schedule_for_queue
+		k_work_reschedule
+		k_work_reschedule_for_queue
+		k_work_delayable_from_work
+		k_work_delayable_busy_get
+		k_work_delayable_is_pending
+		k_work_flush_delayable
+		k_work_cancel_delayable
+		k_work_cancel_delayable_sync
+
+	triggered work
+		k_work_poll_submit
+
+system workqueue 系统工作队列
+
+
+线程同步以及通信
+semaphore 信号量
+	struct k_sem
+	k_sem_init	初始化一个信号量，运行时
+	K_SEM_DEFINE	初始化一个信号量,编译时
+	k_sem_give 	释放一个信号量
+	k_sem_take	获取一个信号量
+互斥量
+	struct k_mutex
+	k_mutex_init	初始化一个互斥量
+	K_MUTEX_DEFINE	初始化一个互斥量
+	k_mutex_lock	获取一个互斥量
+	k_mutex_unlock	释放一个互斥量
+条件变量
+	struct k_condvar
+	k_condvar_init		初始化一个条件变量
+	K_CONDVAR_DEFINE	初始化一个条件变量
+	k_condvar_wait		等待一个条件变量
+	k_condvar_signal	唤醒某个在等待条件变量调用k_condvar_wait
+	k_condvar_broadcast	唤醒所有在等待条件变量，调用k_condvar_wait
+事件
+	struct k_event
+	k_event_init
+	K_EVENT_DEFINE
+	k_event_set		设置事件 （set post有什么区别？？ set是 over writing ， post是bitwise）
+	k_event_post		post事件
+	k_event_wait		等待事件
+	k_event_wait_all	等待所有的事件
+
+
+
+fifo
+	struct k_fifo
+	k_fifo_init	初始化一个fifo
+	K_FIFO_DEFINE	初始化一个fifo
+	struct data_item_t 
+	{
+		void *fifo_reserved;	/* 1st word reserved for use by fifo */
+		...
+	};
+	k_fifo_put	往fifo放数据
+	k_fifo_alloc_put
+	k_fifo_put_list k_fifo_put_slist
+	k_fifo_get	从fifo取数据
+
+
+lifo
+	struct k_lifo
+	k_lifo_init	初始化一个lifo
+	K_LIFO_DEFINE	初始化一个lifo
+	struct data_item_t {
+		void *lifo_reserved;	/* 1st word reserved for use by lifo */
+		...
+	};
+	k_lifo_put	往lifo放数据
+	k_lifo_alloc_put
+	k_lifo_get	从lifo取数据
+
+stack
+	struct k_stack
+	stack_data_t 	栈元素有对齐要求
+	k_stack_init	初始化栈
+	K_STACK_DEFINE	初始化栈
+	k_stack_push	数据入栈
+	k_stack_pop	数据出栈
+
+message queue
+	struct k_msgq
+	k_msgq_init	初始化一个消息队列
+	K_MSGQ_DEFINE	初始化一个消息队列
+	/............
+	struct data_item_type {
+		uint32_t field1;
+		uint32_t field2;
+		uint32_t field3;
+	};
+	char __aligned(4) my_msgq_buff[10 * sizeof(struct data_item_type)];
+	struct k_msgq my_msgq;
+	k_msgq_init(&my_msgq, my_msgq_buffer, sizeof(struct data_item_type), 10);
+
+	typedef struct {
+		uint32_t field1;
+		uint32_t field2;
+		uint32_t field3;
+	} __attribute__((aligned(4))) data_item_type;
+
+	K_MSGQ_DEFINE(my_msgq, sizeof(struct data_item_type), 10, 4);
+	............./
+	
+	k_msgq_put 往消息队列放数据；
+	k_msgq_get 从消息队列接收数据；
+	k_msgq_peek
+	k_msgq_purge
+
+mailbox
+	struct k_mbox_msg
+		info 
+		size
+		tx_data
+		tx_target_thread
+		rx_source_thread
+	struct k_mbox
+	k_mbox_init	初始化一个邮箱
+	K_MBOX_DEFINE	初始化一个邮箱
+	k_mbox_put	往邮箱放数据
+	k_mbox_get	从邮箱取数据
+	k_mbox_data_get	从邮箱取数据
+
+pipes
+	struct k_pipe
+	k_pipe_init
+	K_PIPE_DEFINE
+	/..........
+	unsigned char __aligned(4) my_ring_buffer[100];
+	struct k_pipe my_pipe;
+	k_pipe_init(&my_pipe, my_ring_buffer, sizeof(my_ring_buffer));
+	K_PIPE_DEFINE(my_pipe, 100, 4);
+	............/
+	k_pipe_put		发送数据到管道pipe
+	k_pipe_get		从pipe获取数据
+	k_pipe_buffer_flush	flush 管道pipe 的buffer
+	k_pipe_flush		flush 管道pipe
+
+时间
+	k_cycle_get_32
+	k_cycle_get_64
+	sys_clock_hw_cycles_per_sec 
+	CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC
+	CONFIG_SYS_CLOCK_TICKS_PER_SEC
+	k_ms_to_ticks_ceil32
+	k_cyc_to_us_floor64
+	k_uptime_get			系统开机后经过的milliseconds
+	k_uptime_get_32
+	k_uptime_ticks			系统开机后经过的时间，ticks计时
+	struct k_timeout_t
+	K_MSEC				定义一个相对时间，单位为milliseconds，在当前时间之后
+	K_NSEC				nanoseconds
+	K_USEC				microseconds
+	K_TICKS				ticks
+	K_CYC				cycles
+	K_TIMEOUT_ABS_MS		绝对时间， 同理有NSEC USEC TICKS CYC接口
+	K_FOREVER
+	K_NO_WAIT
+	type: k_timeout_t
+	K_TIMEOUT_EQ
+	sys_timepoint_calc
+	sys_timepoint_timeout
+	k_sleep
+	k_usleep
+
+timer 定时器
+	duration 	首次到时时间
+	period		首次之后的周期时间，K_NO_WAIT or K_FOREVER ： 运行一次
+	expiry function 定时器到时回调函数,回调函数在system clock interrupt handler中回调
+	stop function	被stop时，相应调用stop定时器的线程中执行这个回调函数
+	status		指示定时器运行了多少次/状态，从上次status被读取后计算
+			状态有stopped， 初始化后； started，初始化duration 和period； running， 开始计时
+	定时器计时到时后，会调用回调函数expiry function， 如果定时器的period时间为0，那定时器进入stopped 状态，
+	否则定时器以period重新计时；如果有线程堵塞在定时器上， 线程会返回；
+
+	struct k_timer
+	k_timer_init	初始化一个定时器
+	K_TIMER_DEFINE	初始化一个定时器
+	k_timer_start	开始定时器计时
+	k_timer_status_get	获取定时器状态
+	k_timer_remaining_get	获取定时器剩余时间
+	k_timer_status_sync	同步获取定时器状态
+
+计时
+	timing_t
+	timing_init
+	timing_start
+	timing_counter_get
+	timing_cycles_get
+	timing_cycles_to_ns
+	timing_stop
+
+数据结构 系统提供的一些数据结构
+	sys_slist_t	单向链表
+		struct sys_snode_t
+		struct sys_slist_t
+		sys_slist_init
+		SYS_SLIST_STATIC_INIT
+		sys_slist_peek_head
+		sys_slist_peek_tail
+		SYS_SLIST_CONTAINER
+		sys_slist_peek_next
+		sys_slist_prepend
+		sys_slist_append
+		sys_slist_insert
+		sys_slist_remove
+		sys_slist_merge_slist
+		sys_slist_append_list
+		sys_slist_find_and_remove
+		SYS_SLIST_FOR_EACH_NODE
+		SYS_SLIST_FOR_EACH_NODE_SAFE
+		SYS_SLIST_FOR_EACH_CONTAINER
+		SYS_SLIST_FOR_EACH_CONTAINER_SAFE
+		SYS_SLIST_ITERATE_FROM_NODE
+	sys_dlist_t	双向链表
+		struct sys_dnode_t
+		sys_dlist_init
+		SYS_DLIST_STATIC_INIT
+		sys_dnode_init
+		sys_dlist_peek_head
+		sys_dlist_peek_tail
+		sys_dlist_peek_next
+		sys_dlist_peek_prev
+		sys_dlist_remove
+		sys_dlist_append
+		sys_dlist_prepend
+		sys_dlist_insert
+		SYS_DLIST_FOR_EACH_NODE
+		sys_dlist_insert_at
+		sys_dnode_is_linked
+	MPSC_PBUF	multi producer single consumer packet buffer 多个生产者，单个消费者
+					include/zephyr/sys/mpsc_packet.h
+			具体接口与定义见include/zephyr/sys/mpsc_buf.h
+		MPSC_PBUF_HDR		//使用例子见doc/kernel/data_structures/mpsc_pbuf.rst
+		mpsc_pbuf_alloc
+		mpsc_pbuf_commit
+		mpsc_pbuf_put_word
+		mpsc_pbuf_put_word_ext
+		mpsc_pbuf_claim
+		mpsc_pbuf_free
+	SPSP_PBUF	single producer single consumer packet buffer 单生产者，单消费者
+			具体接口与定义见include/zephyr/sys/spsc_buf.h
+	rbtree		红黑树
+			具体接口与定义见include/zephyr/sys/rb.h
+		struct rbtree
+		rb_lessthan_t
+		struct rbnode
+		rb_insert
+		rb_remove
+		rb_get_min
+		rb_get_max
+		rb_contains
+		rb_walk
+		bsearch
+		RB_FOR_EACH
+		RB_FOR_EACH_CONTAINER
+	ring buffer 	环形缓冲区 struct ring_buf
+			具体接口与定义见include/zephyr/sys/ring_buffer.h
+		byte mode or data item mode
+		struct ring_buf
+		ring_buf_init
+		ring_buf_element_init
+		RING_BUF_DECLARE
+		RING_BUF_ITEM_DECLARE
+		RING_BUF_ITEM_SIZEOF
+		ring_buf_put
+		ring_buf_get
+		ring_buf_put_claim
+		ring_buf_put_finish
+		ring_buf_get_claim
+		ring_buf_get_finish
+		ring_buf_item_put
+		ring_buf_item_get
+		ring_buf_space_get
+		ring_buf_item_space_get
+		ring_buf_is_empty
+		ring_buf_reset
+
+	memory heaps
+		k_heap
+		struct k_heap
+		K_HEAP_DEFINE
+		k_heap_init
+		k_heap_alloc
+		k_heap_free
+		sys_heap 底层一些的，接口非同步的
+		sys_multi_heap
+			sys_multi_heap_init
+			sys_multi_heap_add_heap
+			sys_multi_heap_alloc
+			sys_multi_heap_aligned_alloc
+			sys_multi_heap_free
+		k_malloc	//从SYSTEM_HEAP堆中申请内存, CONFIG_HEAP_MEM_POOL_SIZE
+		k_free
+		z_thread_malloc //从当前线程的资源池中申请， k_free释放；
+
+	shared multi heap
+		shared_multi_heap_pool_init
+		shared_multi_heap_add
+		shared_multi_heap_region
+		shared_multi_heap_alloc
+		shared_multi_heap_free
+
+	slap
+		k_mem_slab
+		k_mem_slab_init
+		K_MEM_SLAB_DEFINE
+		K_MEM_SLAB_DEFINE_STATIC
+		k_mem_slab_alloc
+		k_mem_slab_free
+
+	sys mem blocks
+		sys_mem_blocks_t
+		SYS_MEM_BLOCKS_DEFINE
+		SYS_MEM_BLOCKS_DEFINE_STATIC
+		SYS_MEM_BLOCKS_DEFINE_WITH_EXT_BUF
+		sys_mem_blocks_alloc
+		sys_mem_blocks_free
+		sys_multi_mem_blocks_init
+		sys_multi_mem_blocks_add_allocator
+		sys_multi_mem_blocks_alloc
+		sys_mem_blocks_alloc
+		sys_multi_mem_blocks_free
+		sys_mem_blocks_free
+
+
