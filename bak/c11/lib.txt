@@ -365,8 +365,62 @@ va_copy
 atomic_int
 ATOMIC_VAR_INIT()
 atomic_init(volatile A *obj, C value)
+....
 
 
+<stdbool.h>
+bool
+true
+false
+__bool_true_false_are_defined
 
+<stddef.h>
+ptrdiff_t
+size_t
+max_align_t
+wchar_t
+NULL
+offsetof
+
+<stdint.h>
+intN_t // N: 8 16 24 32 64 ...
+uintN_t // N: 8 16 24 32 64 ...
+int_leastN_t
+uint_leastN_t
+int_fastN_t
+uint_fastN_t
+intptr_t
+uintptr_t
+intmax_t
+uintmax_t
+INTN_MIN	-(2^(N - 1))
+INTN_MAX	(2^(N - 1) - 1)
+UINTN_MAX	(2^N - 1)
+INT_LEASTN_MIN	-(2^(N - 1))
+INT_LEASTN_MAX	(2^(N - 1) - 1)
+UINT_LEASTN_MAX	(2^N - 1)
+INT_FASTN_MIN	-(2^(N - 1))
+INT_FASTN_MAX	(2^(N - 1) - 1)
+UINT_FASTN_MAX	(2^N - 1)
+INTPTR_MIN	-(2^15 - 1)
+INTPTR_MAX	2^15 - 1
+UINTPTR_MAX	2^16 - 1
+INTMAX_MIN	-(2^63 - 1)
+INTMAX_MAX	(2^63 - 1)
+UINTMAX_MAX	(2^64 - 1)
+PTRDIFF_MIN	-65535 may change
+PTRDIFF_MAX	65535	may change 
+SIZE_MAX	65535
+WCHAR_MIN
+WCHAR_MAX
+WINT_MIN
+WINT_MAX
+SIG_ATOMIC_MIN
+SIG_ATOMIC_MAX
+
+INTN_C(value)	// N: 8 16 24 32 64 ... int_leastN_t
+UINTN_C(value)	// N: 8 16 24 32 64 ... uint_leastN_t
+INTMAX_C(value)		// intmax_t
+UINTMAX_C(value)	// uintmax_t
 
 
