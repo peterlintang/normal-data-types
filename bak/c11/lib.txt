@@ -486,4 +486,19 @@ vfscanf
 vpintf
 vscanf
 
+BUFSIZ
+EILSEQ
+FOPENMAX
+
+remove
+rename
+tmpfile
+TMPMAX
+tmpnam
+fclose
+fflush
+fopen
+freopen
+setbuf
+setvbuf
 
