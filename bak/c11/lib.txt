@@ -504,4 +504,16 @@ setvbuf
 
 fprintf
 fscanf
+printf
+scanf
+snprintf
+sprintf
+sscanf
+vfprintf
+vfscanf
+vprintf
+vscanf
+vsnprintf
+vsprintf
+vsscanf
 
