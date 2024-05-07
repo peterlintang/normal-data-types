@@ -502,3 +502,6 @@ freopen
 setbuf
 setvbuf
 
+fprintf
+fscanf
+
