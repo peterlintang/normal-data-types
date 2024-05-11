@@ -579,4 +579,17 @@ abort
 atexit
 at_quick_exit
 quick_exit
+exit
+_Exit
+getenv
+quick_exit
+system
+bsearch
+qsort
+abs
+labs
+llabs
+div
+ldiv
+lldiv
 
