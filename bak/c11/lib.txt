@@ -712,7 +712,16 @@ localtime
 strftime
 
 <uchar.h>
+mbstate_t
+size_t
+char16_t	//uint_least16_t
+char32_t	//uint_least32_t
+mbrtoc16
+c16rtomb
+mbrtoc32
+c32rtomb
 
+<wchar.h>
 
 
 
