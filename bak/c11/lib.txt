@@ -789,6 +789,18 @@ wmemset
 
 wcsftime
 
+btowc
+wctob
+
+mbsinit
+
+mbrlen
+mbrtowc
+wcrtomb
+mbsrtowcs
+wcsrtombs
+
+<wctype.h>
 
 
 
