@@ -801,6 +801,35 @@ mbsrtowcs
 wcsrtombs
 
 <wctype.h>
+wint_t
+wctrans_t
+wctype_t
+WEOF
+
+iswalpha
+iswblank
+iswcntrl
+iswdigit
+iswgraph
+iswlower
+iswprint
+iswpunct
+iswspace
+iswupper
+iswxdigit
+
+iswctype	// iswctype(wc, wctype("alnum")) == iswalnum(wc)
+wctype
+
+towlower
+towupper
+
+towctrans	// towctrans(wc, wctrans("tolower")) == towlower
+		// towctrans(wc, wctrans("toupper")) == towupper
+wctrans
+
+LC_CTYPE
+
 
 
 
