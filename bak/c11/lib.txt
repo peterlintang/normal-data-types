@@ -835,3 +835,10 @@ LC_CTYPE
 \u  zhuan yi zi fu, hou mian jia 16 jin zhi shu zi
 \U
 
+u U l L ll LL: zheng xing chang liang hou zhui
+f l F L: fuo dian hou zhui
+L u U: zi fu qian zhui
+u8 L u U: zi fu chuan qian zhui
+
+
+
