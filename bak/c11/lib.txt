@@ -840,5 +840,24 @@ f l F L: fuo dian hou zhui
 L u U: zi fu qian zhui
 u8 L u U: zi fu chuan qian zhui
 
+0: 8 jin zhi kai tou
+0x 0X: 16 jin zhi kai tou
+
+\ :8 jin zhi xu lie
+\x :16 jin zhi xu lie
+
+e E:  	10 jin zhi zhi shu (fu dian shu)
+p P:	16 jin zhi zhi shu (fu dian shu) 0x/X kai tou
+
+
+
+biao dian fu hao
+<: == [
+:> == ]
+<% == {
+%> == }
+%: == #
+%:%: == ##
+
 
 
