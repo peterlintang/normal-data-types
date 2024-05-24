@@ -63,6 +63,7 @@ int intersectionPoint2LinesSegments(struct Point *A, struct Point *B,
 
 int main(int argc, char *argv[])
 {
+#if 0
 	struct Point A;
 	struct Point B;
 	struct Point C;
@@ -72,18 +73,82 @@ int main(int argc, char *argv[])
 	int result = 0;
 	A.x = 0.0f;
 	A.y = 0.0f;
-	B.x = 3.0f;
-	B.y = 3.0f;
-	C.x = 2.0f;
+	B.x = 0.5f;
+	B.y = 0.5f;
+	C.x = 3.0f;
 	C.y = 0.0f;
 	D.x = 0.0f;
-	D.y = 2.0f;
+	D.y = 3.0f;
 
 	result = isLineIntersectSide(&A, &B, &C, &D);
 
 	fprintf(stdout, "result: %d\n", result);
 	result = intersectionPoint2LinesSegments(&A, &B, &C, &D, &E);
 	fprintf(stdout, "result: %d, %f, %f\n", result, E.x, E.y);
+	return 0;
+#endif
+
+	struct Point A;
+	struct Point B;
+	struct Point E;
+	A.x = -95.263962;
+	A.y = 38.977782;
+	B.x = -95.267057;
+	B.y = 38.978634;
+
+	struct Point Points[] = {
+		{-95.266989, 38.978656}, 
+		{-95.26697, 38.978652}, 
+		{-95.266956, 38.978645}, 
+		{-95.266927, 38.978626}, 
+		{-95.266915, 38.978616}, 
+		{-95.266907, 38.978603}, 
+		{-95.266903, 38.978591}, 
+		{-95.266903, 38.97858}, 
+		{-95.266915, 38.978554}, 
+		{-95.266934, 38.978537}, 
+		{-95.266963, 38.978523}, 
+		{-95.266998, 38.978515}, 
+		{-95.267012, 38.978516}, 
+		{-95.267045, 38.978522}, 
+		{-95.267078, 38.978536}, 
+		{-95.267115, 38.978562}, 
+		{-95.267147, 38.978593}, 
+		{-95.267157, 38.978599}, 
+		{-95.267206, 38.978621}, 
+		{-95.267224, 38.978639}, 
+		{-95.267228, 38.978649}, 
+		{-95.26723, 38.978671}, 
+		{-95.267229, 38.978683}, 
+		{-95.267222, 38.978706}, 
+		{-95.267208, 38.978725}, 
+		{-95.267187, 38.978738}, 
+		{-95.267173, 38.978743}, 
+		{-95.267144, 38.978746}, 
+		{-95.267123, 38.978743}, 
+		{-95.267112, 38.978737}, 
+		{-95.2671, 38.97873}, 
+		{-95.26706, 38.978693}, 
+		{-95.267035, 38.978674}, 
+		{-95.267008, 38.978662}, 
+		{-95.266989, 38.978656}
+	};
+
+	int result = 0;
+	fprintf(stdout, "total num: %ld\n", sizeof(Points) / sizeof(Points[0]));
+	for (int i = 0; i < sizeof(Points) / sizeof(Points[0]) - 1; i++)
+	{
+		E.x = 0;
+		E.y = 0;
+		result = intersectionPoint2LinesSegments(&A, &B, &Points[i % sizeof(Points)], &Points[(i + 1) % sizeof(Points)], &E);
+		fprintf(stdout, "result: %d, (%.8f %.8f) (%.8f %.8f): (%.8f %.8f)\n", result, 
+				Points[i % sizeof(Points)].x, 
+				Points[i % sizeof(Points)].y, 
+				Points[(i + 1) % sizeof(Points)].x, 
+				Points[(i + 1) % sizeof(Points)].y, 
+				E.x, E.y);
+	}
+
 	return 0;
 }
 
