@@ -4,15 +4,15 @@
 #include <string.h>
 
 struct Point {
-	float x;
-	float y;
+	double x;
+	double y;
 };
 
 int isLineIntersectSide(struct Point *A, struct Point *B, 
 		struct Point *C, struct Point *D)
 {
-	float fc = 0.0f;
-	float fd = 0.0f;
+	double fc = 0.0f;
+	double fd = 0.0f;
 
 	fc = (C->y - A->y) * (A->x - B->x) - (C->x - A->x) * (A->y - B->y);
 	fd = (D->y - A->y) * (A->x - B->x) - (D->x - A->x) * (A->y - B->y);
@@ -27,13 +27,13 @@ int intersectionPoint2LinesSegments(struct Point *A, struct Point *B,
 		struct Point *C, struct Point *D,
 		struct Point *E)
 {
-	float a1 = 0.0f;
-	float a2 = 0.0f;
-	float b1 = 0.0f;
-	float b2 = 0.0f;
-	float c1 = 0.0f;
-	float c2 = 0.0f;
-	float d = 0.0f;
+	double a1 = 0.0f;
+	double a2 = 0.0f;
+	double b1 = 0.0f;
+	double b2 = 0.0f;
+	double c1 = 0.0f;
+	double c2 = 0.0f;
+	double d = 0.0f;
 	int result = 0;
 
 	a1 = B->y - A->y;
@@ -51,6 +51,10 @@ int intersectionPoint2LinesSegments(struct Point *A, struct Point *B,
 	result = isLineIntersectSide(A, B, C, D);
 	if (result == 1)
 	{
+		/*
+		fprintf(stdout, "%s: a1: %.8f, a2: %.8f, b1: %.8f, b2: %.8f, c1: %.8f, c2: %.8f, d: %.8f\n",
+				__func__, a1, a2, b1, b2, c1, c2, d);
+		*/
 		E->x = (b1 * c2 - b2 * c1) / d;
 		E->y = (a2 * c1 - a1 * c2) / d;
 		return 1;
@@ -86,13 +90,31 @@ int main(int argc, char *argv[])
 	result = intersectionPoint2LinesSegments(&A, &B, &C, &D, &E);
 	fprintf(stdout, "result: %d, %f, %f\n", result, E.x, E.y);
 	return 0;
-#endif
+#else
 
 	struct Point A;
 	struct Point B;
 	struct Point E;
+#if 0
+	A.x = 1.0;
+	A.y = 2.0;
+	B.x = 2.0;
+	B.y = 2.0;
+	struct Point Points[] = {
+		{0.0, 0.0},
+		{8.0, 0.0},
+		{8.0, 8.0},
+		{0.0, 8.0},
+		{0.0, 0.0},
+	};
+#else
 	A.x = -95.263962;
 	A.y = 38.977782;
+	B.x = -95.267057;
+	B.y = 38.978634;
+
+	A.x = -95.263727;
+	A.y = 38.977727;
 	B.x = -95.267057;
 	B.y = 38.978634;
 
@@ -133,23 +155,26 @@ int main(int argc, char *argv[])
 		{-95.267008, 38.978662}, 
 		{-95.266989, 38.978656}
 	};
+#endif
 
 	int result = 0;
 	fprintf(stdout, "total num: %ld\n", sizeof(Points) / sizeof(Points[0]));
+	fprintf(stdout, "A: (%.8f %.8f), B: (%.8f %.8f)\n", A.x, A.y, B.x, B.y);
 	for (int i = 0; i < sizeof(Points) / sizeof(Points[0]) - 1; i++)
 	{
 		E.x = 0;
 		E.y = 0;
-		result = intersectionPoint2LinesSegments(&A, &B, &Points[i % sizeof(Points)], &Points[(i + 1) % sizeof(Points)], &E);
+		result = intersectionPoint2LinesSegments(&A, &B, &Points[i + 1], &Points[(i )], &E);
 		fprintf(stdout, "result: %d, (%.8f %.8f) (%.8f %.8f): (%.8f %.8f)\n", result, 
-				Points[i % sizeof(Points)].x, 
-				Points[i % sizeof(Points)].y, 
-				Points[(i + 1) % sizeof(Points)].x, 
-				Points[(i + 1) % sizeof(Points)].y, 
+				Points[i].x, 
+				Points[i].y, 
+				Points[(i + 1)].x, 
+				Points[(i + 1)].y, 
 				E.x, E.y);
 	}
 
 	return 0;
+#endif
 }
 
 
