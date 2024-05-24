@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 struct Point {
 	double x;
@@ -63,6 +64,26 @@ int intersectionPoint2LinesSegments(struct Point *A, struct Point *B,
 	{
 		return 0;
 	}
+}
+
+double distance(struct Point *A, struct Point *B)
+{
+	double Ax = A->x * M_PI / 180.0;
+	double Ay = A->y * M_PI / 180.0;
+	double Bx = B->x * M_PI / 180.0;
+	double By = B->y * M_PI / 180.0;
+	double lat;
+	double lon;
+	double a;
+	double c;
+	double d;
+	double R = 6371.0 * 1000;
+
+	lat = Bx - Ax;
+	lon = By - Ay;
+	a = pow(sin(lat / 2), 2) + cos(Ax) * cos(Bx) * pow(sin(lon / 2), 2);
+	c = 2 * atan2(sqrt(a), sqrt(1 - a));
+	return d = R * c;
 }
 
 int main(int argc, char *argv[])
@@ -159,18 +180,22 @@ int main(int argc, char *argv[])
 
 	int result = 0;
 	fprintf(stdout, "total num: %ld\n", sizeof(Points) / sizeof(Points[0]));
-	fprintf(stdout, "A: (%.8f %.8f), B: (%.8f %.8f)\n", A.x, A.y, B.x, B.y);
+	fprintf(stdout, "A: (%.8f %.8f), B: (%.8f %.8f), distance: %.8f\n", 
+			A.x, A.y, B.x, B.y,
+			distance(&A, &B)
+			);
 	for (int i = 0; i < sizeof(Points) / sizeof(Points[0]) - 1; i++)
 	{
 		E.x = 0;
 		E.y = 0;
 		result = intersectionPoint2LinesSegments(&A, &B, &Points[i + 1], &Points[(i )], &E);
-		fprintf(stdout, "result: %d, (%.8f %.8f) (%.8f %.8f): (%.8f %.8f)\n", result, 
+		fprintf(stdout, "result: %d, (%.8f %.8f) (%.8f %.8f): (%.8f %.8f), distance: %.8f\n", result, 
 				Points[i].x, 
 				Points[i].y, 
 				Points[(i + 1)].x, 
 				Points[(i + 1)].y, 
-				E.x, E.y);
+				E.x, E.y,
+				result ? distance(&A, &E) : 0.0);
 	}
 
 	return 0;
