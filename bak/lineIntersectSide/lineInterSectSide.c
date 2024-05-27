@@ -24,6 +24,14 @@ int isLineIntersectSide(struct Point *A, struct Point *B,
 		return 1;
 }
 
+/*
+ *
+ * compute line(A-B) cross point with line segment(C-D)
+ * return value: 	1 get point
+ * 			0 no cross point
+ * @E: the cross point
+ *
+ */
 int intersectionPoint2LinesSegments(struct Point *A, struct Point *B, 
 		struct Point *C, struct Point *D,
 		struct Point *E)
