@@ -94,6 +94,206 @@ double distance(struct Point *A, struct Point *B)
 	return d = R * c;
 }
 
+#include <stdbool.h>
+bool InsidePolygon1(struct Point *polygon, int N, struct Point *ptp )
+{
+    int i,j;
+    bool inside,redo;
+    struct Point pt;
+
+    pt.x = ptp->x;
+    pt.y = ptp->y;
+
+    redo = true;
+    for (i = 0;i < N;++i)
+    {
+        if (polygon[i].x == pt.x &&
+            polygon[i].y == pt.y )
+        {
+            redo = false;
+            inside = true;
+            break;
+        }
+    }
+
+    while (redo)
+    {
+        redo = false;
+        inside = false;
+        for (i = 0,j = N - 1;i < N;j = i++)
+        {
+            if ( (polygon[i].y < pt.y && pt.y < polygon[j].y) ||
+                (polygon[j].y < pt.y && pt.y < polygon[i].y) )
+            {
+                if (pt.x <= polygon[i].x || pt.x <= polygon[j].x)
+                {
+                    double _x = (pt.y-polygon[i].y)*(polygon[j].x-polygon[i].x)/(polygon[j].y-polygon[i].y)+polygon[i].x;
+                    if (pt.x < _x)          // 在线的左侧
+                        inside = !inside;
+                    else if (pt.x == _x)    // 在线上
+                    {
+                        inside = true;
+                        break;
+                    }
+                }
+            }
+            else if ( pt.y == polygon[i].y)
+            {
+                if (pt.x < polygon[i].x)    // 交点在顶点上
+                {
+                    polygon[i].y > polygon[j].y ? --pt.y : ++pt.y;
+                    redo = true;
+                    break;
+                }
+            }
+            else if ( polygon[i].y ==  polygon[j].y && // 在水平的边界线上
+                pt.y == polygon[i].y &&
+                ( (polygon[i].x < pt.x && pt.x < polygon[j].x) ||
+                (polygon[j].x < pt.x && pt.x < polygon[i].x) ) )
+            {
+                inside = true;
+                break;
+            }
+        }
+    }
+
+    return inside;
+}
+
+// 根据需要不判断顶点
+bool IsPointInLine(struct Point *pt, struct Point *pt1, struct Point *pt2)
+{
+    bool inside = false;
+    if (pt->y == pt1->y &&
+        pt1->y == pt2->y &&
+        ((pt1->x < pt->x && pt->x < pt2->x) ||
+        (pt2->x < pt->x && pt->x < pt1->x)) )
+    {
+        inside = true;
+    }
+    else if (pt->x == pt1->x &&
+        pt1->x == pt2->x &&
+        ((pt1->y < pt->y && pt->y < pt2->y) ||
+        (pt2->y < pt->y && pt->y < pt1->y)) )
+    {
+        inside = true;
+    }
+    else if ( ((pt1->y < pt->y && pt->y < pt2->y) ||
+        (pt2->y < pt->y && pt->y < pt1->y)) &&
+        ((pt1->x < pt->x && pt->x < pt2->x) ||
+        (pt2->x < pt->x && pt->x < pt1->x)) )
+    {
+        if (0 == (pt->y-pt1->y)/(pt2->y-pt1->y)-(pt->x - pt1->x) / (pt2->x-pt1->x))
+        {
+            inside = true;
+        }
+    }
+    return inside;
+}
+
+bool InsidePolygon2(struct Point *polygon, int N, struct Point *pp )
+{
+    int i,j;
+    double angle = 0;
+    bool inside = false;
+    struct Point p;
+
+    p.x = pp->x;
+    p.y = pp->y;
+
+    for (i = 0,j = N - 1;i < N;j = i++)
+    {
+        if (polygon[i].x == p.x &&    // 是否在顶点上
+            polygon[i].y == p.y)
+        {
+            inside = true;
+            break;
+        }
+        else if (IsPointInLine(&p, &polygon[i], &polygon[j]))    // 是否在边界线上
+        {
+            inside = true;
+            break;
+        }
+
+        double x1,y1,x2,y2;
+        x1 = polygon[i].x - p.x;
+        y1 = polygon[i].y - p.y;
+        x2 = polygon[j].x - p.x;
+        y2 = polygon[j].y - p.y;
+
+        double radian = atan2(y1,x1) - atan2(y2,x2);
+        radian = abs(radian);
+        if (radian > M_PI) radian = 2* M_PI - radian;
+        angle += radian;            // 计算角度和
+    }
+
+    if ( fabs(6.28318530717958647692 - angle) < 1e-7 )
+        inside = true;
+
+    return inside;
+}
+
+bool InsidePolygon3( struct Point *polygon, int N, struct Point *ptp )
+{
+    int i,j;
+    bool inside = false;
+    double polygon_area = 0;
+    double trigon_area = 0;
+    struct Point pt;
+
+    pt.x = ptp->x;
+    pt.y = ptp->y;
+
+    for (i = 0,j = N - 1;i < N;j = i++)
+    {
+        polygon_area += polygon[i].x * polygon[j].y - polygon[j].x * polygon[i].y;
+        trigon_area += abs(
+            pt.x * polygon[i].y -
+            pt.x * polygon[j].y -
+            polygon[i].x * pt.y +
+            polygon[i].x * polygon[j].y +
+            polygon[j].x * pt.y -
+            polygon[j].x * polygon[i].y
+            );
+    }
+
+    trigon_area *= 0.5;
+    polygon_area = abs(polygon_area * 0.5);
+    if ( fabs(trigon_area - polygon_area) < 1e-7 )
+        inside = true;
+
+    return inside;
+}
+
+bool InsidePolygon4( struct Point *polygon, int N, struct Point *pp )
+{
+    int i,j;
+    bool inside = false;
+    int count1 = 0;
+    int count2 = 0;
+
+    struct Point p;
+
+    p.x = pp->x;
+    p.y = pp->y;
+
+    for (i = 0,j = N - 1;i < N;j = i++)
+    {
+        double value = (p.x - polygon[j].x) * (polygon[i].y - polygon[j].y) - (p.y - polygon[j].y) * (polygon[i].x - polygon[j].x);
+        if (value > 0)
+            ++count1;
+        else if (value < 0)
+            ++count2;
+    }
+
+    if (0 == count1 ||
+        0 == count2)
+    {
+        inside = true;
+    }
+    return inside;
+}
+
 int main(int argc, char *argv[])
 {
 #if 0
@@ -206,32 +406,12 @@ int main(int argc, char *argv[])
 				result ? distance(&A, &E) : 0.0);
 	}
 
+	bool flag;
+
+	flag = InsidePolygon1(Points, sizeof(Points) / sizeof(Points[0]), &B);
+	fprintf(stdout, "flag: %d\n", flag);
 	return 0;
 #endif
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
