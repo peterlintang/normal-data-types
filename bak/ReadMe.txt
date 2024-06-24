@@ -14,6 +14,7 @@ gcc -Isrc/ -Iobsolete/ -Iexample src/nanovg.c example/demo.c example/example_gl3
 #gui
 lvgl
 git@github.com:lvgl/lvgl.git
+https://github.com/lvgl/lv_port_pc_vscode
 
 git@github.com:mjjq/ConvexDecomposition.git
 
