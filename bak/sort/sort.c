@@ -176,8 +176,61 @@ static int compare2(const void *arg1, const void *arg2)
 		return 0;
 }
 
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 int main(int argc, char *argv[])
 {
+#if 1
+	        int ret = 0;
+        int total = 0;
+        int left = 0;
+        int count = 0;
+	int fd = -1;
+//      char test_map[256] = { 0 };
+//
+#define TMP_LEN 1024
+        char *test_map = (char*)calloc(TMP_LEN, sizeof(char));
+        fd = open(argv[1], O_RDONLY);
+	if (fd < -1)
+        {
+                printf("open hello.dat failed\n");
+                return 0;
+        }
+again:
+        ret = read(fd, test_map + left, TMP_LEN - left);
+        if (ret > 0)
+        {
+                total += ret;
+                printf("%s: ret: %d, left: %d, total: %d\n", __func__, ret, left, total);
+
+                int i = 0;
+                int index = 0;
+                for ( i = 0; i < ret + left; i++)
+                {
+                        index++;
+                        if (test_map[i] == '\n')
+                        {
+                                count++;
+                                index = 0;
+                        }
+                }
+                left = index;
+		memcpy(test_map, test_map + TMP_LEN - left, left);
+
+               goto again;
+        }
+        else
+        {
+        }
+
+        printf("count: %d\n", count);
+        free(test_map);
+        close(fd);
+
+        return 0;
+
+#else
 #define COURSES_NUM	40000
 	FILE *fp = NULL;
 	char line[1024];
@@ -220,5 +273,6 @@ again:
 	free(courses_info);
 
 	return ret;
+#endif
 }
 
