@@ -187,6 +187,8 @@ int main(int argc, char *argv[])
         int left = 0;
         int count = 0;
 	int fd = -1;
+	int start = 0;
+	char str[512];
 //      char test_map[256] = { 0 };
 //
 #define TMP_LEN 1024
@@ -202,7 +204,7 @@ again:
         if (ret > 0)
         {
                 total += ret;
-                printf("%s: ret: %d, left: %d, total: %d\n", __func__, ret, left, total);
+//                printf("%s: ret: %d, left: %d, total: %d\n", __func__, ret, left, total);
 
                 int i = 0;
                 int index = 0;
@@ -213,10 +215,15 @@ again:
                         {
                                 count++;
                                 index = 0;
+				memset(str, 0, 512);
+				memcpy(str, test_map + start, i - start);
+				start = i + 1;
+				printf("%s\n", str);
                         }
                 }
                 left = index;
 		memcpy(test_map, test_map + TMP_LEN - left, left);
+		start = 0;
 
                goto again;
         }
@@ -224,7 +231,7 @@ again:
         {
         }
 
-        printf("count: %d\n", count);
+       // printf("count: %d\n", count);
         free(test_map);
         close(fd);
 
