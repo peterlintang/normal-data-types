@@ -775,6 +775,7 @@ int get_mag_data(struct mag_data_t *data, float *acc_mg)
 	printf("%.3f %.3f\n", cosf(atanf(acc_mg[0] / acc_mg[2])), cosf(atanf(acc_mg[1] / acc_mg[2])));
 	printf("%.3f %.3f\n", sinf(atanf(acc_mg[0] / acc_mg[2])), sinf(atanf(acc_mg[1] / acc_mg[2])));
 
+/*	// https://blog.csdn.net/weixin_43614541/article/details/104818380 */
 	float new_mag[3];
 	float angle;
 	new_mag[0] = data->mag_raw_data[0] * cosf(atanf(acc_mg[0] / acc_mg[2])) + data->mag_raw_data[2] * sinf(atanf(acc_mg[0] / acc_mg[2]));
