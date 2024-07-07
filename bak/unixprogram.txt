@@ -1,0 +1,403 @@
+
+包装错误处理函数
+
+/******************************************************/
+11 12章
+线程限制	sysconf
+一个进程可以创建的线程数
+线程栈可用的自小字节数
+
+线程属性
+可取消状态
+可取消类型
+并发度
+detach joinable状态
+栈地址，栈大小，guardsize
+pthread_attr_init
+pthread_attr_destroy
+pthread_attr_getdetachstate	 // detach or joinable
+pthread_attr_setdetachstate
+pthread_attr_getstatck
+pthread_attr_setstack
+pthread_attr_getstacksize
+pthread_attr_setstacksize
+pthread_attr_getguardsize
+pthread_attr_setguardsize
+pthread_getconcurrency
+pthread_setconcurrency
+
+
+线程标识
+
+pthread_self
+pthread_equal
+pthread_create
+pthread_exit
+pthread_join
+pthread_cancel
+pthread_cleanup_push
+pthread_cleanup_pop
+pthread_detach
+
+互斥量
+属性 进程共享、类型
+THREAD_PROCESS_SHARED	// 可以多个进程在共享内存中创建互斥量用于进程同步
+THREAD_PROCESS_PRIVATE	// 一个进程内线程间同步
+pthread_mutexattr_getpshared
+pthread_mutexattr_setpshared
+互斥量类型
+PTHREAD_MUTEX_NORMAL
+PTHREAD_MUTEX_ERRORCHECK
+PTHREAD_MUTEX_RECURSIVE
+PTHREAD_MUTEX_DEFAULT
+pthread_mutexattr_gettype
+pthread_mutexattr_settype
+
+pthread_mutex_init
+pthread_mutex_destroy
+pthread_mutex_lock
+pthread_mutex_trylock
+pthread_mutex_unlock
+
+读写锁 进程共享属性
+pthread_rwlock_init
+pthread_rwlock_destroy
+pthread_rwlockattr_getpshared
+pthread_rwlockattr_setpshared
+pthread_rwlock_rdlock
+pthread_rwlock_wrlock
+pthread_rwlock_unlock
+pthread_rwlock_tryrdlock
+pthread_rwlock_trywrlock
+条件变量 进程共享属性
+pthread_cond_init
+pthread_cond_destroy
+pthread_condattr_getpshared
+pthread_condattr_setpshared
+pthread_cond_wait
+pthread_cond_timedwait
+pthread_cond_signal
+pthread_cond_broadcast
+
+pthread_once_t flag = PTHREAD_ONCE_INIT
+pthread_once
+线程私有数据
+pthread_key_create
+pthread_key_delete
+pthread_getspecific	// 键与线程私有空间地址关联
+pthread_setspecific
+
+可取消状态属性类型
+PTHREAD_CANCEL_ENABLE
+PTHREAD_CANCEL_DISABLE
+pthread_setcancelstate
+pthread_testcancel
+
+PTHREAD_CANCEL_DEFERRED			// only at cancel point will act
+PTHREAD_CANCEL_ASYNCHRONOUS	// can cancel at any time
+pthread_setcanceltype
+
+线程 信号
+pthread_sigmask	// 屏蔽信号
+sigwait	// 会自动取消信号屏蔽字，返回前会自动恢复
+pthread_kill	// 发送信号
+
+线程 锁 fork
+pthread_atfork
+
+线程io
+pread pwrite // 原子操作
+
+/*************************************************************/
+3 4 14章
+文件io			文件描述符表(文件描述符标志)	文件表项(文件状态标志)	v节点
+open 		// O_RDONLY O_WRONLY O_RDWR   O_APPEND O_CREAT O_EXCL O_TRUNC O_NONBLOCK O_NOCTTY O_DSYNC O_RSYNC O_SYNC
+creat 
+close
+lseek		// SEEK_CUR SEEK_SET SEEK_END
+read
+write
+dup dup2	// 文件共享/ 复制文件描述符
+sysc fsync fdatasync	//刷缓存
+fcntl	// 1 复制文件描述符 F_DUPFD
+			2 获得设置文件描述符标记 F_GETFD F_SETFD
+			3 获得设置文件状态标志 F_GETFL F_SETFL
+			4 获得设置异步io所有权 F_GETOWN F_SETOWN
+			5 获得设置记录锁F_GETLK F_SETLK | F_SETLKW
+ioctl
+pread pwrite // 原子操作 seek and read or write
+
+非堵塞
+open	//打开文件	非堵塞O_NONBLOCK or fcntl O_NONBLOCK
+记录锁
+
+文件属性: 文件类型、模式类型、权限、文件链接数、用户id、组id、文件大小、最后访问时间、最后修改时间、文件状态修改最后时间、i节点、设备号、blocks 块数、io size
+文件类型：普通文件、目录文件、块特殊文件、字符特殊文件、fifo、套接字、符号链接
+文件权限：读、写、执行，用户、组、其他
+stat 
+fstat
+lstat 
+access 用实际用户id做权限检查
+umask 文件模式创建屏蔽字
+chmod 	改变文件访问权限
+fchmod
+chown	改变文件用户id、组id
+fchown
+lchown 
+truncate 	截短文件
+ftruncate 
+link	创建新目录项，新目录项引用已有文件
+unlink	删除目录项
+remove 解除对一个文件或目录的链接
+rename 重命名目录或文件
+symlink 创建一个符号链接
+readlink 读符号链接文件本身
+utime 修改文件的访问和修改时间
+mkdir	创建目录
+rmdir	删除目录
+opendir	读目录相关函数
+readdir
+rewinddir
+closedir
+telldir
+seekdir
+chdir	改变进程当前工作目录或获取进程当前工作目录
+fchdir
+getcwd
+
+
+创建记录锁
+fcntl F_GETLK F_SETLK F_SETLKW
+		F_RDLCK F_WRLCK F_UNLCK
+		锁与进程、文件有关，当一个进程终止或关闭文件文件描述符时，锁释放
+		fork产生的子进程不继承父进程的文件锁
+		exec可以进程原程序的文件锁
+flock lockf
+
+streams	本系统上未实现
+
+io多路转接
+poll
+select FD_ISSET FD_CLR FD_SET FD_ZERO
+pselect	相对select多了信号屏蔽字、时间精度也不同
+epoll_create
+
+异步io
+
+readv	散布读
+writev	聚集写
+
+存储映射
+mmap	PROT_READ PROT_WRITE PROT_EXEC PROT_NONE, MAP_PRIVATE MAP_SHARED
+mprotect 更改映射存储区权限
+msync	MS_ASYNC MS_SYNC
+munmap
+
+
+/************************************************************/
+7 8 9章
+exit
+_exit
+_Exit
+pthread_exit
+abort
+
+atexit	安装进程退出时处理函数
+命令行参数、环境表
+存储空间布局：正文、初始化数据段、非初始化数据段、栈、堆、命令行参数、环境变量
+malloc	内存空间
+calloc
+realloc
+free
+sbrk
+alloca
+getenv 		环境变量
+setenv
+putenv
+unsetenv
+setjmp		非局部跳转
+longjmp
+sigsetjmp
+siglongjmp
+getrlimit	资源限制
+setrlimit
+
+进程id：实际用户id、实际组id、	我们实际上是谁
+		有效用户id、有效组id、附加组id，	文件权限检查
+		保存的设置用户id、保存的设置组id	exec函数保存
+
+getpid		进程id
+getppid		父进程id
+getuid		实际用户id
+getgid		实际组id
+geteuid		有效用户id
+getegid		有效组id
+fork	创建新进程
+vfork
+wait	获取进程终止状态
+waitpid
+waitid
+wait3	外加资源汇总
+wait4
+execl	执行新程序
+execv
+execle
+execve	系统调用
+execlp
+execvp
+setuid	更改用户id、组id
+setgid
+seteuid	更改有效用户id、有效组id
+setegid
+setreuid
+setregid
+system
+getlogin	登录名
+times		墙上时钟
+
+getpgrp		进程组id
+getpgid
+setpgid
+setpgrp
+
+setsid	新建会话
+getsid	返回会话id
+
+tcgetpgrp	前台进程组id
+tcsetpgrp
+
+tcgetsid	会话首进程进程组id
+
+/***************************************************/
+10 章
+signal			安装信号处理程序, 注意信号处理程序中的函数是否可重入
+kill(pid_t pid, int signo)		发送信号
+raise(int signo)
+alarm(unsigned int seconds)	到时产生信号SIGALRM
+pause				挂起进程直到收到信号
+sigemptyset(sigset_t *set)		信号集处理函数
+sigfillset(sigset_t *set)
+sigaddset(sigset_t *set, int signo)
+sigdelset(sigset_t *set, int signo)
+sigismember(sigset_t *set, int signo)
+sigprocmask(int how, sigset_t *set, sigset_t *oset);		检测或更改信号屏蔽字 SIG_BLOCK SIG_UNBLOCK SIG_SETMASK
+sigpending(sigset_t *set)			返回信号集，其中信号是堵塞而不能递送的
+sigaction(int signo, struct sigaction *act, struct sigaction *oact)
+sigsetjmp(sigjmp_buf env, int savemask)
+siglongjmp(sigjmp_buf env, int val)
+sigsuspend(sigset_t *sigmask)		将信号屏蔽字设置为sigmask， 在捕捉到一个信号或发生一个会终止进程的信号之前，挂起进程，
+								若从信号处理程序中返回，信号屏蔽字设置为调用sigsuspend之前的信号屏蔽字
+abort(void)			终止程序运行
+sleep(unsigned int seconds)		睡眠seconds秒
+psignal
+strsignal
+sig2str
+str2sig
+
+
+/******************进程间通信*********************************/
+15 16 17章 同一机器上的进程
+
+管道、fifo、消息队列、信号量、共享存储
+pipe 	半双工、全双工管道
+		具有共同的祖先进程
+popen	stdio中实现的
+pclose
+
+mkfifo	创建fifo文件 命名管道, 创建后可以像普通文件一样使用
+
+xsi ipc: 消息队列、信号量、共享存储; ipc对象、标识符、键 
+		IPC_PRIVATE, 权限 (IPC_PRIVATE消息队列、信号量、共享内存是否可以通过将id发给其他进程，然后其他进程可以引用？)
+ftok
+消息队列
+msgget	打开一个现存队列或创建一个新队列	性能方面与其他ipc无多大差别,建议新应用中不使用
+msgctl	执行操作:IPC_STAT	IPC_SET		IPC_RMID
+msgsnd	发送数据到消息队列
+msgrcv	从消息队列接收数据
+
+信号量
+semget	获取一个信号量id
+semctl	信号量操作：IPC_STAT IPC_SET IPC_RMID GETVAL SETVAL GETALL SETALL GETZCNT GETNCNT GETPID
+semop	SEM_UNDO exit 时
+
+共享存储
+shmget		获取共享存储标识符,创建新段size > 0，引用现存的段size = 0
+shmctl		IPC_STAT IPC_SET IPC_RMID SHM_LOCK SHM_UNLOCK
+shmat		将共享内存段隐射到进程空间
+shmdt		将共享存储段从进程空间中解除隐射
+
+16章	不同机器上的进程
+socket(int domain, int type, int protocol)	创建套接字	域：AF_INET AF_INET6 AF_UNIX AF_UNSPEC 类型: SOCK_DGRAM SOCK_RAW SOCK_SEQPACKET SOCK_STREAM
+shutdown(int sockfd, int how)	关闭套接字 SHUT_RD SHUT_WR SHUT_RDWR 注意与close 的区别
+bind(int sockfd, const struct sockaddr *addr, socklen_t len)	将地址与套接字绑定
+getsockname(int sockfd, struct sockaddr_t *addr, socklen_t *len)	与绑定套接字的地址
+getpeername(int sockfd, struct sockaddr_t *addr, socklen_t *len)	获得对方的地址
+connect(int sockfd, struct sockaddr *addr, socklen_t len)	建立链接
+listen(int sockfd, int backlog)	可以接受链接请求
+accept(int sockfd, struct sockaddr *addr, socklen_t *len)		获取链接请求并建立链接
+send(int sockfd, void *buf, size_t nbytes, int flags)	MSG_DONTROUTE MSG_DONTWAIT MSG_EOR MSG_OOB
+sendto(int sockfd, void *buf, size_t nbytes, int flags, struct sockaddr *destaddr, socklen_t destlen)
+sendmsg(int sockfd,   struct msghdr *msg, int flags)			可以用于传送文件描述符
+recv(int sockfd, void *buf, size_t nbytes, int flags)	MSG_OOB MSG_PEEK MSG_TRUNC MSG_WAITALL
+recvfrom(int sockfd, void *buf, size_t nbytes, int flags, struct sockaddr *addr, socklen_t *addrlen)
+recvmsg(int sockfd, struct msghdr *msg, int flags) 				可以接收文件描述符
+setsockopt(int sockfd, int level, int option, void *val, socklen_t len)		设置查询套接字选项
+getsockopt(int sockfd, int level, int option, void *val, socklen_t *lenp)
+SO_ACCEPTCONN		该套接字是否能监听
+SO_BROADCAST		广播数据包
+SO_DEBUG			驱动调试功能
+SO_DONTROUTE		是否路由
+SO_ERROR			返回错误并清除
+SO_KEEPALIVE
+SO_LINGER			当有未发消息且套接字关闭时，延时时间
+SO_OOBINLINE	是否将带外数据放在普通数据中
+SO_RCVBUF			接收缓冲区大小
+SO_RCVLOWAT
+SO_RCVTIMEO			接收调用超时值
+SO_REUSEADDR
+SO_SNDBUF			发送区缓冲区大小
+SO_SNDLOWAT
+SO_SNDTIMEO			发送调用时超时值
+SO_TYPE				套接字类型
+sockatmark(int sockfd)	带外数据
+htonl	字节序转换
+htons
+ntohl
+ntohs
+inet_ntop 网络地址转换
+inet_pton
+gethostent 主机信息
+sethostent
+endhostent
+getnetbyaddr 网络名字、网络号
+getnetbyname
+getnetent
+setnetent
+endnetent
+getprotobyname	协议号
+getprotobynumber
+getprotoent
+setprotoent
+endprotoent
+getservbyname	服务
+getservbyport
+getservent
+setservent
+endservent
+getaddrinfo	主机名字、服务名字映射到一个地址
+freeaddrinfo
+gai_strerror(int error)	指向描述错误的字符串指针
+getnameinfo		将地址转换成主机名或服务名
+
+
+socketpair(int domain, int type, int protocol, int sockfd[2])	创建一对unix域非命名套接字
+
+struct sockaddr_un		AF_UNIX			命名unix域套接字
+
+
+/**********************************************/
+20章数据库
+db
+
+
+getrusage	获取进程、线程、或子进程的资源使用情况

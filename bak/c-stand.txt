@@ -1,0 +1,205 @@
+
+2 章
+c标准：c89 c99 c95?
+字符集：源码字符集、执行字符集
+词法记号：标识符，分隔符，常量，关键字，云算法
+
+3章
+c语言预处理器
+#define 	定义宏
+#undef 		取消预处理器宏定义
+#include 	插入另一源码文本
+#if			
+#ifdef 
+#ifndef
+#else
+#endif
+#line
+#elif
+#			取字符串
+##			连接
+defined
+#pragma		编译器实现
+#error		输出编译错误信息
+
+4章
+声明
+作用域 生存期 有效性 
+存储类说明符：自动、外部、寄存器、静态、typedef
+类型说明符：枚举、浮点、整形、结构、联合、void、typedef
+类型限定符：const、static、volatile、restrict
+声明符：指针声明、函数声明、数组声明、简单声明、复合声明
+初始化
+
+5章
+类型
+标量类型：算术类型（整形、浮点形）、指针类型
+组合类型：结构类型、数组类型
+联合类型
+函数类型
+void类型
+整数类型：有符号、无符号(8 16 32 64)、有符号char、无符号char、bool 取值范围
+浮点类型：单精度、双精度、long double、复数浮点数 取值范围、精度
+指针类型：对象指针、函数指针
+枚举类型：
+结构类型：位字段、成员
+联合类型：
+
+
+6章
+存储单元、数据长度
+字节顺序 高位低位
+对齐限制
+指针长度
+寻址模型
+类型表示
+
+转换
+类型转换、赋值转换
+一元转换、二元转换
+
+
+7章
+对象、左值、指定符
+表达式、优先级
+主表达式：名称（标识符）、字面常量值、括号表达式
+后缀表达式：下标表达式、成员选择(包括结构与组合)、函数调用、后缀自增、后缀自减、复合字面值 有意思
+一元表达式：类型转换、sizeof运算符、一元负号正号运算符、逻辑非运算符、按位反运算符、地址运算符、间接访问运算符、前缀自增自减运算符
+二元表达式：乘法表达式、加法表达式、移位表达式、关系表达式、判等表达式、按位与表达式、按位异或表达式、按位或表达式
+逻辑运算符表达式
+条件表达式
+赋值表达式：简单赋值、复合赋值
+顺序表达式：逗号运算符
+常量表达式：预处理器常量表达式、整型常量表达式、初始化程序常量表达式
+求值顺序、优化
+
+8章
+语句
+表达式语句
+标号语句：命名标号、case标号、default标号
+复合语句
+条件语句:if ;if else ; if ,else if ,else
+迭代语句:while do for
+switch语句：
+break;continue语句：
+return语句：
+goto语句：goto 标号
+null 语句：;
+
+9章
+函数原型
+参数类型检查、返回类型一致性、内联函数、参数传递
+
+
+
+12章
+字符处理：
+1.1 分类: isxxx iswxxx
+1.2 转换: toxxx towxxx
+
+13章字符串 strings.h
+strcat、strncat、
+strcmp、strncmp、
+strcpy、strncpy、
+strlen、
+strchr、strrchr、
+strspn、strcspn、strpbrk
+strstr、strtok、
+strtod、strtof、strtold、strtol、strtoll、strtoul、strtoull、
+atof、atoi、atol、atoll、
+strcoll、strxfrm、
+
+14章
+内存函数：
+memchr、memcmp、memcpy、memccpy、memmove、memset
+
+15章
+输入输出函数
+fopen、fclose、fflush、freopen、fwide：打开、关闭、重定向文件、指定宽字符或字节
+setvbuf、setbuf：设置缓存模式：行、全、不缓存
+fseek、ftell、rewind、fgetpos、fsetpos：设置访问位置
+fgetc fgetwc getc getwc getchar getwchar ungetc ungetwc：从流中读取字符或回退
+fgets fgetws gets:行读取流数据
+fscanf fwscanf scanf wscanf sscanf swscanf：格式化输入数据
+fputc fputwc putc putwc putchar putwchar: 输出字符
+fputs fputws puts：输出字符串
+fprintf printf sprintf snprintf fwprintf wprintf swprintf：格式化输出
+v[x]printf v[x]scanf：参数表格式化输入输出
+fread fwrite：
+feof ferror clearerr:错误相关
+remove rename 
+tmpfile tmpnam mktemp：临时文件
+
+16章
+通用函数 stdlib.h
+malloc、calloc、realloc、free	内存管理函数
+rand、srand、		随机数生成
+atof、atoi、atol、atoll		字符串转换成数字
+strtod、strtof、strtold、strtol、strtoll、strtoul、strtoull		将字符串转换成数字
+abort、atexit、exit、_Exit、	退出、异常处理
+getenv、system
+bsearch、qsort	搜索、排序
+abs、labs、llabs、div、ldiv、lldiv	求绝对值、商、余数
+mblen、mbtowc、wctomb、mbrlen、mbrtowc		扩展字符集
+
+17章
+数学函数
+abs labs llabs div ldiv lldiv：绝对值、求余模
+fabs fabsf fabsl：绝对值
+ceil floor lrint llrint lround llround nearbyint round rint trunc：计算与浮点数参数相近的整数
+fmod remainder remquo：返回浮点数余数的近似值
+frexp ldexp modf scalbn：将浮点数分为小数与指数 将浮点数分为整数和小数部分 将浮点数乘以b的n次方
+exp exp2 expm1 ilogb log log10 log1p log2 logb
+cbrt fma hypot pow sqrt：立方 x*y+z x*x+y*y的平方根 x的y次方 x的非负平方根
+rand srand RAND_MAX
+cos sin tan cosh sinh tanh
+acos asin atan atan2 acosh asinh atanh：
+fdim fmax fmin：正差值 
+erf erfc lgamma tgamma：计算误差函数 计算1-erf 计算x的gamma函数的自然对数 计算x的gamma函数
+fpclassify isfinite isinf isnan isnormal signbit
+copysign nan nextafter nexttoward 
+isgreater isgreaterequal isless islessequal islessgreater isunordered 
+
+18章
+日期、时间
+clock、CLOCKS_PER_SECOND、times
+time、difftime
+asctime、ctime
+gmtime、localtime、mktime
+difftime
+
+19章
+控制函数
+assert、NDEBUG：使用断言是一种在开发过程中的验证条件是否为真的
+system、exec
+exit、abort： 退出、异常退出
+setjmp、longjmp、jmp_buf：非局部跳转
+atexit：安装退出处理程序
+signal、raise、gsignal、ssignal、psignal
+sleep、alarm：休眠、设置时钟
+
+20章
+区域设置函数
+setlocale
+localeconv
+
+21章
+整数扩展类型
+
+
+22章
+浮点数环境
+FENV_ACCESS、fegetenv、fesetenv、feholdexcept、feupdateenv：浮点数环境
+fgetexceptflag、fesetexceptflag、fetestexcept、feraiseexcept、feclearexcept：浮点数异常
+fegetround、fesetround：获取、设置浮点数舍入方向
+
+23章
+复数运算
+
+24章
+宽字符
+
+
+
+
+

@@ -1,0 +1,319 @@
+
+2章
+posix ipc
+路径名标识
+ipc 对象持续性
+消息队列 mq
+信号灯   sem 
+共享内存区 shm
+O_CREAT O_EXCL
+
+3章
+system v ipc
+key_t 标识
+ipc 对象持续性
+消息队列 msg
+信号灯   sem 
+共享内存区 shm
+ipc_perm结构
+ipcrm ipcs命令维护
+ftok key_t
+内核微调
+IPC_CREAT IPC_EXCL
+
+
+4章
+管道、fifo
+int pipe(int fd[2]):	创建管道、fd[0]读、fd[1]写，成功返回0，失败返回-1; 亲缘关系进程间通信
+popen(char *cmd, char *type);
+pclose(FILE *);
+socketpair(int domain, int type, int protocol, int sv[2])
+
+mkfifo(const char *pathname, mode_t mode): 创建有名管道，成功返回0，失败返回-1；当对fifo调用读打开时，调用会堵塞，直到有进程为写打开fifo,除非指定非堵塞模式
+
+迭代服务器：处理完一个客户请求后，再处理另一个客户请求；
+并发服务器：
+
+字节流:无边界
+消息分割：1 带内特殊终止列序（如回车换行表示分割）、2 显式长度（每个记录前冠以长度）、3每次链接一个记录（如http1.0）
+
+
+5章
+posix 消息队列 mqueue.h 	;不能使用select poll之类的
+可以在/dev/mqueue目录查看消息队列
+man mq_overview
+
+队列大小以及每个消息允许的最大大小,随内核持续性
+mqd_t mq_open(const char *name, int oflag): 创建或打开一个消息队列，name应以/开头，成功返回消息队列描述字，错误返回-1
+mqd_t mq_open(const char *name, int oflag, mode_t mode, struct mq_attr *attr):创建时可以指定什么属性
+int mq_close(mqd_t mqds):关闭posix消息队列， 成功返回0，失败返回-1
+int mq_unlink(const char *name):从系统中删除一个posix消息队列,name应以/开头
+
+int mq_getattr(mqd_t mqd, struct mq_attr *attr):获取posix消息队列属性,成功返回0，出错-1
+int mq_setattr(mqd_t mod, const struct mq_attr *attr, struct mq_attr *oattr)：设置posix消息队列属性，成功返回0，出错-1
+struct mq_attr {
+	long mq_flags;		// O_NONBLOCK之类的属性
+	long mq_maxmsg;		// 队列可以的最大消息数量
+	long mq_msgsize;	// 一条消息的最大数据量
+	long mq_curmsgs;	//当前在队列中的消息数量
+};
+mq_maxmsg/mq_msgsize创建时设定，后续不可以修改;
+mq_flags可以运行时改变;
+
+MQ_PRIO_MAX:优先级最大值, prio 越大优先级越高
+最新的加了timeout的send和receive
+int mq_send(mqd_t mdq, const char *ptr, size_t len, unsigned int prio)：按指定优先级发送消息到队列
+ssize_t mq_receive(mqd_t mdq, char *ptr, size_t len, unsigned int *priop)：返回指定队列优先级最高的最早消息
+
+posix 消息队列限制
+mq_msgsize:任意给定消息的最大字节数
+mq_msgmax:	队列中的最大消息数
+MQ_OPEN_MAX: 一个进程能够同时打开的的消息队列的最大数目:最新的貌似没限制
+MQ_PRIO_MAX: 任意消息的最大优先级值加1,最新貌似减1
+
+int mq_notify(mdq_t mqd, const struct sigevent *notification): 给队列建立或删除异步事件通知，成功返回0，失败-1
+union sigval {
+	int sival_int;
+	void sival_ptr;
+};
+struct sigevent {
+	int sigev_notify; // SIGEV_(NONE, SIGNAL, THREAD)
+	int sigev_signo; // signal num if SIGEV_SIGNAL
+	union sigval sigev_value; // pass to signal handler or thread
+	void (*sigev_notify_function)(union sigval); // thread function
+	pthread_attr_t *sigev_notify_attributes;
+};
+
+
+
+6章
+system v 消息队列 sys/msg.h ; 不能使用select poll之类的
+ipcmk, ipcrm, lsipc...命令 man svipc
+
+int msgget(key_t key, int oflag):创建一个新的消息队列或打开一个已存在的消息队列，成功返回标识符，失败-1
+key的值可以是IPC_PRIVATE,或ftok生成, oflag：读写权限值组合、IPC_CREAT IPC_EXCL按位或
+
+int msgsnd(int msgid, const void *ptr, size_t len, int flag):发送一个消息对system v消息队列,成功返回0，失败-1, len指的时mtext的长度
+ptr具有如下结构：
+struct msgbuf {
+	long mbyte;		//消息类型mbyte必须大于0；
+	char mtext[1];
+};
+
+ssize_t msgrcv(int msgid, void *ptr, size_t len, long type, int flag):从消息队列读type类型的消息，
+成功返回读入缓存的字节数，失败-1,注意len指定的是mtext的长度，返回的字节数也指写入mtext的字节数
+
+int msgctl(int msgid, int cmd, struct msqid_ds *buff):提供在消息队列的控制操作,成功返回0，失败-1
+IPC_RMID:从系统中删除该消息队列 
+IPC_SET ：设置消息队列的以下四个成员msg_perm.uid, msg_per.gid, msg_perm.mode, msg_qbytes
+IPC_STAT：获取消息队列的msqid_ds
+
+system v消息队列限制
+???
+
+
+7章
+互斥锁与条件变量
+####TODO####进程间、线程间共享锁、条件变量需考虑进程在获取锁的时候、或线程获取锁的时候退出如何处理 ###TODO####
+int pthread_mutex_lock(pthread_mutex_t *mptr):请求互斥锁,成功返回0，失败-1,请求不到时会堵塞直到获得
+int pthread_mutex_trylock(pthread_mutex_t *mptr):请求互斥锁，不会堵塞,成功返回0，失败-1；
+int pthread_mutex_unlock(pthread_mutex_t *mptr):释放互斥锁,成功返回0，失败-1
+
+int pthread_cond_wait(pthread_cond_t *cptr, pthread_mutex_t *mptr):等待条件变量；成功时返回0，失败-1
+int pthread_cond_signal(pthread_cond_t *cptr)：通知条件变量发生变化；成功时返回0，失败-1；
+
+int pthread_cond_broadcast(pthread_cond_t *cptr)：广播条件变量发生变化，唤醒等待的线程；成功返回0，失败-1;
+int pthread_cond_timedwait(pthread_cond_t *cptr, pthread_mutex_t *mptr, const struct timespec *abstime)：限时等待条件变量,成功返回0，失败-1；超时返回timeout;
+struct timespec {
+	time_t tv_sec;
+	long	tv_nsec;
+};
+
+初始化、销毁互斥锁、条件变量:成功返回0，失败-1;
+int pthread_mutex_init(pthread_mutex_t *mptr, const pthread_mutexattr_t *attr)
+int pthread_mutex_destroy(pthread_mutex_t *mptr)
+int pthread_cond_init(pthread_cond_t *cptr, const pthread_condattr_t *attr)
+int pthread_cond_destroy(pthread_cond_t *cptr)：成功时返回0，失败-1
+
+初始化、销毁互斥锁属性、条件变量属性:成功返回0，失败-1
+int pthread_mutexattr_init(pthread_mutexattr_t *attr)
+int pthread_mutexattr_destroy(pthread_mutexattr_t *attr)
+int pthread_condattr_init(pthread_condattr_t *attr)
+int pthread_condattr_destroy(pthread_condattr_t *attr)
+具体属性设置调用具体函数，参考unix环境高级编程
+
+8章
+读写锁
+int pthread_rwlock_rdlock(pthread_rwlock_t *rwptr)：以读方式获取读写锁，成功返回0，失败-1；
+int pthread_rwlock_wrlock(pthread_rwlock_t *rwptr)：以写方式获取读写锁，成功返回0，失败-1；
+int pthread_rwlock_unlock(pthread_rwlock_t *rwptr)：释放读写锁，成功返回0，失败-1；
+
+int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwptr)：以读方式获取读写锁，不堵塞，成功返回0，失败-1；
+int pthread_rwlock_trywrlock(pthread_rwlock_t *rwptr)：以写方式获取读写锁，不堵塞，成功返回0，失败-1；
+
+int pthread_rwlock_init(pthread_rwlock_t *rwptr, const pthread_rwlockattr_t *attr)：初始化读写锁，成功返回0，失败-1；
+int pthread_rwlock_destroy(pthread_rwlock_t *rwptr)：销毁读写锁，成功返回0，失败-1；
+
+int pthread_rwlockattr_init(pthread_rwlockattr_t *attr)：初始化读写锁属性，成功返回0，失败-1；
+int pthread_rwlockattr_destroy(pthread_rwlockattr_t *attr)：销毁读写锁属性，成功返回0，失败-1；
+
+int pthread_rwlockattr_getpshared(pthread_rwlockattr_t *attr, int *valptr)：获取读写锁属性的进程共享属性，成功返回0，失败-1；
+int pthread_rwlockattr_setpshared(pthread_rwlockattr_t *attr, int value)：设置读写锁属性的进程共享属性，成功返回0，失败-1；
+PTHREAD_PROCESS_SHARED
+PTHREAD_PROCESS_PRIVATE
+
+int pthread_cancel(pthread_t tid):取消某个线程，成功返回0，失败-1；
+void pthread_cleanup_push(void (*function)(void *), void *arg)：安装线程清除处理程序，
+void pthread_cleanup_pop(int execute)：删除线程清除处理程序，
+函数在线程被取消、线程调用pthread_exit、线程返回、时执行；
+
+
+9章
+记录上锁
+进程间共享文件的读写
+
+int fcntl(int fd, int cmd, .../* struct 	flock *arg */):成功时返回值取决与cmd，错误-1；
+struct flock {
+	short l_type;		// F_RDLCK F_WRLCK F_UNLCK
+	short l_whence;		// SEEK_SET SEEK_CUR SEEK_END
+	off_t l_start;
+	off_t l_len;
+	off_t l_pid;
+};
+cmd: F_SETLK 	不堵塞
+	F_SETLKW	获取不到，堵塞
+	F_GETLK
+记录上锁、文件上锁 劝告性上锁 强制性上锁 读出、写入的优先级
+守护进程只运行一个实例的文件上锁
+文件作锁用：利用O_CREAT 与 O_CLOEXEC的原子性，创建文件，成功则获得锁，失败则没有获取锁;释放锁只需将创建的文件删除
+
+
+10章
+posix信号灯
+进程、线程间同步原语
+有名、无名（基于内存）信号灯
+
+sem_t *sem_open(const char *name, int oflag, ... /* mode_t mode, unsigned int value */)：创建一个有名信号灯、或打开一个有名信号灯，可用于进程、线程同步；
+	成功返回信号灯指针，出错SEM_FAILED; 有名信号灯随内核生存期;   @name:貌似只可以是/名字 的格式，且名字中间不可以有/；
+int sem_close(sem_t *sem)：关闭打开的信号灯，成功返回0，出错返回-1；
+int sem_unlink(const char *name)：删除有名信号灯，成功返回0，失败-1；
+
+int sem_wait(sem_t *sem)：测试指定的信号灯，如果大于0，则减一并立即返回；如果值等于0，线程被投入到休眠队列，直到可获取；成功返回0，失败-1；
+int sem_trywait(sem_t *sem)：同上，但在信号灯不可获取的时候立即出错返回0，errno置为again；成功返回0，失败-1；
+
+int sem_post(sem_t *sem)：将信号灯值加1，并唤醒等待的休眠线程；成功返回0，失败-1；
+int sem_getvalue(sem_t *sem, int *valp)：获取指定信号灯当前的值；成功返回0，失败-1；
+
+int sem_init(sem_t *sem, int shared, unsigned int value)：初始化基于内存分配的信号灯， 	shared == 0, 线程共享，shared != 0，进程共享；成功返回0，失败-1；
+int sem_destroy(sem_t *sem)：销毁基于内存分配的信号灯；成功返回0，失败-1；
+信号灯限制
+一个进程可以同时打开的信号灯：SEM_NSEMS_MAX
+一个信号灯的最大值：		  SEM_VALUE_MAX
+fifo实现信号灯
+共享内存实现信号灯
+
+11章
+system v信号灯
+
+int semget(key_t key, int nsems, int oflag)：创建一个信号灯集或打开一个已经存在的信号灯集,成功返回标识符，失败-1； 为何semctl设置的时候，其打开semget只能用O_RDONLY,用O_WRONLY却有权限问题；
+int semop(int semid, struct sembuf *opsptr, size_t nops)：操作信号灯集中的一个或多个信号灯；成功返回0，失败-1；
+struct sembuf {
+	short sem_num;	//信号灯的下标；
+	short sem_op;
+	short sem_flg;
+};
+int semctl(int semid, int semnum, int cmd, ... /* union semun arg */)：对system v信号灯各种操作；成功返回非负值，失败-1；
+semid:信号灯集的标识；semnum：信号灯集中第几个信号；cmd：操作； 
+union semun {
+	int val;
+	struct semid_ds *buf;
+	ushort *array;
+}
+GETVAL：返回semavl的值；
+SETVAL：设置semval的值为val， 
+GETPID：返回当前sempid值； 
+GETNCNT：返回当前semncnt值； 
+GETZCNT：返回当前semzcnt值； 
+GETALL：返回指定信号灯集中每个成员的semval值；array 
+SETALL：设置指定信号灯集中每个成员的semval值；array
+IPC_RMID：删除system v信号灯集；
+IPC_SET：设置指定信号灯集的semid_ds结构中以下三个成员：sem_perm.uid, sem_perm.gid, sem_perm.mode，sem_ctime设置成当前值； 
+IPC_STAT:通过 buf返回指定信号灯集的当前semid_ds结构；
+
+system v信号灯限制
+系统范围内最大信号灯集数
+每个信号灯集最大信号灯数
+系统范围内最大信号灯数
+每个semop调用最大操作数
+系统范围内最大复旧结构数
+每个复旧结构最大复旧项数
+任何信号灯的最大值
+最大退出时调整值
+
+12章
+共享内存
+
+void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)：把一个文件或一个posix共享内存区对象隐射到调用进程的地址空间，成功返回0地址，失败-1；
+addr:建议隐射到的进程空间地址，
+len：隐射长度字节
+prot：属性,PROT_READ可读 PROT_WRITE可写 PROT_EXEC数据可执行 PROT_NON数据不可访问
+flags：MAP_SHARED:变动是共享的 MAP_PRIVATE：变动是私自的 MAP_FIXED:准确解释addr参数 ; MAP_ANON：匿名映射
+fd：文件描述符； -1时匿名映射
+offset：文件偏移量，相对文件开头；
+/dev/zero:
+
+int munmap(void *addr, size_t len)：从进程地址空间删除一个映射；成功返回0，失败-1；
+对MAP_PRIVATE的映射，unmap后改动丢弃
+
+int msync(void *addr, size_t len, int flags)：对MAP_SHARED的映射区（可指定映射区子集），立刻同步修改到文件；成功返回0，失败-1；
+flags:MS_ASYNC:异步写， MS_SYNC:同步写, MS_INVALIDATE:使高速缓存数据无效（不理解这个）
+
+
+13章posix共享内存区
+1. 内存映射文件； open 文件
+2. 共享内存对象； shm_open
+
+int shm_open(const char *name, int oflag, mode_t mode)：创建一个新的共享对象或打开一个已经存在的共享对象；成功返回文件描述字，失败-1；
+oflag:O_RDONLY只读 O_RDWR读写 O_CREAT创建 O_EXCL创建相关 O_TRUNC截断
+mode:S_IRUSR S_IWUSR ...
+int shm_unlink(const char *name):删除一个共享对象，成功返回0，失败-1；后续对name的open操作返回失败
+
+int ftruncate(int fd, off_t length)：修改文件对象或共享对象的大小，成功返回0，失败-1；
+int fstat(int fd, struct stat *buf):返回文件描述符对象的信息；成功返回0，失败-1；
+struct stat {
+	...
+	mode_t st_mode; // S_I(RW)(user, group, other)
+	uid_t st_uid;
+	gid_t st_gid;
+	off_t st_size; // 文件大小，字节
+	...
+};
+
+
+14章system v共享内存
+
+int shmget(key_t key, size_t size, int oflag)：创建一个共享内存区或打开一个已经存在的共享内存区；成功返回共享内存区对象，失败-1；
+创建时size需指定大小，打开时size应为0，key可为ftok或IPC_PRIVATE
+oflag:权限组合、IPC_CREAT IPC_EXCL
+
+void *shmat(int shmid, const void *shmaddr, int flag)：将共享内存区附接到调用进程的地址空间；成功返回映射区的起始地址，出错时-1；
+int shmdt(const void *shmaddr)：进程断接内存区；成功返回0，失败-1；进程终止时也会自动断接
+int shmctl(int shmid, int cmd, struct shmid_ds *buf):操作共享内存区；成功返回0，失败-1；
+man手册与书上的cmd有出入，TODO
+cmd:IPC_RMID 从系统删除共享内存区；
+	IPC_SET  给指定的共享内存区设定shm_perm.uid shm_perm.gid shm_perm.mode;shm_ctime用当前时间替换；
+	IPC_STAT 返回shmid_ds
+限制：
+shmmax:一个共享内存区的最大字节数
+shmmnb:一个共享内存区的最小字节数
+shmmni:系统范围内最大共享内存区标识符数
+shmseg:每个进程附接的最大共享内存区数
+
+
+
+
+
+
+
+
+
