@@ -7,6 +7,26 @@
 #define CALIBRATION_FAILURE            (0) //校准失败
 #define UNDER_CALIBRATION              (2) //正在校准
 /**************************函数声明********************************/
+#include <ui_manager.h>
+/*
+#define LOG_MODULE_CUSTOMER
+#include <logging/log.h>
+LOG_MODULE_REGISTER(mag, LOG_LEVEL_INF);
+*/
+
+char print_str[512];
+#if BEBUG_FLAG
+	#define BEBUG_LOG(...)  	do {  \
+				snprintf(print_str, 512, __VA_ARGS__); \
+				SYS_LOG_INF("%s", print_str);	\
+			} while (0)
+#else
+	#define BEBUG_LOG(...)  	do {  \
+				snprintf(print_str, 512, __VA_ARGS__); \
+				SYS_LOG_INF("%s", print_str);	\
+			} while (0)
+//	#define BEBUG_LOG(...)  ((void)0);
+#endif
 
 float mag_senser_data_buff[MAG_DATA_SAVE_MAX_VALUE][3]={0};
 float get_PP (float *dMod, int size, int count);
@@ -33,6 +53,7 @@ typedef enum
 {
    free=0,
    start_calculate,
+   data_process,
    calc_offset_k_value,
    get_result,
    stop_calculate
@@ -169,27 +190,52 @@ uint8_t mag_calculate(float *mag_data)
       BEBUG_LOG("start PP=%f\r\n",get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN));   
       if(get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN) < THRESH_STOP_VALUES) //停止计算(1、阈值小于5；2、采集数据大于500条)
       {
-        task_step = calc_offset_k_value;
+//        task_step = calc_offset_k_value;
+        task_step = data_process;
+		if(mag_senser_save_cnt>FILTER_DEPTH)
+		{
+			mag_senser_save_cnt = mag_senser_save_cnt-FILTER_DEPTH;
+		}
         BEBUG_LOG("stop calc-pp\r\n");
       }
       if(mag_senser_save_cnt == MAG_DATA_SAVE_MAX_VALUE)  //如果超过500条也进行计算
       {
-        task_step = calc_offset_k_value;
+//        task_step = calc_offset_k_value;
+		task_step = data_process;
+		if(mag_senser_save_cnt>FILTER_DEPTH)
+		{
+			mag_senser_save_cnt = mag_senser_save_cnt-FILTER_DEPTH;
+		}
         BEBUG_LOG("stop calc-cnt\r\n");
       }
       if(mag_senser_save_cnt<MAG_DATA_SAVE_MAX_VALUE)
       {
         mag_senser_data_buff[mag_senser_save_cnt][0] = mag_data[0];
         mag_senser_data_buff[mag_senser_save_cnt][1] = mag_data[1];
-        mag_senser_data_buff[mag_senser_save_cnt][2] = mag_data[2];
+        mag_senser_data_buff[mag_senser_save_cnt][2] = mag_data[2];		
         mag_senser_save_cnt++;
-      }
-      mx = mag_data[0];
-      my = mag_data[1];
-      mz = mag_data[2];    
-      MAG_Calculate();
-    BEBUG_LOG("stop=%3.4f %3.4f %3.4f %3.4f\r\n",mx, my, mz,get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN));          
+	  }
+//      mx = mag_data[0];
+//      my = mag_data[1];
+//      mz = mag_data[2];    
+//      MAG_Calculate();
+//      BEBUG_LOG("stop=%3.4f\r\n",get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN));          
     break;
+	case  data_process:
+	  Mag_Clf = 0;   //进行数据存储
+	  for (uint16_t i = 0; i < mag_senser_save_cnt; i++) 
+      {
+		mx = mag_senser_data_buff[i][0];
+		my = mag_senser_data_buff[i][1];
+		mz = mag_senser_data_buff[i][2];    
+		MAG_Calculate();
+//		k_msleep(5);
+        BEBUG_LOG("org_data=%f,%f,%f,%d\r\n",mag_senser_data_buff[i][0],mag_senser_data_buff[i][1],mag_senser_data_buff[i][2],i);		
+	  }
+	  task_step = calc_offset_k_value;
+	break;
+	
+	
     case calc_offset_k_value:
       Mag_Clf = 1;
       MAG_Calculate(); 
@@ -213,12 +259,17 @@ uint8_t mag_calculate(float *mag_data)
         if (norm < min_value) 
         {
           min_value = norm;
-        }                
-         BEBUG_LOG("norm=%f,%f,%f,%f\r\n",norm_after,norm,max_value,min_value);
+        }
+//		k_msleep(5);
+//		BEBUG_LOG("org_data=%f,%f,%f,%d\r\n",mag_senser_data_buff[i][0],mag_senser_data_buff[i][1],mag_senser_data_buff[i][2],i);
+//		k_msleep(5);
+	    BEBUG_LOG("mag_data=%f,%f,%f,%d\r\n",mag_cal[0],mag_cal[1],mag_cal[2],i);
+       //  BEBUG_LOG("norm=%f,%f,%f,%f\r\n",norm_after,norm,max_value,min_value);
      }
 	 norm_sort(norm_buff,mag_senser_save_cnt);
 	 for (uint16_t i = 0; i < mag_senser_save_cnt; i++)
 	 {
+//		 k_msleep(5);
 		 BEBUG_LOG("norm_buff[%d]=%f\r\n",i,norm_buff[i]);		 
 	 }		 
       

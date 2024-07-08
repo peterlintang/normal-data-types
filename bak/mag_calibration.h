@@ -15,11 +15,6 @@ extern "C" {
 //#include "stm32f4xx.h"
 #endif
 
-#if BEBUG_FLAG
-	#define BEBUG_LOG(...)  	printf(__VA_ARGS__);
-#else
-	#define BEBUG_LOG(...)  ((void)0);
-#endif
 
 
 #define FLOAT_MIN                      FLT_MIN 
@@ -31,6 +26,8 @@ extern "C" {
 #define XY_AXIS_INTERCHANGE            (1)       
 #define THRESH_START_VALUES            (50.0f)
 #define THRESH_STOP_VALUES             (30.0f)
+#define FILTER_DEPTH                   (25)
+
 
 typedef struct
 {

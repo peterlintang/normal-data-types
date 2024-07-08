@@ -597,7 +597,7 @@ static void VCM1195L_init(void)
 
 	dev = device_get_binding("I2C_0");
 
-	if (i2c_reg_write_byte(dev, 0x0c, 0x0a, 0x4d) < 0) {
+	if (i2c_reg_write_byte(dev, 0x0c, 0x0a, 0x49) < 0) {
 		printf( "Failed to write to device: %s %d\n", __func__, __LINE__);
 		return ;
 	}

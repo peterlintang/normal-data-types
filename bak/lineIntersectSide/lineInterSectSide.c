@@ -410,6 +410,16 @@ int main(int argc, char *argv[])
 
 	flag = InsidePolygon1(Points, sizeof(Points) / sizeof(Points[0]), &B);
 	fprintf(stdout, "flag: %d\n", flag);
+
+	struct Point C = {
+		22.755800,
+		113.956498
+	};
+	struct Point D = {
+		22.755025,
+		113.956999
+	};
+	fprintf(stdout, "distance: %f\n", distance(&C, &D));
 	return 0;
 #endif
 }

@@ -38,6 +38,8 @@ west build -t 指定目标 pristine清除所有的
 
 没有使用west
 cmake -Bbuild -DBOARD=qemu_x86 -G'Unix Makefiles' samples/hello_world/
+# sysbuild
+cmake -Bbuild8 -DBOARD=reel_board -DAPP_DIR=samples/hello_world -DSB_CONFIG_BOOTLOADER_MCUBOOT=y -DCONFIG_DEBUG_OPTIMIZATIONS=y -Dmcuboot_DEBUG_OPTIMIZATIONS=y -G'Unix Makefiles' share/sysbuild
 make -Cbuild
 
 
