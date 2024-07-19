@@ -8,10 +8,61 @@ a bo luo
 qiu mian ni he
 https://github.com/amirmohammadnsh/ellipsoid-sphere-fitting-sensor-calibration-stm32.git
 
-magneto
+magneto matlab
 https://github.com/risherlock/Magnetometer-Calibration.git
+
+cjson
+https://github.com/DaveGamble/cJSON.git
+
+mosquitto
+git@github.com:peterlintang/mosquitto.git
+
+git@github.com:mjjq/ConvexDecomposition.git
+
+lvgl simulation
+https://github.com/lvgl/lv_port_pc_vscode
+
+mbedtls
+git@github.com:peterlintang/mbedtls.git
+
+st 
+https://github.com/STMicroelectronics/STMems_Standard_C_drivers.git
+
+git@github.com:peterlintang/unarr.git
+
+git@github.com:kuba--/zip.git
+
+git@github.com:peterlintang/nanovg.git
+
+https://github.com/adriaan-pelzer/libGeoJson.git
+
+git@github.com:peterlintang/LearningMasteringAlgorithms-C.git
+
+https://github.com/ceteuf/geojson-parser.git
+
+https://github.com/freetype/freetype.git
 
 cscope -Rbq 
 cs add ***.out
 cs f s|g|c|t|e|f|i^|d symbol
 cs show
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
