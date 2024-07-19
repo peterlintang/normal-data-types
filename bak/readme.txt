@@ -18,6 +18,7 @@ mosquitto
 git@github.com:peterlintang/mosquitto.git
 
 git@github.com:mjjq/ConvexDecomposition.git
+g++ main.cpp src/ConcavePolygon.h -lsfml-graphics -lsfml-window -lsfml-system
 
 lvgl simulation
 https://github.com/lvgl/lv_port_pc_vscode
