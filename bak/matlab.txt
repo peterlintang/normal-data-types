@@ -1,3 +1,4 @@
+password for rar: www.jb51.net
 0.挂载iso文件Matlab911R2021b_Lin64.iso
 
 1.从安装的iso文件运行“安装”，如果你看到登录/密码/登录表单（安装程序可以访问互联网）
