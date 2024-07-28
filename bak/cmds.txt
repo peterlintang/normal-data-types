@@ -32,6 +32,9 @@ cha kan xian ka shi yong
 radeontop
 intel_gpu_top
 
+
+vulkaninfo
+
 lspci
 lshw
 i2cdetect
