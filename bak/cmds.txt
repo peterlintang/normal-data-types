@@ -48,6 +48,17 @@ snort
 
 
 
+an zhuang bao
+ricks-amdgpu-utils
+rickslab-gpu-utils
+
+cmd:
+gpu-ls
+gpu-chk
+
+power stress and shaping tool
+psst
+
 
 
 
