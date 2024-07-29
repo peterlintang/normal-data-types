@@ -46,6 +46,8 @@ lshw
 i2cdetect
 snort
 
+dpkg	// cha xun shi fou an zhuang bao
+
 
 
 an zhuang bao
