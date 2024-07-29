@@ -45,6 +45,7 @@ https://github.com/freetype/freetype.git
 
 https://github.com/alrevuelta/sensor-calibration.git
 
+git@github.com:aklomp/base64.git
 
 
 https://www.earthol.com/
