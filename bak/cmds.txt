@@ -23,6 +23,10 @@ ps
 strace
 top
 pmap
+vmstat
+sar
+ps
+watch
 
 dijkstra
 iconv	// change code 
@@ -31,6 +35,8 @@ iconv -f ISO-8859-1 -t  UTF-8  input.txt -o output.txt
 cha kan xian ka shi yong 
 radeontop
 intel_gpu_top
+gpustat
+glxgear
 
 
 vulkaninfo
@@ -39,3 +45,9 @@ lspci
 lshw
 i2cdetect
 snort
+
+
+
+
+
+
