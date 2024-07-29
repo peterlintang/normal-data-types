@@ -37,6 +37,7 @@ radeontop
 intel_gpu_top
 gpustat
 glxgear
+glmark2 // test gpu 
 
 
 vulkaninfo
