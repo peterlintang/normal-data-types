@@ -24,7 +24,7 @@ strace
 top
 pmap
 vmstat
-sar
+sar	//sysstat
 ps
 watch
 
