@@ -11,6 +11,9 @@ https://github.com/amirmohammadnsh/ellipsoid-sphere-fitting-sensor-calibration-s
 magneto matlab
 https://github.com/risherlock/Magnetometer-Calibration.git
 
+qiu mian ni he
+https://github.com/bleachangel/EllipsoidFitting.git
+
 cjson
 https://github.com/DaveGamble/cJSON.git
 
