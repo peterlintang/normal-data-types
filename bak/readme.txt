@@ -50,6 +50,9 @@ https://github.com/alrevuelta/sensor-calibration.git
 
 git@github.com:aklomp/base64.git
 
+matlab save variable
+writematrix(x_hat, '11.txt')
+
 
 https://www.earthol.com/
 
