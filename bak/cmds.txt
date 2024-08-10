@@ -9,6 +9,10 @@ ipcrm		system v ipc tools
 ipcmk
 mkfifo		创建fifo
 lsof		查看使用资源的进程
+查看硬盘信息
+smartctrl -a /dev/sda
+测试硬盘读写
+hdparm -Tt /dev/sda
 
 ar
 strings
