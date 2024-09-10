@@ -141,6 +141,9 @@ extern void mm_init(void);
 
 
 #if 1
+//https://wenku.baidu.com/view/218c876d856a561253d36f2a.html?_wkts_=1725587903391&needWelcomeRecommand=1
+//https://blog.csdn.net/Nirvana_Tai/article/details/105554473
+//https://blog.csdn.net/u010097644/article/details/70881395/
 
 #defineKp 10.0f                        // 这里的KpKi是用于调整加速度计修正陀螺仪的速度
 #defineKi 0.008f
