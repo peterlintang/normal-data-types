@@ -32,6 +32,10 @@ git@github.com:peterlintang/mbedtls.git
 st 
 https://github.com/STMicroelectronics/STMems_Standard_C_drivers.git
 
+imu
+https://github.com/kyuhyong/STM32IMU.git
+https://github.com/rbv188/IMU-algorithm.git
+
 git@github.com:peterlintang/unarr.git
 
 git@github.com:kuba--/zip.git
