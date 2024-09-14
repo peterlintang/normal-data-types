@@ -1,0 +1,913 @@
+diff --git a/software/.west/config b/software/.west/config
+index 9f439fe..fd358f2 100755
+--- a/software/.west/config
++++ b/software/.west/config
+@@ -1,4 +1,7 @@
+-[manifest]
+-path = zephyr
+-file = west.yml
+-
++[manifest]
++path = zephyr
++file = west.yml
++
++[zephyr]
++base = zephyr
++
+diff --git a/software/application/bt_watch_call/resource/360x360/bt_watch.ui b/software/application/bt_watch_call/resource/360x360/bt_watch.ui
+index b95f48d..23cd622 100755
+--- a/software/application/bt_watch_call/resource/360x360/bt_watch.ui
++++ b/software/application/bt_watch_call/resource/360x360/bt_watch.ui
+@@ -24072,17 +24072,17 @@
+         <picture value=".\clock\raw\digital_clock\动画\9.jpg" LayerID="177" />
+         <picture value=".\clock\raw\digital_clock\动画\10.jpg" LayerID="178" />
+         <picture value=".\clock\raw\digital_clock\动画\11.jpg" LayerID="179" />
+-        <picture value=".\clock\raw\digital_clock\日期\0.jpg" LayerID="0" />
+-        <picture value=".\clock\raw\digital_clock\日期\1.jpg" LayerID="0" />
+-        <picture value=".\clock\raw\digital_clock\日期\2.jpg" LayerID="0" />
+-        <picture value=".\clock\raw\digital_clock\日期\3.jpg" LayerID="0" />
+-        <picture value=".\clock\raw\digital_clock\日期\4.jpg" LayerID="0" />
+-        <picture value=".\clock\raw\digital_clock\日期\5.jpg" LayerID="0" />
+-        <picture value=".\clock\raw\digital_clock\日期\6.jpg" LayerID="0" />
+-        <picture value=".\clock\raw\digital_clock\日期\7.jpg" LayerID="0" />
+-        <picture value=".\clock\raw\digital_clock\日期\8.jpg" LayerID="0" />
+-        <picture value=".\clock\raw\digital_clock\日期\9.jpg" LayerID="0" />
+-        <picture value=".\clock\raw\digital_clock\日期\-.jpg" LayerID="0" />
++        <picture value=".\clock\raw\digital_clock\日期\0.jpg" />
++        <picture value=".\clock\raw\digital_clock\日期\1.jpg" />
++        <picture value=".\clock\raw\digital_clock\日期\2.jpg" />
++        <picture value=".\clock\raw\digital_clock\日期\3.jpg" />
++        <picture value=".\clock\raw\digital_clock\日期\4.jpg" />
++        <picture value=".\clock\raw\digital_clock\日期\5.jpg" />
++        <picture value=".\clock\raw\digital_clock\日期\6.jpg" />
++        <picture value=".\clock\raw\digital_clock\日期\7.jpg" />
++        <picture value=".\clock\raw\digital_clock\日期\8.jpg" />
++        <picture value=".\clock\raw\digital_clock\日期\9.jpg" />
++        <picture value=".\clock\raw\digital_clock\日期\-.jpg" />
+         <picture value=".\clock\raw\digital_clock\睡眠距离\0.jpg" LayerID="144" />
+         <picture value=".\clock\raw\digital_clock\睡眠距离\1.jpg" LayerID="145" />
+         <picture value=".\clock\raw\digital_clock\睡眠距离\2.jpg" LayerID="146" />
+@@ -24103,9 +24103,9 @@
+         <picture value=".\message\raw\短信.png" LayerID="182" />
+         <picture value=".\message\raw\微信.png" LayerID="183" />
+         <picture value=".\message\raw\消息.png" LayerID="184" />
+-        <picture value=".\message\raw\圆角矩形 4.png" LayerID="0" />
++        <picture value=".\message\raw\圆角矩形 4.png" />
+         <picture value=".\compass\main.jpg" LayerID="185" />
+-        <picture value=".\compass\decor.jpg" LayerID="0" />
++        <picture value=".\compass\decor.jpg" />
+         <picture value=".\compass\char\0.jpg" LayerID="187" />
+         <picture value=".\compass\char\1.jpg" LayerID="188" />
+         <picture value=".\compass\char\2.jpg" LayerID="189" />
+@@ -24136,8 +24136,8 @@
+         <picture value=".\lcmusic\raw\vol_bg.jpg" LayerID="215" />
+         <picture value=".\lcmusic\raw\vol_up.png" LayerID="216" />
+         <picture value=".\lcmusic\raw\vol_down.png" LayerID="217" />
+-        <picture value=".\lcmusic\raw\vol_bar.png" LayerID="0" />
+-        <picture value=".\lcmusic\raw\vol_val.png" LayerID="0" />
++        <picture value=".\lcmusic\raw\vol_bar.png" />
++        <picture value=".\lcmusic\raw\vol_val.png" />
+         <picture value=".\lcmusic\raw\watch.png" LayerID="218" />
+         <picture value=".\lcmusic\raw\phone.png" LayerID="219" />
+         <picture value=".\lcmusic\raw\bt.png" LayerID="220" />
+@@ -24589,7 +24589,7 @@
+         <picture value=".\golf_putting_green\font_10_w\8.png" LayerID="482" />
+         <picture value=".\golf_putting_green\font_10_w\9.png" LayerID="483" />
+         <picture value=".\golf_time\10_medium_22.png" LayerID="500" />
+-        <picture value=".\golf_putting_green\arrow.png" LayerID="0" />
++        <picture value=".\golf_putting_green\arrow.png" />
+         <picture value=".\golf_putting_green\arrow2.png" LayerID="473" />
+         <txt value=".\multilang_translate_table.xls" />
+         <txt value="" />
+diff --git a/software/application/bt_watch_call/src/gps/uart2_to_gps.c b/software/application/bt_watch_call/src/gps/uart2_to_gps.c
+index 28139d1..c45ac3e 100755
+--- a/software/application/bt_watch_call/src/gps/uart2_to_gps.c
++++ b/software/application/bt_watch_call/src/gps/uart2_to_gps.c
+@@ -560,6 +560,40 @@ static int cmp(const void *arg1, const void *arg2)
+                 return 0;
+ }
+ 
++int GPS_GSA_Parse(unsigned char *line, GPS_INFO *GPS)
++{
++        unsigned char *p = NULL;
++        unsigned char *start = NULL;
++
++        printf("line: %s\n", line);
++
++        if (strncmp(line + 3, "GSA", 3) != 0)
++        {
++                return -1;
++        }
++
++        start = strchr(line, ',');
++        if (start == NULL)
++                return -1;
++
++        start += 1;
++        p = strchr(start, ',');
++        if (p == NULL)
++                return -1;
++
++        start = p + 1;
++        p = strchr(start, ',');
++        if (p == NULL)
++                return -1;
++
++//      printf("p: %s\n", p);
++//      printf("start: %s\n", start);
++        printf("fixed value: %d\n", (int)strtod(start, NULL));
++	GPS->gps_fixed = (int)strtod(start, NULL);
++        return 0;
++}
++
++
+ int GPS_GSV_Parse(unsigned char *line, GPS_INFO *GPS)
+ {
+ 	static char GPS_snr[256] = { 0 };
+@@ -787,6 +821,13 @@ out:
+ 	
+ 	snr_cur = 0;
+ 	id_cur = 0;
++	sn_count = sn_count > 16 ? 16 : sn_count;
++
++	snr_ret = snprintf(my_gps_sn + snr_cur, 256 - snr_cur, "%s", "   ");
++	id_ret = snprintf(my_gps_id + id_cur, 256 - id_cur, "%s", "   ");
++	snr_cur += snr_ret;
++	id_cur += id_ret;
++
+ 	for (i = 0; i < sn_count; i++)
+ 	{
+ //		printf("i: %d, sn: %d, id: %d\n", i, sp[i].sn, sp[i].id);
+@@ -801,6 +842,14 @@ out:
+ 		else
+ 			id_ret = snprintf(my_gps_id + id_cur, 256 - id_cur, "%d,", sp[i].id);
+ 		id_cur += id_ret;
++
++		if ((i + 1) % 6 == 0)
++		{
++			snr_ret = snprintf(my_gps_sn + snr_cur, 256 - snr_cur, "%c%s", '\n', "   ");
++			id_ret = snprintf(my_gps_id + id_cur, 256 - id_cur, "%c%s", '\n', "   ");
++			snr_cur += snr_ret;
++			id_cur += id_ret;
++		}
+ 	}
+ //	printf("snr: %s\n", my_gps_sn );
+ //	printf("id: %s\n", my_gps_id );
+@@ -897,6 +946,7 @@ void gps_enable(void *p1,void *p2,void *p3)
+ 			}
+ 			GPS_GSV_Parse(p_char, &GPS);
+ 			GPS_GNRMC_Parse(p_char, &GPS);
++			GPS_GSA_Parse(p_char, &GPS);
+ 
+ 		}
+ 
+diff --git a/software/application/bt_watch_call/src/gps/uart2_to_gps.h b/software/application/bt_watch_call/src/gps/uart2_to_gps.h
+index a5460ca..7e30242 100644
+--- a/software/application/bt_watch_call/src/gps/uart2_to_gps.h
++++ b/software/application/bt_watch_call/src/gps/uart2_to_gps.h
+@@ -20,6 +20,7 @@ typedef struct data
+     //int satellite;//卫星数量
+     unsigned char NS;
+     unsigned char EW;
++    int gps_fixed;
+     int numSat;
+     unsigned char snr[64 * 2 * 2];
+     unsigned char id[64 * 2 * 2];
+diff --git a/software/application/bt_watch_call/src/gsensor/lsm6dsv16x_reg.c b/software/application/bt_watch_call/src/gsensor/lsm6dsv16x_reg.c
+index a84610f..f33a629 100644
+--- a/software/application/bt_watch_call/src/gsensor/lsm6dsv16x_reg.c
++++ b/software/application/bt_watch_call/src/gsensor/lsm6dsv16x_reg.c
+@@ -4390,6 +4390,7 @@ int32_t lsm6dsv16x_fifo_sflp_batch_set(stmdev_ctx_t *ctx,
+     emb_func_fifo_en_a.sflp_game_fifo_en = val.game_rotation;
+     emb_func_fifo_en_a.sflp_gravity_fifo_en = val.gravity;
+     emb_func_fifo_en_a.sflp_gbias_fifo_en = val.gbias;
++    emb_func_fifo_en_a.step_counter_fifo_en = 1;
+     ret += lsm6dsv16x_write_reg(ctx, LSM6DSV16X_EMB_FUNC_FIFO_EN_A,
+                                 (uint8_t *)&emb_func_fifo_en_a, 1);
+   }
+@@ -4413,10 +4414,18 @@ int32_t lsm6dsv16x_fifo_sflp_batch_get(stmdev_ctx_t *ctx,
+   lsm6dsv16x_emb_func_fifo_en_a_t emb_func_fifo_en_a;
+   int32_t ret;
+ 
++  printf("hello world\n");
+   ret = lsm6dsv16x_mem_bank_set(ctx, LSM6DSV16X_EMBED_FUNC_MEM_BANK);
+   if (ret == 0)
+   {
+     ret = lsm6dsv16x_read_reg(ctx, LSM6DSV16X_EMB_FUNC_FIFO_EN_A, (uint8_t *)&emb_func_fifo_en_a, 1);
++    printf("%s: %d %d %d %d\n", 
++		    __func__, 
++		    emb_func_fifo_en_a.step_counter_fifo_en,
++		    emb_func_fifo_en_a.sflp_game_fifo_en,
++		    emb_func_fifo_en_a.sflp_gravity_fifo_en,
++		    emb_func_fifo_en_a.sflp_gbias_fifo_en
++		    );
+ 
+     val->game_rotation = emb_func_fifo_en_a.sflp_game_fifo_en;
+     val->gravity = emb_func_fifo_en_a.sflp_gravity_fifo_en;
+@@ -9233,6 +9242,7 @@ int32_t lsm6dsv16x_sflp_game_rotation_set(stmdev_ctx_t *ctx, uint8_t val)
+   {
+     ret = lsm6dsv16x_read_reg(ctx, LSM6DSV16X_EMB_FUNC_EN_A, (uint8_t *)&emb_func_en_a, 1);
+     emb_func_en_a.sflp_game_en = val;
++    emb_func_en_a.pedo_en = val;
+     ret += lsm6dsv16x_write_reg(ctx, LSM6DSV16X_EMB_FUNC_EN_A,
+                                 (uint8_t *)&emb_func_en_a, 1);
+   }
+@@ -9259,6 +9269,11 @@ int32_t lsm6dsv16x_sflp_game_rotation_get(stmdev_ctx_t *ctx, uint8_t *val)
+   if (ret == 0)
+   {
+     ret = lsm6dsv16x_read_reg(ctx, LSM6DSV16X_EMB_FUNC_EN_A, (uint8_t *)&emb_func_en_a, 1);
++    printf("%s: %d %d \n", 
++		    __func__, 
++		    emb_func_en_a.pedo_en ,
++		    emb_func_en_a.sflp_game_en
++		    );
+     *val = emb_func_en_a.sflp_game_en;
+   }
+ 
+diff --git a/software/application/bt_watch_call/src/launcher/test/CMakeLists.txt b/software/application/bt_watch_call/src/launcher/test/CMakeLists.txt
+index 3955038..7125fac 100644
+--- a/software/application/bt_watch_call/src/launcher/test/CMakeLists.txt
++++ b/software/application/bt_watch_call/src/launcher/test/CMakeLists.txt
+@@ -15,9 +15,12 @@ target_sources(app PRIVATE
+ 	spl06001.c
+ 	#	SPA06_003.c
+ 	lsm6dsv16x_read_data_polling.c
+-	#	lsm6dsv16x_reg.c
++	#lsm6dsv16x_reg.c
+ 	#lps22df_reg.c
+ 	#lps22df_read_data_polling.c
++	lsm6dsv16x_sensor_fusion.c
+ 	mag_calibration.c
++	#EKF.c
++	#MadgwickAHRS.c
+ )
+ 
+diff --git a/software/application/bt_watch_call/src/launcher/test/gps_bt_test_view.c b/software/application/bt_watch_call/src/launcher/test/gps_bt_test_view.c
+index 3f017eb..94db9bf 100644
+--- a/software/application/bt_watch_call/src/launcher/test/gps_bt_test_view.c
++++ b/software/application/bt_watch_call/src/launcher/test/gps_bt_test_view.c
+@@ -479,12 +479,38 @@ static void timer_ing_update(lv_timer_t *timer)
+ 
+ }
+ */
+-	snprintf(text, 680, "%c:%.8f\n%c:%.8f\ntime: %d\nC/No:%s\nid:%s",GPS.NS, GPS.latitude, GPS.EW, GPS.longitude, gps_hot_duration_time, /*GPS.numSat,*/ GPS.snr, GPS.id);
+-	SYS_LOG_INF("%.8f, %.8f, %.8f \n%s\n",GPS.latitude, GPS.longitude, GPS.height, text);
++
++//	snprintf(text, 680, "   %c:%.8f\n   %c:%.8f\n   time: %d %s\n   C/No:\n%s\n   id:\n%s",
++//			GPS.NS, GPS.latitude, GPS.EW, GPS.longitude, gps_hot_duration_time, GPS.gps_fixed == 3 ? " 3D fixed" : " 3D not fixed", /*GPS.numSat,*/ GPS.snr, GPS.id);
++
++if (GPS.gps_fixed == 3)
++{
++	snprintf(text, 680, "   %c:%.8f\n   %c:%.8f\n   time: %d %s\n   C/No:\n%s\n   id:\n%s",
++			GPS.NS == '\0' ? ' ' : GPS.NS, GPS.latitude, 
++			GPS.EW == '\0' ? ' ' : GPS.EW, GPS.longitude, 
++			gps_hot_duration_time, 
++			GPS.gps_fixed == 3 ? " 3D fixed" : " 3D not fixed", /*GPS.numSat,*/ 
++			GPS.snr == '\0' ? ' ' : GPS.snr, 
++			GPS.id == '\0' ? ' ' : GPS.id);
++}
++else
++{
++	snprintf(text, 680, "   \n\n   time: %d %s\n   C/No:\n%s\n   id:\n%s",
++			gps_hot_duration_time, 
++			GPS.gps_fixed == 3 ? " 3D fixed" : " 3D not fixed",
++			GPS.snr == '\0' ? " " : GPS.snr, 
++			GPS.id == '\0' ? " " : GPS.id);
++}
++	SYS_LOG_INF("hello world:::%.8f, %.8f, %.8f \n%s\n",GPS.latitude, GPS.longitude, GPS.height, text);
++	SYS_LOG_INF("hello world:::time : %d, %s, snr: %s, id: %s\n", gps_hot_duration_time, GPS.gps_fixed == 3 ? " 3D fixed" : " 3D not fixed", GPS.snr, GPS.id);
+ 
+ //	snprintf(text, 680, "%c:%.8f\n%c:%.8f\ntime: %d\nC/No:%s\nid:%s",GPS.NS, GPS.latitude, GPS.EW, GPS.longitude, gps_hot_duration_time, /*GPS.numSat,*/ snr_text, id_text);
+ //	SYS_LOG_INF("%.8f, %.8f, %.8f \n%s\n",GPS.latitude, GPS.longitude, GPS.height, text);
+ 
++	/*
++	snprintf(text, 680, " %c:%.8f\n %c:%.8f\n time: %d\n C/No:\n%s\n id:\n%s", 'N', 22.2345890, 'E', 123.3232290, 30, 
++		 " 48, 47, 46, 45, 43, 42,\n 41, 40, 40, 40, 40, 39,\n 39, 39, 38, 38, 37, 37,", " 72, 32, 31, 23, 13, 12,\n 11, 21, 22, 32, 33, 34,\n 20, 21 22, 23, 24, 25");
++	*/
+ 	lv_label_set_text(data->label_gps_data, text);
+ 
+ }
+@@ -525,13 +551,17 @@ static int gps_bt_test_view_create(view_data_t *view_data)
+ 
+ 
+ 	lv_obj_t *label_gps_switch = lv_label_create(data->obj);
+-	lv_label_set_text(label_gps_switch, data->res_txts[0].txt);
++//	lv_label_set_text(label_gps_switch, data->res_txts[0].txt);
++	lv_label_set_text(label_gps_switch, "   GPS switch");
+ 	lv_obj_add_style(label_gps_switch, &data->style_txts[0], LV_PART_MAIN);
++	lv_obj_set_style_text_align(label_gps_switch, LV_TEXT_ALIGN_LEFT, 0);
+ //	lv_obj_set_width(label_gps_switch,300);
+ 
+ lv_obj_t *label_gps_hot_switch = lv_label_create(data->obj);
+-lv_label_set_text(label_gps_hot_switch, data->res_txts[2].txt);
++//lv_label_set_text(label_gps_hot_switch, data->res_txts[2].txt);
++lv_label_set_text(label_gps_hot_switch, "   GPS hot switch");
+ lv_obj_add_style(label_gps_hot_switch, &data->style_txts[2], LV_PART_MAIN);
++lv_obj_set_style_text_align(label_gps_hot_switch, LV_TEXT_ALIGN_LEFT, 0);
+ 
+ 
+ //	lv_obj_t *obj_main_btn_2line = lv_obj_create(data->obj);
+@@ -550,6 +580,7 @@ lv_obj_add_style(label_gps_hot_switch, &data->style_txts[2], LV_PART_MAIN);
+ 	data->label_gps_data = lv_label_create(data->obj);
+ 	lv_label_set_text(data->label_gps_data, data->res_txts[1].txt);
+ 	lv_obj_add_style(data->label_gps_data, &data->style_txts[1], LV_PART_MAIN);
++//	lv_obj_set_style_text_align(data->label_gps_data, LV_TEXT_ALIGN_CENTER, 0);
+ 	lv_obj_set_style_text_align(data->label_gps_data, LV_TEXT_ALIGN_LEFT, 0);
+ 
+ 	data->timer = lv_timer_create(timer_ing_update, 1000, view_data);
+@@ -577,6 +608,9 @@ lv_obj_add_style(label_gps_hot_switch, &data->style_txts[2], LV_PART_MAIN);
+ 	lv_obj_add_flag(data->obj_swtich_gps_hot, LV_OBJ_FLAG_CLICKABLE);
+ 	lv_obj_add_event_cb(data->obj_swtich_gps_hot, open_gps_hot_switch_btn_event_handler, LV_EVENT_SHORT_CLICKED, NULL);
+ #endif
++	gps_close();
++	gps_state = GPS_OFF;
++	open_gps_switch_btn_event_handler(NULL);
+ 	
+ 	return 0;
+ }
+diff --git a/software/application/bt_watch_call/src/launcher/test/lcd_test_view.c b/software/application/bt_watch_call/src/launcher/test/lcd_test_view.c
+index 993f0b6..f9a41e2 100644
+--- a/software/application/bt_watch_call/src/launcher/test/lcd_test_view.c
++++ b/software/application/bt_watch_call/src/launcher/test/lcd_test_view.c
+@@ -126,6 +126,8 @@ static int _lcd_test_view_delete(view_data_t *view_data)
+ 		lv_timer_del(timer);
+ 		timer = NULL;
+ 	}
++	lv_obj_del(canvas);
++	canvas = NULL;
+ 	lvgl_res_unload_scene_compact(SCENE_LCD_TEST_VIEW);
+ 	return 0;
+ }
+diff --git a/software/application/bt_watch_call/src/launcher/test/lsm6dsv16x_read_data_polling.c b/software/application/bt_watch_call/src/launcher/test/lsm6dsv16x_read_data_polling.c
+index 734ce0c..4537303 100644
+--- a/software/application/bt_watch_call/src/launcher/test/lsm6dsv16x_read_data_polling.c
++++ b/software/application/bt_watch_call/src/launcher/test/lsm6dsv16x_read_data_polling.c
+@@ -161,8 +161,8 @@ void lsm6dsv16x_init(void)
+    * Selected data rate have to be equal or greater with respect
+    * with MLC data rate.
+    */
+-  lsm6dsv16x_xl_data_rate_set(&dev_ctx, LSM6DSV16X_ODR_AT_7Hz5);
+-  lsm6dsv16x_gy_data_rate_set(&dev_ctx, LSM6DSV16X_ODR_AT_15Hz);
++  lsm6dsv16x_xl_data_rate_set(&dev_ctx, LSM6DSV16X_ODR_AT_60Hz);
++  lsm6dsv16x_gy_data_rate_set(&dev_ctx, LSM6DSV16X_ODR_AT_60Hz);
+   /* Set full scale */
+   lsm6dsv16x_xl_full_scale_set(&dev_ctx, LSM6DSV16X_2g);
+   lsm6dsv16x_gy_full_scale_set(&dev_ctx, LSM6DSV16X_2000dps);
+@@ -204,10 +204,12 @@ void lsm6dsv16x_read_data_polling(float *acc_mg, float *ang_mdps)
+       acc_mg[1] = acceleration_mg[1];
+       acc_mg[2] = acceleration_mg[2];
+ 
++      /*
+       sprintf((char *)tx_buffer,
+               "Acceleration [mg]:%4.2f\t%4.2f\t%4.2f\r\n",
+               acceleration_mg[0], acceleration_mg[1], acceleration_mg[2]);
+       tx_com(tx_buffer, strlen((char const *)tx_buffer));
++      */
+     }
+ 
+     /* Read output only if new xl value is available */
+@@ -226,10 +228,12 @@ void lsm6dsv16x_read_data_polling(float *acc_mg, float *ang_mdps)
+ 	ang_mdps[1] = angular_rate_mdps[1];
+ 	ang_mdps[2] = angular_rate_mdps[2];
+ 
++	/*
+       sprintf((char *)tx_buffer,
+               "Angular rate [mdps]:%4.2f\t%4.2f\t%4.2f\r\n",
+               angular_rate_mdps[0], angular_rate_mdps[1], angular_rate_mdps[2]);
+       tx_com(tx_buffer, strlen((char const *)tx_buffer));
++      */
+     }
+ 
+     if (drdy.drdy_temp) {
+@@ -238,9 +242,11 @@ void lsm6dsv16x_read_data_polling(float *acc_mg, float *ang_mdps)
+       lsm6dsv16x_temperature_raw_get(&dev_ctx, &data_raw_temperature);
+       temperature_degC = lsm6dsv16x_from_lsb_to_celsius(
+                            data_raw_temperature);
++      /*
+       sprintf((char *)tx_buffer,
+               "Temperature [degC]:%6.2f\r\n", temperature_degC);
+       tx_com(tx_buffer, strlen((char const *)tx_buffer));
++      */
+     }
+   }
+ }
+diff --git a/software/application/bt_watch_call/src/launcher/test/lsm6dsv16x_reg.c b/software/application/bt_watch_call/src/launcher/test/lsm6dsv16x_reg.c
+index a84610f..9819a60 100644
+--- a/software/application/bt_watch_call/src/launcher/test/lsm6dsv16x_reg.c
++++ b/software/application/bt_watch_call/src/launcher/test/lsm6dsv16x_reg.c
+@@ -4390,6 +4390,7 @@ int32_t lsm6dsv16x_fifo_sflp_batch_set(stmdev_ctx_t *ctx,
+     emb_func_fifo_en_a.sflp_game_fifo_en = val.game_rotation;
+     emb_func_fifo_en_a.sflp_gravity_fifo_en = val.gravity;
+     emb_func_fifo_en_a.sflp_gbias_fifo_en = val.gbias;
++    emb_func_fifo_en_a.step_counter_fifo_en = 1;
+     ret += lsm6dsv16x_write_reg(ctx, LSM6DSV16X_EMB_FUNC_FIFO_EN_A,
+                                 (uint8_t *)&emb_func_fifo_en_a, 1);
+   }
+@@ -4413,10 +4414,18 @@ int32_t lsm6dsv16x_fifo_sflp_batch_get(stmdev_ctx_t *ctx,
+   lsm6dsv16x_emb_func_fifo_en_a_t emb_func_fifo_en_a;
+   int32_t ret;
+ 
++  printf("hello world\n");
+   ret = lsm6dsv16x_mem_bank_set(ctx, LSM6DSV16X_EMBED_FUNC_MEM_BANK);
+   if (ret == 0)
+   {
+     ret = lsm6dsv16x_read_reg(ctx, LSM6DSV16X_EMB_FUNC_FIFO_EN_A, (uint8_t *)&emb_func_fifo_en_a, 1);
++    printf("%s: %d %d %d %d\n", 
++		    __func__, 
++		    emb_func_fifo_en_a.step_counter_fifo_en,
++		    emb_func_fifo_en_a.sflp_game_fifo_en,
++		    emb_func_fifo_en_a.sflp_gravity_fifo_en,
++		    emb_func_fifo_en_a.sflp_gbias_fifo_en
++		    );
+ 
+     val->game_rotation = emb_func_fifo_en_a.sflp_game_fifo_en;
+     val->gravity = emb_func_fifo_en_a.sflp_gravity_fifo_en;
+@@ -9233,6 +9242,7 @@ int32_t lsm6dsv16x_sflp_game_rotation_set(stmdev_ctx_t *ctx, uint8_t val)
+   {
+     ret = lsm6dsv16x_read_reg(ctx, LSM6DSV16X_EMB_FUNC_EN_A, (uint8_t *)&emb_func_en_a, 1);
+     emb_func_en_a.sflp_game_en = val;
++    emb_func_en_a.pedo_en = val;
+     ret += lsm6dsv16x_write_reg(ctx, LSM6DSV16X_EMB_FUNC_EN_A,
+                                 (uint8_t *)&emb_func_en_a, 1);
+   }
+diff --git a/software/application/bt_watch_call/src/launcher/test/mag_calibration.c b/software/application/bt_watch_call/src/launcher/test/mag_calibration.c
+index e3ec519..41da3cc 100644
+--- a/software/application/bt_watch_call/src/launcher/test/mag_calibration.c
++++ b/software/application/bt_watch_call/src/launcher/test/mag_calibration.c
+@@ -174,7 +174,7 @@ uint8_t mag_calculate(float *mag_data)
+       calibration_result = UNDER_CALIBRATION;
+ //	  norm = calculateMagnitude(mag_data[0],mag_data[1],mag_data[2]);  //三轴磁力计模值计算
+ //	  BEBUG_LOG("free norm=%f\r\n",norm);
+-	  BEBUG_LOG("free PP=%f\r\n",get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN));
++//	  BEBUG_LOG("free PP=%f\r\n",get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN));
+       if (get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN) > THRESH_START_VALUES)  //启动计算（1、阈值大于50）
+       {
+         task_step = start_calculate;
+diff --git a/software/application/bt_watch_call/src/launcher/test/pre_test_view.c b/software/application/bt_watch_call/src/launcher/test/pre_test_view.c
+index 0a3715e..09f791e 100644
+--- a/software/application/bt_watch_call/src/launcher/test/pre_test_view.c
++++ b/software/application/bt_watch_call/src/launcher/test/pre_test_view.c
+@@ -116,12 +116,15 @@ static void timer_ing_update(lv_timer_t *timer)
+ //     	printf("pa = %f\n",pa);
+ 	*/
+ //	lsm6dsl_read_data_polling(acc_mg, ang_mdps);
+-	lsm6dsv16x_read_data_polling(acc_mg, ang_mdps);
++//	lsm6dsv16x_read_data_polling(acc_mg, ang_mdps);
++#if 0
+ 	temp = mts4b_read_temp();
+ 	mts4b_start();
++#endif
+ //	pa = ReadSPL06_Pressure(&t_SPL06_calibPara);
+ 	
+ 	float deg_c = 0.0;
++#if 0
+ 	if (chip_id == LPS22DF_ID)
+ 	{
+ 		extern void lps22df_read_data_polling(float *hpa, float *deg_c);
+@@ -140,9 +143,12 @@ static void timer_ing_update(lv_timer_t *timer)
+ 		hight = Caculate_Altitude(pa * 100);
+ 		printf("spl003 tmp: %.2f\n", spl07_003_get_temperature());
+ 	}
++#endif
+ 	
+ 	 printf("pa:%.2f   gao:%.2fm, deg: %.2f, temp: %.2f\n",pa,hight, deg_c, temp);
+ 
++	 float x[3] = { 0 };
++
+ 	src = lv_disp_get_scr_act(view_data->display);
+ 	if (src == NULL)
+ 		return ;
+@@ -151,11 +157,32 @@ extern int get_mag_data(struct mag_data_t *data, float *acc_mg);
+ 	struct mag_data_t mag_data;
+ 	mag_data.flag = 0;
+ 	get_mag_data(&mag_data, acc_mg);
++extern void oo_get_(float out[3]);
++	oo_get_(x);
++	printf("%s: hhhhhhhh %f %f %f\n", __func__, x[0], x[1], x[2]);
+ 	int charge_status = power_manager_get_charge_status();
+ 	printf("charge_status: %d(%d)\n", charge_status, BAT_STATUS_CHARGING);
+ 	if (BAT_STATUS_CHARGING == charge_status)
+ 	{
+-	snprintf(text, 220, "\ntmp: %.2f\npre: %.2f\nheight: %.2f\ncalbrating: %d\nmag: %.3f\npower: %d%% charging\nmg: %4.2f %4.2f %4.2f\nmdps: %4.2f %4.2f %4.2f", temp, pa, hight,
++#if 1
++	snprintf(text, 220, "\ntmp: %.2f\npre: %.2f\nheight: %.2f\ncalbrating: %d\nmag: %.3f\npower: %d%% charging\nmg: %4.2f %4.2f %4.2f\nmdps: %4.2f %4.2f %4.2f\n  %.3f %.3f %.3f", 
++			temp, pa, hight,
++			mag_data.flag,
++			mag_data.angle_yaw,
++			power_manager_get_battery_capacity(),
++			acc_mg[0],
++			acc_mg[1],
++			acc_mg[2],
++			ang_mdps[0],
++			ang_mdps[1],
++			ang_mdps[2],
++			x[0],
++			x[1],
++			x[2]
++			);
++#else
++	snprintf(text, 220, "\ntmp: %.2f\npre: %.2f\nheight: %.2f\ncalbrating: %d\nmag: %.3f\npower: %d%% charging\nmg: %4.2f %4.2f %4.2f\nmdps: %4.2f %4.2f %4.2f\n", 
++			temp, pa, hight,
+ 			mag_data.flag,
+ 			mag_data.angle_yaw,
+ 			power_manager_get_battery_capacity(),
+@@ -166,10 +193,29 @@ extern int get_mag_data(struct mag_data_t *data, float *acc_mg);
+ 			ang_mdps[1],
+ 			ang_mdps[2]
+ 			);
++#endif
+ 	}
+ 	else
+ 	{
+-	snprintf(text, 220, "\ntmp: %.2f\npre: %.2f\nheight: %.2f\ncalbrating: %d\nmag: %.3f\npower: %d%%\nmg: %4.2f %4.2f %4.2f\nmdps: %4.2f %4.2f %4.2f", temp, pa, hight,
++#if 1
++	snprintf(text, 220, "\ntmp: %.2f\npre: %.2f\nheight: %.2f\ncalbrating: %d\nmag: %.3f\npower: %d%%\nmg: %4.2f %4.2f %4.2f\nmdps: %4.2f %4.2f %4.2f\n   %.3f %.3f %.3f", 
++			temp, pa, hight,
++			mag_data.flag,
++			mag_data.angle_yaw,
++			power_manager_get_battery_capacity(),
++			acc_mg[0],
++			acc_mg[1],
++			acc_mg[2],
++			ang_mdps[0],
++			ang_mdps[1],
++			ang_mdps[2],
++			x[0],
++			x[1],
++			x[2]
++			);
++#else
++	snprintf(text, 220, "\ntmp: %.2f\npre: %.2f\nheight: %.2f\ncalbrating: %d\nmag: %.3f\npower: %d%%\nmg: %4.2f %4.2f %4.2f\nmdps: %4.2f %4.2f %4.2f\n", 
++			temp, pa, hight,
+ 			mag_data.flag,
+ 			mag_data.angle_yaw,
+ 			power_manager_get_battery_capacity(),
+@@ -180,6 +226,7 @@ extern int get_mag_data(struct mag_data_t *data, float *acc_mg);
+ 			ang_mdps[1],
+ 			ang_mdps[2]
+ 			);
++#endif
+ 	}
+ 
+ 	lv_label_set_text(private_data->pre_test_label, text);
+@@ -208,6 +255,7 @@ static int create_view(view_data_t *view_data)
+ 	extern void SPL06_Init(T_SPL06_calibPara *ptSPL06_calibPara);
+ 	extern void spl06_start(uint8_t mode);
+ 	void lps22df_init(void);
++#if 0
+ 	extern void pressure_lps22df_id_get(uint8_t *chip_id);
+ 	pressure_lps22df_id_get(&chip_id);
+ 	printf("%s: pressure chip id: %x, %x\n", __func__, chip_id, LPS22DF_ID);
+@@ -229,9 +277,12 @@ static int create_view(view_data_t *view_data)
+ 	lsm6dsv16x_init();
+ //	SPL06_Init(&t_SPL06_calibPara);
+ 	printf("%p\n", &t_SPL06_calibPara);
++#endif
+ 	timer = lv_timer_create(timer_ing_update, 1000, view_data);
+ 	//spl07_003_init();
+ 	//spl07_003_start_continuous(CONTINUOUS_P_AND_T);
++	extern int shell_aa_test(const struct shell *shell, size_t argc, char **argv);
++	shell_aa_test(NULL, 0, NULL);
+ 	if (timer)
+ 		lv_timer_ready(timer);
+ 	return 0;
+@@ -282,6 +333,8 @@ static int _pre_test_view_delete(view_data_t *view_data)
+ 
+ 	if (timer) 
+ 	{
++		extern int shell_aa_test_exit(void);
++		shell_aa_test_exit();
+ 		lv_timer_del(timer);
+ 		timer = NULL;
+ 	}
+diff --git a/software/application/bt_watch_call/src/launcher/test/sensor_test_view.c b/software/application/bt_watch_call/src/launcher/test/sensor_test_view.c
+index 567f0bf..9a7bd08 100644
+--- a/software/application/bt_watch_call/src/launcher/test/sensor_test_view.c
++++ b/software/application/bt_watch_call/src/launcher/test/sensor_test_view.c
+@@ -591,7 +591,7 @@ void mag_calibration_start(void)
+ 	SYS_LOG_INF("%s: end init mag calibration\n", __func__);
+ }
+ 
+-static void VCM1195L_init(void)
++void VCM1195L_init(void)
+ {
+ 	const struct device *dev;
+ 
+@@ -893,7 +893,7 @@ void mag_calibration_test(void)
+             }
+             else if(res==2) //校准中
+             {
+-                printf("%s: calibrating\r\n", __func__);
++//                printf("%s: calibrating\r\n", __func__);
+             }
+             else if(res==0) //校准失败
+             {                     
+diff --git a/software/application/bt_watch_call/src/launcher/test/test_mode.c b/software/application/bt_watch_call/src/launcher/test/test_mode.c
+index 73ec463..bcb6979 100644
+--- a/software/application/bt_watch_call/src/launcher/test/test_mode.c
++++ b/software/application/bt_watch_call/src/launcher/test/test_mode.c
+@@ -110,6 +110,16 @@ static void gps_test_btn_event_handler(lv_event_t * e)
+ 	SYS_LOG_INF("%s: event\n", __func__);
+ 	view_stack_push_view(GPS_BT_TEST_VIEW, NULL);
+ }
++
++extern void com_test_btn_event_handler(lv_event_t * e);
++static void lcd_test_btn_event_handler(lv_event_t * e);
++void hello_my(void)
++{
++//	lcd_test_btn_event_handler(NULL);
++	com_test_btn_event_handler(NULL);
++//	gps_test_btn_event_handler(NULL);
++}
++
+ #include <fs_manager.h>
+ #include <fs/fs.h>
+ #include <fs/fs.h>
+diff --git a/software/application/bt_watch_call/src/main/system_app_main.c b/software/application/bt_watch_call/src/main/system_app_main.c
+index c9fe27a..49a0084 100755
+--- a/software/application/bt_watch_call/src/main/system_app_main.c
++++ b/software/application/bt_watch_call/src/main/system_app_main.c
+@@ -503,7 +503,36 @@ uart_tid = 	k_thread_create(&thread_data,stack_area,
+ 								PRIORITY,0,K_NO_WAIT);
+ 	k_thread_name_set(uart_tid , "gps_uart");
+ 	k_msleep(120);
+-//	k_thread_suspend(uart_tid);
++	k_thread_suspend(uart_tid);
++
++	int64_t d64;
++	int64_t t64[2];
++
++	t64[0] = k_uptime_ticks();
++	k_msleep(1000);
++	t64[1] = k_uptime_ticks();
++	d64 = MIN(t64[1] - t64[0], t64[1] - t64[0]);
++	printf("10m: 1000 %f\n", d64 / (1.0 * CONFIG_SYS_CLOCK_TICKS_PER_SEC));
++
++
++	t64[0] = k_uptime_ticks();
++	k_msleep(100);
++	t64[1] = k_uptime_ticks();
++	d64 = MIN(t64[1] - t64[0], t64[1] - t64[0]);
++	printf("10m: 100 %f\n", d64 / (1.0 * CONFIG_SYS_CLOCK_TICKS_PER_SEC));
++
++
++	t64[0] = k_uptime_ticks();
++	k_msleep(10);
++	t64[1] = k_uptime_ticks();
++	d64 = MIN(t64[1] - t64[0], t64[1] - t64[0]);
++	printf("10m: 10 %f\n", d64 / (1.0 * CONFIG_SYS_CLOCK_TICKS_PER_SEC));
++
++	t64[0] = k_uptime_ticks();
++	k_msleep(1);
++	t64[1] = k_uptime_ticks();
++	d64 = MIN(t64[1] - t64[0], t64[1] - t64[0]);
++	printf("10m: 1  %f\n", d64 / (1.0 * CONFIG_SYS_CLOCK_TICKS_PER_SEC));
+ 
+ 	while (1) {
+ 		main_msg_proc(NULL, NULL, NULL);
+diff --git a/software/framework/system/sys_shell.c b/software/framework/system/sys_shell.c
+index 4be1023..e1444c4 100755
+--- a/software/framework/system/sys_shell.c
++++ b/software/framework/system/sys_shell.c
+@@ -121,6 +121,231 @@ static int shell_wake_lock(const struct shell *shell, size_t argc, char **argv)
+ }
+ #endif
+ 
++static int shell_gps_test(const struct shell *shell, size_t argc, char **argv)
++{
++extern void hello_my(void);
++	hello_my();
++	return 0;
++}
++
++static int shell_mm_test(const struct shell *shell, size_t argc, char **argv)
++{
++extern void mm_init(void);
++	mm_init();
++	return 0;
++}
++
++#include "math.h"
++
++#if 1
++float	x0 = 1, x1 = 0, x2 = 0, x3 = 0;
++float	x_total = 0, y_total = 0, z_total= 0;
++float oo[3] = { 0.0 };
++                             
++void IMUupdate(float gx, float gy, float gz, float ax, float ay, float az)
++{
++//	printf("%s: %f %f %f, %f %f %f\n", __func__, gx, gy, gz, ax, ay, az);
++
++  float x0temp,x1temp,x2temp,x3temp;
++  float norm; 
++  float vx, vy, vz;
++  float ex, ey, ez;
++              
++
++
++  float x0x0 = x0*x0;
++  float x0x1 = x0*x1;
++  float x0x2 = x0*x2;
++  float x1x1 = x1*x1;
++  float x1x3 = x1*x3;
++  float x2x2 = x2*x2;
++  float x2x3 = x2*x3;
++  float x3x3 = x3*x3;
++
++  if(ax == 0 && ay == 0 && az == 0)
++        return;
++  norm = sqrt(ax*ax + ay*ay + az*az);
++  ax = ax /norm;
++  ay = ay / norm;
++  az = az / norm;
++
++  vx = 2*(x1x3 - x0x2);
++  vy = 2*(x0x1 + x2x3);
++  vz = x0x0 - x1x1 - x2x2 + x3x3 ;
++
++  ex = (ay*vz - az*vy) ;
++  ey = (az*vx - ax*vz) ;
++  ez = (ax*vy - ay*vx) ;
++
++  x_total = x_total + ex * 0.001;
++  y_total = y_total + ey * 0.001;
++  z_total = z_total + ez * 0.001;
++
++  gx = gx + 8.0*ex + x_total;
++  gy = gy + 8.0*ey + y_total;
++  gz = gz + 8.0*ez + z_total;
++			  
++  x0temp=x0;
++  x1temp=x1;
++  x2temp=x2;
++  x3temp=x3;
++
++  x0 = x0temp + (-x1temp*gx - x2temp*gy -x3temp*gz)*0.001;
++  x1 = x1temp + (x0temp*gx + x2temp*gz -x3temp*gy)*0.001;
++  x2 = x2temp + (x0temp*gy - x1temp*gz +x3temp*gx)*0.001;
++  x3 = x3temp + (x0temp*gz + x1temp*gy -x2temp*gx)*0.001;
++
++  norm = sqrt(x0*x0 + x1*x1 + x2*x2 + x3*x3);
++  x0 = x0 / norm;
++  x1 = x1 / norm;
++  x2 = x2 / norm;
++  x3 = x3 / norm;
++
++
++                    oo[0] = atan2(2 * (x0 * x1 + x2 * x3), 1 - 2 * (x1 * x1 + x2 * x2));
++                    oo[1] = asin(2 * (x0 * x2 - x3 * x1));
++                    oo[2] = atan2(2 * (x0 * x3 + x1 * x2),  1 - 2 * (x2 * x2 + x3 * x3));
++		    #define M_PI        3.14159265358979323846
++
++                    // Conversione da radianti a gradi
++                    oo[0] *= (float)((float)180.0 / (float)M_PI);
++                    oo[1] *= (float)((float)180.0 / (float)M_PI);
++                    oo[2] *= (float)((float)180.0 / (float)M_PI);
++
++
++		    static int mm_count = 0;
++		    mm_count++;
++    if (mm_count % 500 == 0)
++  	printf("angle: %f %f %f\n", oo[0], oo[1], oo[2]);						    
++
++										    
++}
++
++void oo_get_(float out[3])
++{
++	out[0] = oo[0];
++	out[1] = oo[1];
++	out[2] = oo[2];
++}
++
++#endif
++
++static int quit_flag = 0;
++static void aa_calibration_thread(void *p1,void *p2,void *p3)
++{
++	float acc[3] = { 0, 0 , 0 };
++	float ang[3] = { 0, 0, 0 };
++//	float aa[3];
++//	aa_t cc;
++//	float a1= 0.0;
++//	float a2= 0.0;
++//	float a3= 0.0;
++    	float mag_data[3]={0};//存储磁数据
++	extern void lsm6dsv16x_read_data_polling(float *acc, float *ang);
++	extern void lsm6dsv16x_init(void);
++	extern void VCM1195L_init(void);
++	extern uint8_t VCM119xL_ReadData(float *mag);
++
++	lsm6dsv16x_init();
++    	VCM1195L_init();
++//	VCM119xL_ReadData(mag_data);
++//	aa_init(&cc, mag_data[2], mag_data[1], mag_data[0], 0.1, 1, 100);
++	k_msleep(1000 * 2);
++	float axs = 0;
++	float ays = 0;
++	float azs = 0;
++	float gxs = 0;
++	float gys = 0;
++	float gzs = 0;
++	float axx = 0;
++	float ayy = 0;
++	float azz = 0;
++	float gxx = 0;
++	float gyy = 0;
++	float gzz = 0;
++	
++	for (int i = 0; i < 200; i++)
++	{
++		k_msleep(5);
++		lsm6dsv16x_read_data_polling(acc, ang);
++		axs = axs + acc[0] / 1000.0;
++		ays = ays + acc[1] / 1000.0;
++		azs = azs + (acc[2] - 1000) / 1000.0;
++		gxs = gxs + ang[0] / 1000.0;
++		gys = gys + ang[1] / 1000.0;
++		gzs = gzs + ang[2] / 1000.0;
++		printf(": %f %f %f, %f %f %f\n", axs, ays, azs, gxs, gys, gzs);
++	}
++
++	axx = axs / 200;
++	ayy = ays / 200;
++	azz = azs / 200;
++
++	gxx = gxs / 200;
++	gyy = gys / 200;
++	gzz = gzs / 200;
++	
++
++		printf(": %f %f %f, %f %f %f\n", axx, ayy, azz, gxx, gyy, gzz);
++
++		extern void aaupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
++	while (quit_flag != 1)
++	{
++		k_msleep(2);
++	//	VCM119xL_ReadData(mag_data);
++		lsm6dsv16x_read_data_polling(acc, ang);
++	//	aaupdate(&aa, cc, acc[0], acc[1], acc[2], ang[0], ang[1], ang[2], mag_data[2], mag_data[1], mag_data[0], 0.01);
++//		a1= cc[0] * 180.0f / 3.14159265f;
++//		a2= cc[1] * 180.0f / 3.14159265f;
++//		a3= cc[2] * 180.0f / 3.14159265f;
++//		printf("aaa: %f %f %f\n", acc[0] - axx, acc[1] - ayy, acc[2] - azz);
++//		printf("bbb: %f %f %f\n", ang[0] - gxx, ang[1] - gyy, ang[2] - gzz);
++		IMUupdate(
++				(ang[0] / 1000.0 - gxx) * 0.0174532925, 
++				(ang[1] / 1000.0 - gyy) * 0.0174532925, 
++				(ang[2] / 1000.0 - gzz) * 0.0174532925 ,
++				acc[0] / 1000.0 - axx, 
++				acc[1] / 1000.0 - ayy, 
++				acc[2] / 1000.0 - azz); 
++//		aaupdate(ang[0] - gxx, ang[1] - gyy, ang[2] - gzz, acc[0] - axx, acc[1] - ayy, acc[2] - azz, 0, 0, 0 );
++		//printf("a1: %f, a2: %f, a3: %f\n", a1, a2, a3);
++	}
++}
++
++static k_tid_t m_tid = NULL;
++K_THREAD_STACK_DEFINE(aa_stack_area, 2048);
++static struct k_thread thread_data;
++void aa_thread_init(void)
++{
++	if (m_tid == NULL)
++	{
++		//extern void lsm6dsv16x_init(void);
++		//lsm6dsv16x_init();
++		m_tid = k_thread_create(&thread_data, aa_stack_area,
++				K_THREAD_STACK_SIZEOF(aa_stack_area),
++				aa_calibration_thread, NULL, NULL, NULL,
++				15, 0, K_NO_WAIT);
++		k_thread_name_set(m_tid, "aa_thread");
++	}
++	else
++	{
++		SYS_LOG_INF("%s: already started", __func__);
++	}
++}
++
++int shell_aa_test_exit(void)
++{
++	quit_flag = 1;
++	return 0;
++}
++
++int shell_aa_test(const struct shell *shell, size_t argc, char **argv)
++{
++	quit_flag = 0;
++	m_tid = NULL;
++	aa_thread_init();
++	return 0;
++}
+ 
+ SHELL_STATIC_SUBCMD_SET_CREATE(sub_system,
+ 	SHELL_CMD(dumpmem, NULL, "dump mem info.", shell_dump_meminfo),
+@@ -132,6 +357,9 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_system,
+ #ifdef CONFIG_SYS_WAKELOCK
+ 	SHELL_CMD(wlock, NULL, "wlock lock[unlock] ", shell_wake_lock),
+ #endif
++	SHELL_CMD(gps_test, NULL, "wlock lock[unlock] ", shell_gps_test),
++	SHELL_CMD(mm_test, NULL, "wlock lock[unlock] ", shell_mm_test),
++	SHELL_CMD(aa_test, NULL, "wlock lock[unlock] ", shell_aa_test),
+ 	SHELL_SUBCMD_SET_END /* Array terminated. */
+ );
+ 
