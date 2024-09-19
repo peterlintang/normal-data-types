@@ -37,6 +37,10 @@ https://github.com/kyuhyong/STM32IMU.git
 https://github.com/rbv188/IMU-algorithm.git
 git@github.com:peterlintang/EKF-Attitude-Estimation.git
 
+https://blog.csdn.net/Mua111/article/details/125433510
+https://blog.csdn.net/Mua111/article/details/125459185
+https://blog.csdn.net/Mua111/article/details/125470317
+
 git@github.com:peterlintang/unarr.git
 
 git@github.com:kuba--/zip.git
