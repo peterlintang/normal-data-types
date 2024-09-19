@@ -1,0 +1,6 @@
+
+no os:
+
+rtos: (at least) 40MHZ, 64KB flash, 8KB RAM
+
+Linux: 
