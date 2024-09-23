@@ -1,0 +1,38 @@
+
+raw=importdata('tmp/mag-org-1.txt');
+%raw=importdata('sensor_data.txt');
+x_m=raw(:,1);
+y_m=raw(:,2);
+z_m=raw(:,3);
+x2 = x_m.^2;
+x2=-x2;
+x2 = x_m.^2;
+x2=-x2;
+y2=y_m.^2;
+z2=z_m.^2;
+x1=x_m;
+y1=y_m;
+z1=z_m;
+ll=size(z1);
+a1=ones(ll(1), 1);
+aa=[y2 z2 x1 y1 z1 a1];
+bb=inv(aa'*aa);
+cc=aa'*x2;
+q=bb*cc;
+ox=-q(3)/2;
+oy=-q(4)/(2*q(1));
+oz=-q(5)/(2*q(2));
+Rx=sqrt(ox*ox+q(1)*oy*oy+q(2)*oz*oz-q(6));
+Ry=sqrt((Rx*Rx)/q(1));
+Rz=sqrt((Rx*Rx)/q(2));
+x_k=1.0;
+y_k=1/(Ry/Rx);
+z_k=1/(Rz/Rx);
+x_h=(x_m-ox)*x_k;
+y_h=(y_m-oy)*y_k;
+z_h=(z_m-oz)*z_k;
+
+scatter3(x_m - ox, y_m - oy, z_m - oz, 'fill', 'MarkerFaceColor', 'red'); hold on;
+scatter3(x_h, y_h, z_h, 'fill', 'MarkerFaceColor', 'blue'); hold on;
+%plot_sphere([0,0,0]', 455);
+plot_sphere([0,0,0]', max(x_h));
