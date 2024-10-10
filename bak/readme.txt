@@ -40,6 +40,8 @@ git@github.com:peterlintang/EKF-Attitude-Estimation.git
 https://blog.csdn.net/Mua111/article/details/125433510
 https://blog.csdn.net/Mua111/article/details/125459185
 https://blog.csdn.net/Mua111/article/details/125470317
+kalman
+https://blog.csdn.net/ouok000/article/details/125578636
 
 
 
