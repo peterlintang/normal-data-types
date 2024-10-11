@@ -5,6 +5,8 @@ https://github.com/STMicroelectronics/
 https://github.com/AmbiqMicro
 a bo luo
 
+https://github.com/m3y54m/Embedded-Engineering-Roadmap
+
 qiu mian ni he
 https://github.com/amirmohammadnsh/ellipsoid-sphere-fitting-sensor-calibration-stm32.git
 
