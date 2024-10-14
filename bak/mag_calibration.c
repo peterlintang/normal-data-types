@@ -587,6 +587,16 @@ void MAG_Calculate(void)
 			B[3]=-xxy_avr ;
 			B[4]=-xxz_avr ;
 			B[5]=-xx_avr  ;
+/*
+ * /                                              \ /   \    /          \
+ * | y^2*y^2 z^2*y^2  x*y^2  y*y^2  z*y^2  1*y^2  | | a |    | -x^2*y^2  |
+ * | y^2*z^2 z^2*z^2 x*z^2 y*z^2 z*z^2 1*z^2      | | b |    | -x^2*z^2  | 
+ * | y^2*x z^2*x x*x y*x z*x 1*x                  | | c | =  | -x^2*x    |
+ * | y^2*y z^2*y x*y y*y z*y 1*y                  | | d |    | -x^2*y    |
+ * | y^2*z z^2*z x*z y*z z*z 1*z                  | | e |    | -x^2*z    |
+ * | y^2 z^2 x y z 1                              | | f |    | -x^2      |
+ * \                                              / \   /    \           /
+ */
  
 			//系数矩阵求逆
 			mat_inverse_float(&A_matrix,&A_inv_matrix);
