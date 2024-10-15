@@ -1,0 +1,126 @@
+diff --git a/bak/lineIntersectSide/lineInterSectSide.c b/bak/lineIntersectSide/lineInterSectSide.c
+index a3294e3..89a4126 100644
+--- a/bak/lineIntersectSide/lineInterSectSide.c
++++ b/bak/lineIntersectSide/lineInterSectSide.c
+@@ -94,6 +94,68 @@ double distance(struct Point *A, struct Point *B)
+ 	return d = R * c;
+ }
+ 
++static double compute_angle2(struct Point *A, struct Point *B, struct Point *C)
++{
++	double angle = 0.0f;
++
++	struct Point PA;
++	struct Point PB;
++
++	PA.x = A->x - B->x;
++	PA.y = A->y - B->y;
++
++	PB.x = A->x - C->x;
++	PB.y = A->y - C->y;
++
++	angle = acos((PA.x * PA.y + PB.x * PB.y) / (sqrt(PA.x * PA.x + PA.y * PA.y) * sqrt(PB.x * PB.x + PB.y * PB.y)));
++	printf("%.8f %.8f %.8f %.8f\n", PA.x, PA.y, PB.x, PB.y);
++
++	return angle;
++}
++
++static double compute_angle(struct Point *A, struct Point *B, struct Point *C)
++{
++	double angle1 = 0.0f;
++	double angle2 = 0.0f;
++
++	fprintf(stdout, "A: %.8f %.8f, B: %.8f %.8f, C: %.8f %.8f\n", A->x, A->y, B->x, B->y, C->x, C->y);
++	fprintf(stdout, "%.8f %.8f\n", (A->y - B->y), (A->x - B->x));
++	fprintf(stdout, "%.8f %.8f\n", (A->y - C->y), (A->x - C->x));
++	angle1 = atan2((A->y - B->y), (A->x - B->x));
++	angle2 = atan2((A->y - C->y), (A->x - C->x));
++	fprintf(stdout, "angle1: %.8f angle2: %.8f\n", angle1, angle2);
++	if (angle1 < 0.0f && angle2 < 0.0f)
++		return (fabs(angle2 - angle1));
++	else if (angle1 > 0.0f && angle2 > 0.0f)
++		return fabs((angle2 - angle1));
++	else
++		return fabs((angle2) - (angle1));
++}
++
++static int isInPolygon(struct Point *A, struct Point *points, int points_num)
++{
++	int i;
++	double total_angle = 0.0f;
++	double angle = 0.0f;
++
++	for (i = 0; i < points_num - 1; i++)
++	{
++		angle = compute_angle2(A, points + i, points + i + 1);
++		total_angle += (angle);
++		fprintf(stdout, "angle: %.8f (%.8f %.8f) (%.8f %.8f)\n", angle, 
++				points[i].x,
++				points[i].y,
++				points[i + 1].x,
++				points[i + 1].y
++				);
++	}
++
++	fprintf(stdout, "total_angle: %.8f\n", total_angle);
++
++	return 0;
++}
++
++
+ int main(int argc, char *argv[])
+ {
+ #if 0
+@@ -137,12 +199,12 @@ int main(int argc, char *argv[])
+ 		{0.0, 0.0},
+ 	};
+ #else
+-	A.x = -95.263962;
++	A.x = -95.263962;	// tex box
+ 	A.y = 38.977782;
+ 	B.x = -95.267057;
+ 	B.y = 38.978634;
+ 
+-	A.x = -95.263727;
++	A.x = -95.263727;	// tex box
+ 	A.y = 38.977727;
+ 	B.x = -95.267057;
+ 	B.y = 38.978634;
+@@ -186,6 +248,7 @@ int main(int argc, char *argv[])
+ 	};
+ #endif
+ 
++#if 0
+ 	int result = 0;
+ 	fprintf(stdout, "total num: %ld\n", sizeof(Points) / sizeof(Points[0]));
+ 	fprintf(stdout, "A: (%.8f %.8f), B: (%.8f %.8f), distance: %.8f\n", 
+@@ -205,7 +268,29 @@ int main(int argc, char *argv[])
+ 				E.x, E.y,
+ 				result ? distance(&A, &E) : 0.0);
+ 	}
++#endif
++
++	struct Point MA = { 0.0f, 5.0f };
++	struct Point MB = { 5.0f, -5.0f };
++	struct Point MC = { 5.0f, 5.0f };
++	struct Point MS[] = {
++		{ -5.0f, 5.0f },
++		{ 5.0f, 5.0f },
++		{ 5.0f, -5.0f },
++		{ -5.0f, -5.0f },
++		{ -5.0f, 5.0f }
++	};
++//	fprintf(stdout, "%.8f\n", compute_angle2(&MA, &MB, &MC));
++//	fprintf(stdout, "%.8f %.8f\n", tan(M_PI / 4.0), M_PI / 4.0);
++//	fprintf(stdout, "%.8f %.8f\n", atan(1.0), M_PI / 4.0);
++
++//	fprintf(stdout, "MA: %.8f %.8f PI/2: %.8f, %.8f\n", MA.x, MA.y, M_PI / 2.0, atan2(5.0f, -5.0f));
++//	isInPolygon(&MA, MS, sizeof(MS) / sizeof(MS[0]));
++	isInPolygon(&B, Points, sizeof(Points) / sizeof(Points[0]));
+ 
++//	fprintf(stdout, "%.8f %.8f %.8f %.8f\n", atan2(5.0f, -5.0f), atan2(5.0f, 5.0f), atan2(-5.0f, 5.0f), atan2(-5.0f, -5.0f));
++//	fprintf(stdout, "%.8f %.8f %.8f %.8f\n", atan2(0.0f, -5.0f), atan2(0.0f, 5.0f), atan2(-5.0f, 0.0f), atan2(5.0f, 0.0f));
++//	fprintf(stdout, "test: %.8f\n", atan2(3.0f, 0.0f));
+ 	return 0;
+ #endif
+ }
