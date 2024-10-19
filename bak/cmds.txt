@@ -14,6 +14,10 @@ smartctrl -a /dev/sda
 测试硬盘读写
 hdparm -Tt /dev/sda
 
+测试系统cpu性能
+sysbench
+sysbench cpu --cpu-max-prime=20000 run
+
 ar
 strings
 strip
