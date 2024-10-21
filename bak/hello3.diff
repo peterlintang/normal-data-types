@@ -1,0 +1,2122 @@
+diff --git a/software/.west/config b/software/.west/config
+index 9f439fe..fd358f2 100755
+--- a/software/.west/config
++++ b/software/.west/config
+@@ -1,4 +1,7 @@
+-[manifest]
+-path = zephyr
+-file = west.yml
+-
++[manifest]
++path = zephyr
++file = west.yml
++
++[zephyr]
++base = zephyr
++
+diff --git a/software/application/bt_watch_call/nvram.prop b/software/application/bt_watch_call/nvram.prop
+index 40d7e2d..a38ceaf 100755
+--- a/software/application/bt_watch_call/nvram.prop
++++ b/software/application/bt_watch_call/nvram.prop
+@@ -15,7 +15,7 @@ AUTO_POWERDOWN=true
+ MAX_SILIENT_TIME=300000
+ 
+ # low power
+-LOWPOWER_LEVEL=3700000
++LOWPOWER_LEVEL=3400000
+ NOPOWER_LEVEL=3300000
+ 
+ # bluetooth
+diff --git a/software/application/bt_watch_call/src/gps/uart2_to_gps.c b/software/application/bt_watch_call/src/gps/uart2_to_gps.c
+index 28139d1..c45ac3e 100755
+--- a/software/application/bt_watch_call/src/gps/uart2_to_gps.c
++++ b/software/application/bt_watch_call/src/gps/uart2_to_gps.c
+@@ -560,6 +560,40 @@ static int cmp(const void *arg1, const void *arg2)
+                 return 0;
+ }
+ 
++int GPS_GSA_Parse(unsigned char *line, GPS_INFO *GPS)
++{
++        unsigned char *p = NULL;
++        unsigned char *start = NULL;
++
++        printf("line: %s\n", line);
++
++        if (strncmp(line + 3, "GSA", 3) != 0)
++        {
++                return -1;
++        }
++
++        start = strchr(line, ',');
++        if (start == NULL)
++                return -1;
++
++        start += 1;
++        p = strchr(start, ',');
++        if (p == NULL)
++                return -1;
++
++        start = p + 1;
++        p = strchr(start, ',');
++        if (p == NULL)
++                return -1;
++
++//      printf("p: %s\n", p);
++//      printf("start: %s\n", start);
++        printf("fixed value: %d\n", (int)strtod(start, NULL));
++	GPS->gps_fixed = (int)strtod(start, NULL);
++        return 0;
++}
++
++
+ int GPS_GSV_Parse(unsigned char *line, GPS_INFO *GPS)
+ {
+ 	static char GPS_snr[256] = { 0 };
+@@ -787,6 +821,13 @@ out:
+ 	
+ 	snr_cur = 0;
+ 	id_cur = 0;
++	sn_count = sn_count > 16 ? 16 : sn_count;
++
++	snr_ret = snprintf(my_gps_sn + snr_cur, 256 - snr_cur, "%s", "   ");
++	id_ret = snprintf(my_gps_id + id_cur, 256 - id_cur, "%s", "   ");
++	snr_cur += snr_ret;
++	id_cur += id_ret;
++
+ 	for (i = 0; i < sn_count; i++)
+ 	{
+ //		printf("i: %d, sn: %d, id: %d\n", i, sp[i].sn, sp[i].id);
+@@ -801,6 +842,14 @@ out:
+ 		else
+ 			id_ret = snprintf(my_gps_id + id_cur, 256 - id_cur, "%d,", sp[i].id);
+ 		id_cur += id_ret;
++
++		if ((i + 1) % 6 == 0)
++		{
++			snr_ret = snprintf(my_gps_sn + snr_cur, 256 - snr_cur, "%c%s", '\n', "   ");
++			id_ret = snprintf(my_gps_id + id_cur, 256 - id_cur, "%c%s", '\n', "   ");
++			snr_cur += snr_ret;
++			id_cur += id_ret;
++		}
+ 	}
+ //	printf("snr: %s\n", my_gps_sn );
+ //	printf("id: %s\n", my_gps_id );
+@@ -897,6 +946,7 @@ void gps_enable(void *p1,void *p2,void *p3)
+ 			}
+ 			GPS_GSV_Parse(p_char, &GPS);
+ 			GPS_GNRMC_Parse(p_char, &GPS);
++			GPS_GSA_Parse(p_char, &GPS);
+ 
+ 		}
+ 
+diff --git a/software/application/bt_watch_call/src/gps/uart2_to_gps.h b/software/application/bt_watch_call/src/gps/uart2_to_gps.h
+index a5460ca..7e30242 100644
+--- a/software/application/bt_watch_call/src/gps/uart2_to_gps.h
++++ b/software/application/bt_watch_call/src/gps/uart2_to_gps.h
+@@ -20,6 +20,7 @@ typedef struct data
+     //int satellite;//卫星数量
+     unsigned char NS;
+     unsigned char EW;
++    int gps_fixed;
+     int numSat;
+     unsigned char snr[64 * 2 * 2];
+     unsigned char id[64 * 2 * 2];
+diff --git a/software/application/bt_watch_call/src/launcher/other/golf_config.c b/software/application/bt_watch_call/src/launcher/other/golf_config.c
+index 07c20e6..51b9dc6 100644
+--- a/software/application/bt_watch_call/src/launcher/other/golf_config.c
++++ b/software/application/bt_watch_call/src/launcher/other/golf_config.c
+@@ -46,7 +46,7 @@ int golf_config_get(GOLF_DATA_T *config)
+ 	struct fs_file_t zfp;
+ 	memset(&zfp, 0, sizeof(zfp));
+ 
+-//	if (fs_open(&zfp, GOLF_CONFIG_FILE, FA_READ))
++	if (fs_open(&zfp, GOLF_CONFIG_FILE, FA_READ))
+ 	{
+ #if 0
+ 		GOLF_CONFIG golf = {//.bt_flag = 1,
+@@ -94,7 +94,7 @@ int golf_config_get(GOLF_DATA_T *config)
+ 			.lcd_backlight_value = 120,
+ 
+ 					  };
+-//		if (golf_config_set(&Golf_Info) != 0)
++		if (golf_config_set(&Golf_Info) != 0)
+ 		{
+ 			printf("config %s not exist, set default config failed\n", GOLF_CONFIG_FILE);
+ 		}
+diff --git a/software/application/bt_watch_call/src/launcher/test/CMakeLists.txt b/software/application/bt_watch_call/src/launcher/test/CMakeLists.txt
+index 3955038..4796037 100644
+--- a/software/application/bt_watch_call/src/launcher/test/CMakeLists.txt
++++ b/software/application/bt_watch_call/src/launcher/test/CMakeLists.txt
+@@ -13,9 +13,9 @@ target_sources(app PRIVATE
+ 	sensor_test_view.c
+ 	pre_test_view.c
+ 	spl06001.c
+-	#	SPA06_003.c
++	#SPA06_003.c
+ 	lsm6dsv16x_read_data_polling.c
+-	#	lsm6dsv16x_reg.c
++	#lsm6dsv16x_reg.c
+ 	#lps22df_reg.c
+ 	#lps22df_read_data_polling.c
+ 	mag_calibration.c
+diff --git a/software/application/bt_watch_call/src/launcher/test/gps_bt_test_view.c b/software/application/bt_watch_call/src/launcher/test/gps_bt_test_view.c
+index 3f017eb..94db9bf 100644
+--- a/software/application/bt_watch_call/src/launcher/test/gps_bt_test_view.c
++++ b/software/application/bt_watch_call/src/launcher/test/gps_bt_test_view.c
+@@ -479,12 +479,38 @@ static void timer_ing_update(lv_timer_t *timer)
+ 
+ }
+ */
+-	snprintf(text, 680, "%c:%.8f\n%c:%.8f\ntime: %d\nC/No:%s\nid:%s",GPS.NS, GPS.latitude, GPS.EW, GPS.longitude, gps_hot_duration_time, /*GPS.numSat,*/ GPS.snr, GPS.id);
+-	SYS_LOG_INF("%.8f, %.8f, %.8f \n%s\n",GPS.latitude, GPS.longitude, GPS.height, text);
++
++//	snprintf(text, 680, "   %c:%.8f\n   %c:%.8f\n   time: %d %s\n   C/No:\n%s\n   id:\n%s",
++//			GPS.NS, GPS.latitude, GPS.EW, GPS.longitude, gps_hot_duration_time, GPS.gps_fixed == 3 ? " 3D fixed" : " 3D not fixed", /*GPS.numSat,*/ GPS.snr, GPS.id);
++
++if (GPS.gps_fixed == 3)
++{
++	snprintf(text, 680, "   %c:%.8f\n   %c:%.8f\n   time: %d %s\n   C/No:\n%s\n   id:\n%s",
++			GPS.NS == '\0' ? ' ' : GPS.NS, GPS.latitude, 
++			GPS.EW == '\0' ? ' ' : GPS.EW, GPS.longitude, 
++			gps_hot_duration_time, 
++			GPS.gps_fixed == 3 ? " 3D fixed" : " 3D not fixed", /*GPS.numSat,*/ 
++			GPS.snr == '\0' ? ' ' : GPS.snr, 
++			GPS.id == '\0' ? ' ' : GPS.id);
++}
++else
++{
++	snprintf(text, 680, "   \n\n   time: %d %s\n   C/No:\n%s\n   id:\n%s",
++			gps_hot_duration_time, 
++			GPS.gps_fixed == 3 ? " 3D fixed" : " 3D not fixed",
++			GPS.snr == '\0' ? " " : GPS.snr, 
++			GPS.id == '\0' ? " " : GPS.id);
++}
++	SYS_LOG_INF("hello world:::%.8f, %.8f, %.8f \n%s\n",GPS.latitude, GPS.longitude, GPS.height, text);
++	SYS_LOG_INF("hello world:::time : %d, %s, snr: %s, id: %s\n", gps_hot_duration_time, GPS.gps_fixed == 3 ? " 3D fixed" : " 3D not fixed", GPS.snr, GPS.id);
+ 
+ //	snprintf(text, 680, "%c:%.8f\n%c:%.8f\ntime: %d\nC/No:%s\nid:%s",GPS.NS, GPS.latitude, GPS.EW, GPS.longitude, gps_hot_duration_time, /*GPS.numSat,*/ snr_text, id_text);
+ //	SYS_LOG_INF("%.8f, %.8f, %.8f \n%s\n",GPS.latitude, GPS.longitude, GPS.height, text);
+ 
++	/*
++	snprintf(text, 680, " %c:%.8f\n %c:%.8f\n time: %d\n C/No:\n%s\n id:\n%s", 'N', 22.2345890, 'E', 123.3232290, 30, 
++		 " 48, 47, 46, 45, 43, 42,\n 41, 40, 40, 40, 40, 39,\n 39, 39, 38, 38, 37, 37,", " 72, 32, 31, 23, 13, 12,\n 11, 21, 22, 32, 33, 34,\n 20, 21 22, 23, 24, 25");
++	*/
+ 	lv_label_set_text(data->label_gps_data, text);
+ 
+ }
+@@ -525,13 +551,17 @@ static int gps_bt_test_view_create(view_data_t *view_data)
+ 
+ 
+ 	lv_obj_t *label_gps_switch = lv_label_create(data->obj);
+-	lv_label_set_text(label_gps_switch, data->res_txts[0].txt);
++//	lv_label_set_text(label_gps_switch, data->res_txts[0].txt);
++	lv_label_set_text(label_gps_switch, "   GPS switch");
+ 	lv_obj_add_style(label_gps_switch, &data->style_txts[0], LV_PART_MAIN);
++	lv_obj_set_style_text_align(label_gps_switch, LV_TEXT_ALIGN_LEFT, 0);
+ //	lv_obj_set_width(label_gps_switch,300);
+ 
+ lv_obj_t *label_gps_hot_switch = lv_label_create(data->obj);
+-lv_label_set_text(label_gps_hot_switch, data->res_txts[2].txt);
++//lv_label_set_text(label_gps_hot_switch, data->res_txts[2].txt);
++lv_label_set_text(label_gps_hot_switch, "   GPS hot switch");
+ lv_obj_add_style(label_gps_hot_switch, &data->style_txts[2], LV_PART_MAIN);
++lv_obj_set_style_text_align(label_gps_hot_switch, LV_TEXT_ALIGN_LEFT, 0);
+ 
+ 
+ //	lv_obj_t *obj_main_btn_2line = lv_obj_create(data->obj);
+@@ -550,6 +580,7 @@ lv_obj_add_style(label_gps_hot_switch, &data->style_txts[2], LV_PART_MAIN);
+ 	data->label_gps_data = lv_label_create(data->obj);
+ 	lv_label_set_text(data->label_gps_data, data->res_txts[1].txt);
+ 	lv_obj_add_style(data->label_gps_data, &data->style_txts[1], LV_PART_MAIN);
++//	lv_obj_set_style_text_align(data->label_gps_data, LV_TEXT_ALIGN_CENTER, 0);
+ 	lv_obj_set_style_text_align(data->label_gps_data, LV_TEXT_ALIGN_LEFT, 0);
+ 
+ 	data->timer = lv_timer_create(timer_ing_update, 1000, view_data);
+@@ -577,6 +608,9 @@ lv_obj_add_style(label_gps_hot_switch, &data->style_txts[2], LV_PART_MAIN);
+ 	lv_obj_add_flag(data->obj_swtich_gps_hot, LV_OBJ_FLAG_CLICKABLE);
+ 	lv_obj_add_event_cb(data->obj_swtich_gps_hot, open_gps_hot_switch_btn_event_handler, LV_EVENT_SHORT_CLICKED, NULL);
+ #endif
++	gps_close();
++	gps_state = GPS_OFF;
++	open_gps_switch_btn_event_handler(NULL);
+ 	
+ 	return 0;
+ }
+diff --git a/software/application/bt_watch_call/src/launcher/test/lcd_test_view.c b/software/application/bt_watch_call/src/launcher/test/lcd_test_view.c
+index 993f0b6..f9a41e2 100644
+--- a/software/application/bt_watch_call/src/launcher/test/lcd_test_view.c
++++ b/software/application/bt_watch_call/src/launcher/test/lcd_test_view.c
+@@ -126,6 +126,8 @@ static int _lcd_test_view_delete(view_data_t *view_data)
+ 		lv_timer_del(timer);
+ 		timer = NULL;
+ 	}
++	lv_obj_del(canvas);
++	canvas = NULL;
+ 	lvgl_res_unload_scene_compact(SCENE_LCD_TEST_VIEW);
+ 	return 0;
+ }
+diff --git a/software/application/bt_watch_call/src/launcher/test/lsm6dsv16x_read_data_polling.c b/software/application/bt_watch_call/src/launcher/test/lsm6dsv16x_read_data_polling.c
+index 734ce0c..2638d00 100644
+--- a/software/application/bt_watch_call/src/launcher/test/lsm6dsv16x_read_data_polling.c
++++ b/software/application/bt_watch_call/src/launcher/test/lsm6dsv16x_read_data_polling.c
+@@ -161,8 +161,8 @@ void lsm6dsv16x_init(void)
+    * Selected data rate have to be equal or greater with respect
+    * with MLC data rate.
+    */
+-  lsm6dsv16x_xl_data_rate_set(&dev_ctx, LSM6DSV16X_ODR_AT_7Hz5);
+-  lsm6dsv16x_gy_data_rate_set(&dev_ctx, LSM6DSV16X_ODR_AT_15Hz);
++  lsm6dsv16x_xl_data_rate_set(&dev_ctx, LSM6DSV16X_ODR_AT_480Hz);
++  lsm6dsv16x_gy_data_rate_set(&dev_ctx, LSM6DSV16X_ODR_AT_480Hz);
+   /* Set full scale */
+   lsm6dsv16x_xl_full_scale_set(&dev_ctx, LSM6DSV16X_2g);
+   lsm6dsv16x_gy_full_scale_set(&dev_ctx, LSM6DSV16X_2000dps);
+@@ -204,10 +204,12 @@ void lsm6dsv16x_read_data_polling(float *acc_mg, float *ang_mdps)
+       acc_mg[1] = acceleration_mg[1];
+       acc_mg[2] = acceleration_mg[2];
+ 
++      /*
+       sprintf((char *)tx_buffer,
+               "Acceleration [mg]:%4.2f\t%4.2f\t%4.2f\r\n",
+               acceleration_mg[0], acceleration_mg[1], acceleration_mg[2]);
+       tx_com(tx_buffer, strlen((char const *)tx_buffer));
++      */
+     }
+ 
+     /* Read output only if new xl value is available */
+@@ -226,10 +228,12 @@ void lsm6dsv16x_read_data_polling(float *acc_mg, float *ang_mdps)
+ 	ang_mdps[1] = angular_rate_mdps[1];
+ 	ang_mdps[2] = angular_rate_mdps[2];
+ 
++	/*
+       sprintf((char *)tx_buffer,
+               "Angular rate [mdps]:%4.2f\t%4.2f\t%4.2f\r\n",
+               angular_rate_mdps[0], angular_rate_mdps[1], angular_rate_mdps[2]);
+       tx_com(tx_buffer, strlen((char const *)tx_buffer));
++      */
+     }
+ 
+     if (drdy.drdy_temp) {
+@@ -238,9 +242,11 @@ void lsm6dsv16x_read_data_polling(float *acc_mg, float *ang_mdps)
+       lsm6dsv16x_temperature_raw_get(&dev_ctx, &data_raw_temperature);
+       temperature_degC = lsm6dsv16x_from_lsb_to_celsius(
+                            data_raw_temperature);
++      /*
+       sprintf((char *)tx_buffer,
+               "Temperature [degC]:%6.2f\r\n", temperature_degC);
+       tx_com(tx_buffer, strlen((char const *)tx_buffer));
++      */
+     }
+   }
+ }
+diff --git a/software/application/bt_watch_call/src/launcher/test/mag_calibration.c-bak b/software/application/bt_watch_call/src/launcher/test/mag_calibration.c-bak
+deleted file mode 100644
+index 6ca3cc2..0000000
+--- a/software/application/bt_watch_call/src/launcher/test/mag_calibration.c-bak
++++ /dev/null
+@@ -1,515 +0,0 @@
+-/****************************包含头文件******************************/
+-
+-#include "mag_calibration.h"
+-/************************宏定义**********************************/
+-#define PI                             (3.14159265358979f)
+-#define CALIBRATION_SUCCESS            (1) //校准成功
+-#define CALIBRATION_FAILURE            (0) //校准失败
+-#define UNDER_CALIBRATION              (2) //正在校准
+-/**************************函数声明********************************/
+-
+-float mag_senser_data_buff[MAG_DATA_SAVE_MAX_VALUE][3]={0};
+-float get_PP (float *dMod, int size, int count);
+-float get_PP_InWindow(int size, int count);
+-void Algo_Update_Mag(float MagX, float MagY, float MagZ);
+-void MAG_Calculate(void);
+-float calculateMagnitude(float x, float y, float z);
+-void get_calibration_parameter(float *para);
+-void axis_interchange(float *data);
+-uint8_t calibration_init = 0;
+-uint8_t instantly_calculate_flg = 0;
+-/****************************变量定义******************************/
+-
+-float mx_offset,my_offset,mz_offset,mx_k,my_k,mz_k,mx_k_ratio,my_k_ratio,mz_k_ratio;
+-float mx=0.0f,my=0.0f,mz=0.0f;
+-char Mag_Clf=0;
+-uint8_t calibration_result = UNDER_CALIBRATION;  
+-
+-static float	RAW_X[MAG_RAW_BUF_LEN]	= {0};
+-static float	RAW_Y[MAG_RAW_BUF_LEN]	= {0};
+-static float	RAW_Z[MAG_RAW_BUF_LEN]	= {0};
+-
+-typedef enum 
+-{
+-   free=0,
+-   start_calculate,
+-   calc_offset_k_value,
+-   get_result,
+-   stop_calculate
+-}work_step_enum;
+-
+-/******************************函数体*************************************/
+-
+-float get_PP (float *dMod, int size, int count)
+-{
+-    int i;
+-    float max, min;
+-    max = min = dMod[size - count];
+-    for (i = 0; i < count; i++)
+-    {
+-        max = (dMod[size - count + i] > max) ? dMod[size - count + i] : max;
+-        min = (dMod[size - count + i] < min) ? dMod[size - count + i] : min;
+-    }
+-    return (max - min);
+-}
+-
+-float get_PP_InWindow(int size, int count)
+-{
+-    float PPV_X, PPV_Y, PPV_Z, PPV_InWindow;
+-    PPV_X = get_PP (RAW_X, size, count);
+-    PPV_Y = get_PP (RAW_Y, size, count);
+-    PPV_Z = get_PP (RAW_Z, size, count);
+-    PPV_InWindow = (PPV_X >= PPV_Y ? PPV_X >= PPV_Z ? PPV_X : PPV_Z : PPV_Y >= PPV_Z ? PPV_Y : PPV_Z);
+-    return PPV_InWindow;
+-}
+-
+-void Algo_Update_Mag(float MagX, float MagY, float MagZ)
+-{
+-    int i	= 0;
+-    for(i = 0; i < MAG_RAW_BUF_LEN - 1; i++)
+-    {
+-        RAW_X[i] = RAW_X[i + 1];
+-        RAW_Y[i] = RAW_Y[i + 1];
+-        RAW_Z[i] = RAW_Z[i + 1];
+-    }
+-    RAW_X[MAG_RAW_BUF_LEN - 1] = MagX;
+-    RAW_Y[MAG_RAW_BUF_LEN - 1] = MagY;
+-    RAW_Z[MAG_RAW_BUF_LEN - 1] = MagZ;
+-}
+-
+-//模值计算
+-float calculateMagnitude(float x, float y, float z) 
+-  {
+-      float magnitude;
+-      magnitude = sqrt(x*x + y*y + z*z);
+-      return magnitude;
+-  }
+-  
+-void mag_calibration_init(void)
+-{
+-   calibration_init = 1;
+-}
+-void mag_res_instantly_calculate(void)
+-{
+-  instantly_calculate_flg = 1;
+-}
+-uint8_t mag_calculate(float *mag_data)
+-{
+-  static work_step_enum task_step = free;
+-  static uint16_t  mag_senser_save_cnt = 0;
+-  float max_value = FLOAT_MIN; // 初始化最大值为float的最小值
+-  float min_value = FLOAT_MAX; // 初始化最小值为float的最大值
+-  float norm = 0.0;    //存储模值
+-  float mag_cal[3] = {0}; 
+-#if XY_AXIS_INTERCHANGE
+-    axis_interchange(mag_data);
+-#endif 
+-  if(calibration_init)  //进行了初始化，跳转到初始化任务
+-  {
+-    Mag_Clf = 0;   
+-    mx = mag_data[0];
+-    my = mag_data[1];
+-    mz = mag_data[2];    
+-    MAG_Calculate();
+-    task_step = free;
+-    for(uint8_t i = 0; i < MAG_RAW_BUF_LEN; i++)
+-    {
+-        RAW_X[i] = mag_data[0];
+-        RAW_Y[i] = mag_data[1];
+-        RAW_Z[i] = mag_data[2];
+-    }
+-  }
+-  if(instantly_calculate_flg)  //如果需要立即计算，跳转到计算步骤
+-  {
+-    if(calibration_result == UNDER_CALIBRATION) //校准中
+-    {
+-      task_step = calc_offset_k_value;
+-    }
+-    instantly_calculate_flg  = 0;   
+-  }  
+-  Algo_Update_Mag(mag_data[0],mag_data[1],mag_data[2]); 
+-  switch (task_step)
+-  {
+-    case free:   //空闲状态进行判断
+-      calibration_result = UNDER_CALIBRATION;
+-//	  norm = calculateMagnitude(mag_data[0],mag_data[1],mag_data[2]);  //三轴磁力计模值计算
+-//	  BEBUG_LOG("free norm=%f\r\n",norm);
+-	  BEBUG_LOG("free PP=%f\r\n",get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN));
+-      if (get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN) > THRESH_START_VALUES)  //启动计算（1、阈值大于50）
+-      {
+-        task_step = start_calculate;
+-        mag_senser_save_cnt = 0;
+-        Mag_Clf = 0;   //进行数据存储
+-        BEBUG_LOG("start calc\r\n");
+-      }
+-    break;
+-    
+-    case start_calculate:  //满足条件开始计算 
+-//      norm = calculateMagnitude(mag_data[0],mag_data[1],mag_data[2]);  //三轴磁力计模值计算
+-//	  BEBUG_LOG("start norm=%f\r\n",norm); 
+-      BEBUG_LOG("start PP=%f\r\n",get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN));   
+-      if(get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN) < THRESH_STOP_VALUES) //停止计算(1、阈值小于5；2、采集数据大于500条)
+-      {
+-        task_step = calc_offset_k_value;
+-        BEBUG_LOG("stop calc-pp\r\n");
+-      }
+-      if(mag_senser_save_cnt == MAG_DATA_SAVE_MAX_VALUE)  //如果超过500条也进行计算
+-      {
+-        task_step = calc_offset_k_value;
+-        BEBUG_LOG("stop calc-cnt\r\n");
+-      }
+-      if(mag_senser_save_cnt<MAG_DATA_SAVE_MAX_VALUE)
+-      {
+-        mag_senser_data_buff[mag_senser_save_cnt][0] = mag_data[0];
+-        mag_senser_data_buff[mag_senser_save_cnt][1] = mag_data[1];
+-        mag_senser_data_buff[mag_senser_save_cnt][2] = mag_data[2];
+-        mag_senser_save_cnt++;
+-      }
+-      mx = mag_data[0];
+-      my = mag_data[1];
+-      mz = mag_data[2];    
+-      MAG_Calculate();
+-    BEBUG_LOG("stop=%3.4f %3.4f %3.4f %3.4f\r\n",mx, my, mz,get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN));          
+-    break;
+-    case calc_offset_k_value:
+-      Mag_Clf = 1;
+-      MAG_Calculate(); 
+-      task_step = get_result;    
+-    break;
+-      
+-    case get_result: //满足条件开始计算  
+-      for (uint16_t i = 0; i < mag_senser_save_cnt; i++) 
+-      {
+-        mag_cal[0] = (mag_senser_data_buff[i][0]-mx_offset)*mx_k_ratio;
+-        mag_cal[1] = (mag_senser_data_buff[i][1]-my_offset)*my_k_ratio;
+-        mag_cal[2] = (mag_senser_data_buff[i][2]-mz_offset)*mz_k_ratio;        
+-        norm = calculateMagnitude(mag_cal[0],mag_cal[1],mag_cal[2]);  //三轴磁力计模值计算      
+-        if (norm > max_value) 
+-        {
+-          max_value = norm;
+-        }
+-        if (norm < min_value) 
+-        {
+-          min_value = norm;
+-        }        
+- //        HAL_Delay(20);        
+-         BEBUG_LOG("norm=%f,%f,%f\r\n",norm,max_value,min_value);
+-//         HAL_Delay(20);
+-     }
+-      mag_senser_save_cnt =0;
+-      if((max_value-min_value)>THRESH_CALC_SUCCESSFUL_VALUES)
+-      { 
+-        calibration_result = CALIBRATION_FAILURE;
+-        task_step = stop_calculate;       
+-        BEBUG_LOG("Magnetometer calibration failed\r\n");
+-        BEBUG_LOG("Peak-valley value = %f\r\n",max_value-min_value);
+-        return calibration_result;
+-      }
+-      else
+-      {
+-        calibration_result = CALIBRATION_SUCCESS;
+-        task_step = stop_calculate;       
+-        BEBUG_LOG("Magnetometer calibration successful\r\n");
+-        BEBUG_LOG("Peak-valley value = %f\r\n",max_value-min_value);
+-        return calibration_result;
+-      }
+-      
+-    break;  
+-    
+-    case stop_calculate:
+-    break;
+-    
+-    default:
+-    break;
+-  }
+-  return calibration_result;   
+-}
+-
+-void axis_interchange(float *data)
+-{
+-  float mag_x,mag_y,mag_z;
+-  mag_x = data[0];
+-  mag_y = data[1];
+-  mag_z = data[2];
+-  data[0] = mag_y * -1.0f; 
+-  data[1] = mag_x * -1.0f; 
+-  data[2] = mag_z * -1.0f; ;
+-}
+-
+-
+-void get_calibration_parameter(float *param)
+-{
+-  if(calibration_result == CALIBRATION_SUCCESS)
+-  {
+-    param[0] = mx_offset;
+-    param[1] = my_offset;
+-    param[2] = mz_offset;
+-    param[3] = mx_k_ratio;
+-    param[4] = my_k_ratio;
+-    param[5] = mz_k_ratio;
+-  }
+-  else
+-  {
+-    param[0] = 0.0f;
+-    param[1] = 0.0f;
+-    param[2] = 0.0f;
+-    param[3] = 0.0f;
+-    param[4] = 0.0f;
+-    param[5] = 0.0f;
+-  }
+-
+-}
+-
+-void MAG_Calculate(void)
+-{
+-    static float n=0.0f;
+-	//椭球校准
+-	static float  
+-	//一次项
+-	x_sum=0.0f,			  
+-	y_sum=0.0f,			  
+-	z_sum=0.0f,			  
+-	//二次项			  	 
+-	xx_sum=0.0f,				  	 
+-	yy_sum=0.0f,				  	 					  
+-	zz_sum=0.0f,				       
+-	xy_sum=0.0f,   			       
+-	xz_sum=0.0f,   			      
+-	yz_sum=0.0f,   			  
+-	//三次项  			  
+-	xxx_sum=0.0f,			  
+-	xxy_sum=0.0f,			  
+-	xxz_sum=0.0f,			  
+-	xyy_sum=0.0f, 			  
+-	xzz_sum=0.0f, 			  			  
+-	yyy_sum=0.0f,				  
+-	yyz_sum=0.0f,				                           
+-	yzz_sum=0.0f,	 			                           
+-	zzz_sum=0.0f,	 			  
+-	//四次项				  	
+-	yyyy_sum=0.0f,			  	
+-	zzzz_sum=0.0f,			  	
+-	xxyy_sum=0.0f,			  	
+-	xxzz_sum=0.0f,			  
+-	yyzz_sum=0.0f;
+- 
+-	static float  
+-	//一次项
+-	x_avr=0.0f,			  
+-	y_avr=0.0f,			  
+-	z_avr=0.0f,			  
+-	//二次项			  	 
+-	xx_avr=0.0f,				  	 
+-	yy_avr=0.0f,				  	 					  
+-	zz_avr=0.0f,				       
+-	xy_avr=0.0f,   			       
+-	xz_avr=0.0f,   			      
+-	yz_avr=0.0f,   			  
+-	//三次项  			  
+-	xxx_avr=0.0f,			  
+-	xxy_avr=0.0f,			  
+-	xxz_avr=0.0f,			  
+-	xyy_avr=0.0f, 			  
+-	xzz_avr=0.0f, 			  			  
+-	yyy_avr=0.0f,				  
+-	yyz_avr=0.0f,				                           
+-	yzz_avr=0.0f,	 			                           
+-	zzz_avr=0.0f,	 			  
+-	//四次项				  	
+-	yyyy_avr=0.0f,			  	
+-	zzzz_avr=0.0f,			  	
+-	xxyy_avr=0.0f,			  	
+-	xxzz_avr=0.0f,			  
+-	yyzz_avr=0.0f;
+-  if(calibration_init)
+-  {
+-    calibration_init = 0;
+-    n=0.0f;
+-    //椭球校准
+-    //一次项
+-    x_sum=0.0f,			  
+-    y_sum=0.0f,			  
+-    z_sum=0.0f,			  
+-    //二次项			  	 
+-    xx_sum=0.0f,				  	 
+-    yy_sum=0.0f,				  	 					  
+-    zz_sum=0.0f,				       
+-    xy_sum=0.0f,   			       
+-    xz_sum=0.0f,   			      
+-    yz_sum=0.0f,   			  
+-    //三次项  			  
+-    xxx_sum=0.0f,			  
+-    xxy_sum=0.0f,			  
+-    xxz_sum=0.0f,			  
+-    xyy_sum=0.0f, 			  
+-    xzz_sum=0.0f, 			  			  
+-    yyy_sum=0.0f,				  
+-    yyz_sum=0.0f,				                           
+-    yzz_sum=0.0f,	 			                           
+-    zzz_sum=0.0f,	 			  
+-    //四次项				  	
+-    yyyy_sum=0.0f,			  	
+-    zzzz_sum=0.0f,			  	
+-    xxyy_sum=0.0f,			  	
+-    xxzz_sum=0.0f,			  
+-    yyzz_sum=0.0f;
+-  
+-    //一次项
+-    x_avr=0.0f,			  
+-    y_avr=0.0f,			  
+-    z_avr=0.0f,			  
+-    //二次项			  	 
+-    xx_avr=0.0f,				  	 
+-    yy_avr=0.0f,				  	 					  
+-    zz_avr=0.0f,				       
+-    xy_avr=0.0f,   			       
+-    xz_avr=0.0f,   			      
+-    yz_avr=0.0f,   			  
+-    //三次项  			  
+-    xxx_avr=0.0f,			  
+-    xxy_avr=0.0f,			  
+-    xxz_avr=0.0f,			  
+-    xyy_avr=0.0f, 			  
+-    xzz_avr=0.0f, 			  			  
+-    yyy_avr=0.0f,				  
+-    yyz_avr=0.0f,				                           
+-    yzz_avr=0.0f,	 			                           
+-    zzz_avr=0.0f,	 			  
+-    //四次项				  	
+-    yyyy_avr=0.0f,			  	
+-    zzzz_avr=0.0f,			  	
+-    xxyy_avr=0.0f,			  	
+-    xxzz_avr=0.0f,			  
+-    yyzz_avr=0.0f;
+-  }
+-
+-	//矩阵定义
+-	static float                   A[36]   ,      A_inv [36];  //系数矩阵
+-	static matrix_instance_f32 A_matrix,      A_inv_matrix;	
+-	static float                   B[6];                       //非齐次项
+-	static matrix_instance_f32 B_matrix;
+-	static float                   Par[6];                     //需要拟合的参数
+-	static matrix_instance_f32 Par_matrix;
+-	
+-	switch(Mag_Clf)
+-	{
+-		case 0:
+-		{
+-			x_sum   =x_sum   +(mx); 
+-			y_sum   =y_sum   +(my); 
+-			z_sum   =z_sum   +(mz); 
+-			xx_sum  =xx_sum  +(mx*mx); 	   
+-			yy_sum  =yy_sum  +(my*my); 
+-			zz_sum  =zz_sum  +(mz*mz); 
+-			xy_sum  =xy_sum  +(mx*my); 
+-			xz_sum  =xz_sum  +(mx*mz); 
+-			yz_sum  =yz_sum  +(my*mz); 
+-			xxx_sum =xxx_sum +(mx*mx*mx); 					
+-			xxy_sum =xxy_sum +(mx*mx*my); 				
+-			xxz_sum =xxz_sum +(mx*mx*mz); 				
+-			xyy_sum =xyy_sum +(mx*my*my); 
+-			xzz_sum =xzz_sum +(mx*mz*mz); 
+-			yyy_sum =yyy_sum +(my*my*my);
+-			yyz_sum =yyz_sum +(my*my*mz);
+-			yzz_sum =yzz_sum +(my*mz*mz);
+-			zzz_sum =zzz_sum +(mz*mz*mz);
+-			yyyy_sum=yyyy_sum+(my*my*my*my);
+-			zzzz_sum=zzzz_sum+(mz*mz*mz*mz);
+-			xxyy_sum=xxyy_sum+(mx*mx*my*my);		   
+-			xxzz_sum=xxzz_sum+(mx*mx*mz*mz);		   
+-			yyzz_sum=yyzz_sum+(my*my*mz*mz);		   
+-			n=n+1.0f;
+-			break;
+-		}
+-		case 1://各次累加和统计
+-		{
+-			//矩阵初始化	
+-			A_matrix.numRows=6;   A_inv_matrix.numRows=6;     B_matrix.numRows=6;   Par_matrix.numRows=6;
+-			A_matrix.numCols=6;   A_inv_matrix.numCols=6;     B_matrix.numCols=1;   Par_matrix.numCols=1;
+-			A_matrix.pData  =A;   A_inv_matrix.pData  =A_inv; B_matrix.pData  =B;   Par_matrix.pData  =Par;
+-		
+-			//各次均值统计
+-			x_avr   =x_sum/n; 
+-			y_avr   =y_sum/n; 
+-			z_avr   =z_sum/n; 
+-			xx_avr  =xx_sum/n; 
+-			yy_avr  =yy_sum/n; 			
+-			zz_avr  =zz_sum/n; 			
+-			xy_avr  =xy_sum/n; 			
+-			xz_avr  =xz_sum/n; 			
+-			yz_avr  =yz_sum/n; 					
+-			xxx_avr =xxx_sum/n; 		
+-			xxy_avr =xxy_sum/n; 
+-			xxz_avr =xxz_sum/n; 
+-			xyy_avr =xyy_sum/n; 
+-			xzz_avr =xzz_sum/n; 
+-			yyy_avr =yyy_sum/n;			
+-			yyz_avr =yyz_sum/n;						
+-			yzz_avr =yzz_sum/n;										 	
+-			zzz_avr =zzz_sum/n;	
+-			yyyy_avr=yyyy_sum/n;
+-			zzzz_avr=zzzz_sum/n;
+-			xxyy_avr=xxyy_sum/n;
+-			xxzz_avr=xxzz_sum/n;
+-			yyzz_avr=yyzz_sum/n;							
+-																			
+-			//系数矩阵计算
+-			A[0 ]=yyyy_avr;A[1 ]=yyzz_avr;A[2 ]=xyy_avr;A[3 ]=yyy_avr;A[4 ]=yyz_avr; A[5 ]=yy_avr;
+-			A[6 ]=yyzz_avr;A[7 ]=zzzz_avr;A[8 ]=xzz_avr;A[9 ]=yzz_avr;A[10]=zzz_avr; A[11]=zz_avr;
+-			A[12]=xyy_avr ;A[13]=xzz_avr ;A[14]=xx_avr ;A[15]=xy_avr ;A[16]=xz_avr ; A[17]=x_avr ;
+-			A[18]=yyy_avr ;A[19]=yzz_avr ;A[20]=xy_avr ;A[21]=yy_avr ;A[22]=yz_avr ; A[23]=y_avr ;
+-			A[24]=yyz_avr ;A[25]=zzz_avr ;A[26]=xz_avr ;A[27]=yz_avr ;A[28]=zz_avr ; A[29]=z_avr ;
+-			A[30]=yy_avr  ;A[31]=zz_avr  ;A[32]=x_avr  ;A[33]=y_avr  ;A[34]=z_avr  ; A[35]=1     ;
+-			
+-			//非齐次列向量赋值
+-			B[0]=-xxyy_avr;
+-			B[1]=-xxzz_avr;
+-			B[2]=-xxx_avr ;
+-			B[3]=-xxy_avr ;
+-			B[4]=-xxz_avr ;
+-			B[5]=-xx_avr  ;
+- 
+-			//系数矩阵求逆
+-			mat_inverse_float(&A_matrix,&A_inv_matrix);
+-			
+-			//解方程组得出拟合参数
+-			mat_mult_float(&A_inv_matrix,&B_matrix,&Par_matrix);
+-			
+-			//计算椭球参数
+-			mx_offset=(-Par[2]/2.0f);             //拟合出的x轴中心坐标
+-			my_offset=(-Par[3]/(2.0f*Par[0]));    //拟合出的y轴中心坐标
+-			mz_offset=(-Par[4]/(2.0f*Par[1]));    //拟合出的z轴中心坐标
+-			mx_k= sqrt(mx_offset*mx_offset + Par[0]*my_offset*my_offset + Par[1]*mz_offset*mz_offset - Par[5]);   //拟合出的x方向上的轴半径
+-			my_k= mx_k/sqrt(Par[0]);                                                                              //拟合出的y方向上的轴半径
+-			mz_k= mx_k/sqrt(Par[1]);                                                                              //拟合出的z方向上的轴半径
+-			mx_k_ratio = 1.0f/1.0f;
+-			my_k_ratio = 1.0f/(my_k/mx_k);
+-			mz_k_ratio = 1.0f/(mz_k/mx_k);
+-//       HAL_Delay(20); 
+-			BEBUG_LOG(" x0=%f\r\n y0=%f\r\n z0=%f\r\n A=%f\r\n B=%f\r\n C=%f\r\n AK=%f\r\n BK=%f\r\n CK=%f\r\n\r\n",mx_offset,my_offset,mz_offset,mx_k,my_k,mz_k,mx_k_ratio,my_k_ratio,mz_k_ratio);
+-//			 HAL_Delay(20); 
+-       Mag_Clf = 0;
+-			break;
+-		}
+-		default :break;
+-	}
+-}
+-
+-void get_calibrat_mag_data(float *mag_data)
+-{
+-  
+-#if XY_AXIS_INTERCHANGE
+-    axis_interchange(mag_data);
+-#endif 
+-  
+-  mag_data[0] = (mag_data[0]-mx_offset)*mx_k_ratio;
+-  mag_data[1] = (mag_data[1]-my_offset)*my_k_ratio;
+-  mag_data[2] = (mag_data[2]-mz_offset)*mz_k_ratio;
+-}
+-
+-float get_angle(float *mag_data)
+-{
+-  float yaw = 0.0f;
+-  yaw = atan2(mag_data[1],mag_data[0])* 180.0/PI;
+-  return yaw;
+-}
+diff --git a/software/application/bt_watch_call/src/launcher/test/mag_calibration.c-bak2 b/software/application/bt_watch_call/src/launcher/test/mag_calibration.c-bak2
+deleted file mode 100644
+index 96a245d..0000000
+--- a/software/application/bt_watch_call/src/launcher/test/mag_calibration.c-bak2
++++ /dev/null
+@@ -1,560 +0,0 @@
+-/****************************包含头文件******************************/
+-
+-#include "mag_calibration.h"
+-/************************宏定义**********************************/
+-#define PI                             (3.14159265358979f)
+-#define CALIBRATION_SUCCESS            (1) //校准成功
+-#define CALIBRATION_FAILURE            (0) //校准失败
+-#define UNDER_CALIBRATION              (2) //正在校准
+-/**************************函数声明********************************/
+-
+-float mag_senser_data_buff[MAG_DATA_SAVE_MAX_VALUE][3]={0};
+-float get_PP (float *dMod, int size, int count);
+-float get_PP_InWindow(int size, int count);
+-void Algo_Update_Mag(float MagX, float MagY, float MagZ);
+-void MAG_Calculate(void);
+-float calculateMagnitude(float x, float y, float z);
+-void get_calibration_parameter(float *para);
+-void axis_interchange(float *data);
+-uint8_t calibration_init = 0;
+-uint8_t instantly_calculate_flg = 0;
+-/****************************变量定义******************************/
+-
+-float mx_offset,my_offset,mz_offset,mx_k,my_k,mz_k,mx_k_ratio,my_k_ratio,mz_k_ratio;
+-float mx=0.0f,my=0.0f,mz=0.0f;
+-char Mag_Clf=0;
+-uint8_t calibration_result = UNDER_CALIBRATION;  
+-
+-static float	RAW_X[MAG_RAW_BUF_LEN]	= {0};
+-static float	RAW_Y[MAG_RAW_BUF_LEN]	= {0};
+-static float	RAW_Z[MAG_RAW_BUF_LEN]	= {0};
+-
+-typedef enum 
+-{
+-   free=0,
+-   start_calculate,
+-   calc_offset_k_value,
+-   get_result,
+-   stop_calculate
+-}work_step_enum;
+-
+-/******************************函数体*************************************/
+-
+-float get_PP (float *dMod, int size, int count)
+-{
+-    int i;
+-    float max, min;
+-    max = min = dMod[size - count];
+-    for (i = 0; i < count; i++)
+-    {
+-        max = (dMod[size - count + i] > max) ? dMod[size - count + i] : max;
+-        min = (dMod[size - count + i] < min) ? dMod[size - count + i] : min;
+-    }
+-    return (max - min);
+-}
+-
+-float get_PP_InWindow(int size, int count)
+-{
+-    float PPV_X, PPV_Y, PPV_Z, PPV_InWindow;
+-    PPV_X = get_PP (RAW_X, size, count);
+-    PPV_Y = get_PP (RAW_Y, size, count);
+-    PPV_Z = get_PP (RAW_Z, size, count);
+-    PPV_InWindow = (PPV_X >= PPV_Y ? PPV_X >= PPV_Z ? PPV_X : PPV_Z : PPV_Y >= PPV_Z ? PPV_Y : PPV_Z);
+-    return PPV_InWindow;
+-}
+-
+-void Algo_Update_Mag(float MagX, float MagY, float MagZ)
+-{
+-    int i	= 0;
+-    for(i = 0; i < MAG_RAW_BUF_LEN - 1; i++)
+-    {
+-        RAW_X[i] = RAW_X[i + 1];
+-        RAW_Y[i] = RAW_Y[i + 1];
+-        RAW_Z[i] = RAW_Z[i + 1];
+-    }
+-    RAW_X[MAG_RAW_BUF_LEN - 1] = MagX;
+-    RAW_Y[MAG_RAW_BUF_LEN - 1] = MagY;
+-    RAW_Z[MAG_RAW_BUF_LEN - 1] = MagZ;
+-}
+-
+-//模值计算
+-float calculateMagnitude(float x, float y, float z) 
+-  {
+-      float magnitude;
+-      magnitude = sqrt(x*x + y*y + z*z);
+-      return magnitude;
+-  }
+-  
+-void mag_calibration_init(void)
+-{
+-   calibration_init = 1;
+-}
+-void mag_res_instantly_calculate(void)
+-{
+-  instantly_calculate_flg = 1;
+-}
+-void norm_sort(float *out,uint16_t n)
+-{
+-	uint16_t i,j;
+-	float temp = 0;
+-	for(i=0;i<n;i++)
+-	{
+-	  for(j=i+1;j<n;j++)
+-	  {
+-		if(out[i]<out[j])
+-		{
+-		  temp = out[i];
+-		  out[i] = out[j];
+-		  out[j] = temp;				
+-		}			
+-	 }		
+-	}
+-	
+-}
+-uint8_t mag_calculate(float *mag_data)
+-{
+-  static work_step_enum task_step = free;
+-  static uint16_t  mag_senser_save_cnt = 0;
+-  float norm_buff[MAG_DATA_SAVE_MAX_VALUE]={0};
+-  float max_value = FLOAT_MIN; // 初始化最大值为float的最小值
+-  float min_value = FLOAT_MAX; // 初始化最小值为float的最大值
+-  float norm = 0.0,norm_after = 0.0;    //存储模值
+-  float mag_cal[3] = {0}; 
+-#if XY_AXIS_INTERCHANGE
+-    axis_interchange(mag_data);
+-#endif 
+-  if(calibration_init)  //进行了初始化，跳转到初始化任务
+-  {
+-    Mag_Clf = 0;   
+-    mx = mag_data[0];
+-    my = mag_data[1];
+-    mz = mag_data[2];    
+-    MAG_Calculate();
+-    task_step = free;
+-    for(uint8_t i = 0; i < MAG_RAW_BUF_LEN; i++)
+-    {
+-        RAW_X[i] = mag_data[0];
+-        RAW_Y[i] = mag_data[1];
+-        RAW_Z[i] = mag_data[2];
+-    }
+-  }
+-  if(instantly_calculate_flg)  //如果需要立即计算，跳转到计算步骤
+-  {
+-    if(calibration_result == UNDER_CALIBRATION) //校准中
+-    {
+-      task_step = calc_offset_k_value;
+-    }
+-    instantly_calculate_flg  = 0;   
+-  }  
+-  Algo_Update_Mag(mag_data[0],mag_data[1],mag_data[2]); 
+-  switch (task_step)
+-  {
+-    case free:   //空闲状态进行判断
+-      calibration_result = UNDER_CALIBRATION;
+-//	  norm = calculateMagnitude(mag_data[0],mag_data[1],mag_data[2]);  //三轴磁力计模值计算
+-//	  BEBUG_LOG("free norm=%f\r\n",norm);
+-	  BEBUG_LOG("free PP=%f\r\n",get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN));
+-      if (get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN) > THRESH_START_VALUES)  //启动计算（1、阈值大于50）
+-      {
+-        task_step = start_calculate;
+-        mag_senser_save_cnt = 0;
+-        Mag_Clf = 0;   //进行数据存储
+-        BEBUG_LOG("start calc\r\n");
+-      }
+-    break;
+-    
+-    case start_calculate:  //满足条件开始计算 
+-//      norm = calculateMagnitude(mag_data[0],mag_data[1],mag_data[2]);  //三轴磁力计模值计算
+-//	  BEBUG_LOG("start norm=%f\r\n",norm); 
+-      BEBUG_LOG("start PP=%f\r\n",get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN));   
+-      if(get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN) < THRESH_STOP_VALUES) //停止计算(1、阈值小于5；2、采集数据大于500条)
+-      {
+-        task_step = calc_offset_k_value;
+-        BEBUG_LOG("stop calc-pp\r\n");
+-      }
+-      if(mag_senser_save_cnt == MAG_DATA_SAVE_MAX_VALUE)  //如果超过500条也进行计算
+-      {
+-        task_step = calc_offset_k_value;
+-        BEBUG_LOG("stop calc-cnt\r\n");
+-      }
+-      if(mag_senser_save_cnt<MAG_DATA_SAVE_MAX_VALUE)
+-      {
+-        mag_senser_data_buff[mag_senser_save_cnt][0] = mag_data[0];
+-        mag_senser_data_buff[mag_senser_save_cnt][1] = mag_data[1];
+-        mag_senser_data_buff[mag_senser_save_cnt][2] = mag_data[2];
+-        mag_senser_save_cnt++;
+-      }
+-      mx = mag_data[0];
+-      my = mag_data[1];
+-      mz = mag_data[2];    
+-      MAG_Calculate();
+-    BEBUG_LOG("stop=%3.4f %3.4f %3.4f %3.4f\r\n",mx, my, mz,get_PP_InWindow(MAG_RAW_BUF_LEN, PP_BUF_LEN));          
+-    break;
+-    case calc_offset_k_value:
+-      Mag_Clf = 1;
+-      MAG_Calculate(); 
+-      task_step = get_result;    
+-    break;
+-      
+-    case get_result: //满足条件开始计算  
+-      for (uint16_t i = 0; i < mag_senser_save_cnt; i++) 
+-      {
+-        mag_cal[0] = (mag_senser_data_buff[i][0]-mx_offset)*mx_k_ratio;
+-        mag_cal[1] = (mag_senser_data_buff[i][1]-my_offset)*my_k_ratio;
+-        mag_cal[2] = (mag_senser_data_buff[i][2]-mz_offset)*mz_k_ratio; 
+-        norm_after = calculateMagnitude(mag_senser_data_buff[i][0],mag_senser_data_buff[i][1],mag_senser_data_buff[i][2]);  //三轴磁力计模值计算		
+-        norm = calculateMagnitude(mag_cal[0],mag_cal[1],mag_cal[2]);  //三轴磁力计模值计算
+-        norm_buff[i] = norm;		
+-        if (norm > max_value) 
+-        {
+-          max_value = norm;
+-        }
+-		
+-        if (norm < min_value) 
+-        {
+-          min_value = norm;
+-        }                
+-         BEBUG_LOG("norm=%f,%f,%f,%f\r\n",norm_after,norm,max_value,min_value);
+-     }
+-	 norm_sort(norm_buff,mag_senser_save_cnt);
+-	 for (uint16_t i = 0; i < mag_senser_save_cnt; i++)
+-	 {
+-		 BEBUG_LOG("norm_buff[%d]=%f\r\n",i,norm_buff[i]);		 
+-	 }		 
+-      
+-	  /*
+-      if((max_value-min_value)>THRESH_CALC_SUCCESSFUL_VALUES)
+-      { 
+-        calibration_result = CALIBRATION_FAILURE;
+-        task_step = stop_calculate;       
+-        BEBUG_LOG("Magnetometer calibration failed\r\n");
+-        BEBUG_LOG("Peak-valley value = %f\r\n",max_value-min_value);
+-        return calibration_result;
+-      }
+-      else
+-      {
+-        calibration_result = CALIBRATION_SUCCESS;
+-        task_step = stop_calculate;       
+-        BEBUG_LOG("Magnetometer calibration successful\r\n");
+-        BEBUG_LOG("Peak-valley value = %f\r\n",max_value-min_value);
+-        return calibration_result;
+-      }
+-	  */
+-	  if((norm_buff[2]-norm_buff[mag_senser_save_cnt-2-1])>THRESH_CALC_SUCCESSFUL_VALUES)
+-      { 
+-        calibration_result = CALIBRATION_FAILURE;
+-        task_step = stop_calculate;       
+-        BEBUG_LOG("Magnetometer calibration failed\r\n");
+-        BEBUG_LOG("Peak-valley value = %f\r\n",max_value-min_value);
+-		BEBUG_LOG("value2 = %f\r\n",norm_buff[2]-norm_buff[mag_senser_save_cnt-2-1]);
+-        return calibration_result;
+-      }
+-      else
+-      {
+-        calibration_result = CALIBRATION_SUCCESS;
+-        task_step = stop_calculate;       
+-        BEBUG_LOG("Magnetometer calibration successful\r\n");
+-        BEBUG_LOG("Peak-valley value = %f\r\n",max_value-min_value);
+-		BEBUG_LOG("value2 = %f\r\n",norm_buff[2]-norm_buff[mag_senser_save_cnt-2-1]);
+-        return calibration_result;
+-      }
+-      mag_senser_save_cnt =0;
+-    break;  
+-    
+-    case stop_calculate:
+-    break;
+-    
+-    default:
+-    break;
+-  }
+-  return calibration_result;   
+-}
+-
+-void axis_interchange(float *data)
+-{
+-  float mag_x,mag_y,mag_z;
+-  mag_x = data[0];
+-  mag_y = data[1];
+-  mag_z = data[2];
+-  data[0] = mag_y * -1.0f; 
+-  data[1] = mag_x * -1.0f; 
+-  data[2] = mag_z * -1.0f; ;
+-}
+-
+-
+-void get_calibration_parameter(float *param)
+-{
+-  if(calibration_result == CALIBRATION_SUCCESS)
+-  {
+-    param[0] = mx_offset;
+-    param[1] = my_offset;
+-    param[2] = mz_offset;
+-    param[3] = mx_k_ratio;
+-    param[4] = my_k_ratio;
+-    param[5] = mz_k_ratio;
+-  }
+-  else
+-  {
+-    param[0] = 0.0f;
+-    param[1] = 0.0f;
+-    param[2] = 0.0f;
+-    param[3] = 0.0f;
+-    param[4] = 0.0f;
+-    param[5] = 0.0f;
+-  }
+-
+-}
+-
+-void MAG_Calculate(void)
+-{
+-    static float n=0.0f;
+-	//椭球校准
+-	static float  
+-	//一次项
+-	x_sum=0.0f,			  
+-	y_sum=0.0f,			  
+-	z_sum=0.0f,			  
+-	//二次项			  	 
+-	xx_sum=0.0f,				  	 
+-	yy_sum=0.0f,				  	 					  
+-	zz_sum=0.0f,				       
+-	xy_sum=0.0f,   			       
+-	xz_sum=0.0f,   			      
+-	yz_sum=0.0f,   			  
+-	//三次项  			  
+-	xxx_sum=0.0f,			  
+-	xxy_sum=0.0f,			  
+-	xxz_sum=0.0f,			  
+-	xyy_sum=0.0f, 			  
+-	xzz_sum=0.0f, 			  			  
+-	yyy_sum=0.0f,				  
+-	yyz_sum=0.0f,				                           
+-	yzz_sum=0.0f,	 			                           
+-	zzz_sum=0.0f,	 			  
+-	//四次项				  	
+-	yyyy_sum=0.0f,			  	
+-	zzzz_sum=0.0f,			  	
+-	xxyy_sum=0.0f,			  	
+-	xxzz_sum=0.0f,			  
+-	yyzz_sum=0.0f;
+- 
+-	static float  
+-	//一次项
+-	x_avr=0.0f,			  
+-	y_avr=0.0f,			  
+-	z_avr=0.0f,			  
+-	//二次项			  	 
+-	xx_avr=0.0f,				  	 
+-	yy_avr=0.0f,				  	 					  
+-	zz_avr=0.0f,				       
+-	xy_avr=0.0f,   			       
+-	xz_avr=0.0f,   			      
+-	yz_avr=0.0f,   			  
+-	//三次项  			  
+-	xxx_avr=0.0f,			  
+-	xxy_avr=0.0f,			  
+-	xxz_avr=0.0f,			  
+-	xyy_avr=0.0f, 			  
+-	xzz_avr=0.0f, 			  			  
+-	yyy_avr=0.0f,				  
+-	yyz_avr=0.0f,				                           
+-	yzz_avr=0.0f,	 			                           
+-	zzz_avr=0.0f,	 			  
+-	//四次项				  	
+-	yyyy_avr=0.0f,			  	
+-	zzzz_avr=0.0f,			  	
+-	xxyy_avr=0.0f,			  	
+-	xxzz_avr=0.0f,			  
+-	yyzz_avr=0.0f;
+-  if(calibration_init)
+-  {
+-    calibration_init = 0;
+-    n=0.0f;
+-    //椭球校准
+-    //一次项
+-    x_sum=0.0f,			  
+-    y_sum=0.0f,			  
+-    z_sum=0.0f,			  
+-    //二次项			  	 
+-    xx_sum=0.0f,				  	 
+-    yy_sum=0.0f,				  	 					  
+-    zz_sum=0.0f,				       
+-    xy_sum=0.0f,   			       
+-    xz_sum=0.0f,   			      
+-    yz_sum=0.0f,   			  
+-    //三次项  			  
+-    xxx_sum=0.0f,			  
+-    xxy_sum=0.0f,			  
+-    xxz_sum=0.0f,			  
+-    xyy_sum=0.0f, 			  
+-    xzz_sum=0.0f, 			  			  
+-    yyy_sum=0.0f,				  
+-    yyz_sum=0.0f,				                           
+-    yzz_sum=0.0f,	 			                           
+-    zzz_sum=0.0f,	 			  
+-    //四次项				  	
+-    yyyy_sum=0.0f,			  	
+-    zzzz_sum=0.0f,			  	
+-    xxyy_sum=0.0f,			  	
+-    xxzz_sum=0.0f,			  
+-    yyzz_sum=0.0f;
+-  
+-    //一次项
+-    x_avr=0.0f,			  
+-    y_avr=0.0f,			  
+-    z_avr=0.0f,			  
+-    //二次项			  	 
+-    xx_avr=0.0f,				  	 
+-    yy_avr=0.0f,				  	 					  
+-    zz_avr=0.0f,				       
+-    xy_avr=0.0f,   			       
+-    xz_avr=0.0f,   			      
+-    yz_avr=0.0f,   			  
+-    //三次项  			  
+-    xxx_avr=0.0f,			  
+-    xxy_avr=0.0f,			  
+-    xxz_avr=0.0f,			  
+-    xyy_avr=0.0f, 			  
+-    xzz_avr=0.0f, 			  			  
+-    yyy_avr=0.0f,				  
+-    yyz_avr=0.0f,				                           
+-    yzz_avr=0.0f,	 			                           
+-    zzz_avr=0.0f,	 			  
+-    //四次项				  	
+-    yyyy_avr=0.0f,			  	
+-    zzzz_avr=0.0f,			  	
+-    xxyy_avr=0.0f,			  	
+-    xxzz_avr=0.0f,			  
+-    yyzz_avr=0.0f;
+-  }
+-
+-	//矩阵定义
+-	static float                   A[36]   ,      A_inv [36];  //系数矩阵
+-	static matrix_instance_f32 A_matrix,      A_inv_matrix;	
+-	static float                   B[6];                       //非齐次项
+-	static matrix_instance_f32 B_matrix;
+-	static float                   Par[6];                     //需要拟合的参数
+-	static matrix_instance_f32 Par_matrix;
+-	
+-	switch(Mag_Clf)
+-	{
+-		case 0:
+-		{
+-			x_sum   =x_sum   +(mx); 
+-			y_sum   =y_sum   +(my); 
+-			z_sum   =z_sum   +(mz); 
+-			xx_sum  =xx_sum  +(mx*mx); 	   
+-			yy_sum  =yy_sum  +(my*my); 
+-			zz_sum  =zz_sum  +(mz*mz); 
+-			xy_sum  =xy_sum  +(mx*my); 
+-			xz_sum  =xz_sum  +(mx*mz); 
+-			yz_sum  =yz_sum  +(my*mz); 
+-			xxx_sum =xxx_sum +(mx*mx*mx); 					
+-			xxy_sum =xxy_sum +(mx*mx*my); 				
+-			xxz_sum =xxz_sum +(mx*mx*mz); 				
+-			xyy_sum =xyy_sum +(mx*my*my); 
+-			xzz_sum =xzz_sum +(mx*mz*mz); 
+-			yyy_sum =yyy_sum +(my*my*my);
+-			yyz_sum =yyz_sum +(my*my*mz);
+-			yzz_sum =yzz_sum +(my*mz*mz);
+-			zzz_sum =zzz_sum +(mz*mz*mz);
+-			yyyy_sum=yyyy_sum+(my*my*my*my);
+-			zzzz_sum=zzzz_sum+(mz*mz*mz*mz);
+-			xxyy_sum=xxyy_sum+(mx*mx*my*my);		   
+-			xxzz_sum=xxzz_sum+(mx*mx*mz*mz);		   
+-			yyzz_sum=yyzz_sum+(my*my*mz*mz);		   
+-			n=n+1.0f;
+-			break;
+-		}
+-		case 1://各次累加和统计
+-		{
+-			//矩阵初始化	
+-			A_matrix.numRows=6;   A_inv_matrix.numRows=6;     B_matrix.numRows=6;   Par_matrix.numRows=6;
+-			A_matrix.numCols=6;   A_inv_matrix.numCols=6;     B_matrix.numCols=1;   Par_matrix.numCols=1;
+-			A_matrix.pData  =A;   A_inv_matrix.pData  =A_inv; B_matrix.pData  =B;   Par_matrix.pData  =Par;
+-		
+-			//各次均值统计
+-			x_avr   =x_sum/n; 
+-			y_avr   =y_sum/n; 
+-			z_avr   =z_sum/n; 
+-			xx_avr  =xx_sum/n; 
+-			yy_avr  =yy_sum/n; 			
+-			zz_avr  =zz_sum/n; 			
+-			xy_avr  =xy_sum/n; 			
+-			xz_avr  =xz_sum/n; 			
+-			yz_avr  =yz_sum/n; 					
+-			xxx_avr =xxx_sum/n; 		
+-			xxy_avr =xxy_sum/n; 
+-			xxz_avr =xxz_sum/n; 
+-			xyy_avr =xyy_sum/n; 
+-			xzz_avr =xzz_sum/n; 
+-			yyy_avr =yyy_sum/n;			
+-			yyz_avr =yyz_sum/n;						
+-			yzz_avr =yzz_sum/n;										 	
+-			zzz_avr =zzz_sum/n;	
+-			yyyy_avr=yyyy_sum/n;
+-			zzzz_avr=zzzz_sum/n;
+-			xxyy_avr=xxyy_sum/n;
+-			xxzz_avr=xxzz_sum/n;
+-			yyzz_avr=yyzz_sum/n;							
+-																			
+-			//系数矩阵计算
+-			A[0 ]=yyyy_avr;A[1 ]=yyzz_avr;A[2 ]=xyy_avr;A[3 ]=yyy_avr;A[4 ]=yyz_avr; A[5 ]=yy_avr;
+-			A[6 ]=yyzz_avr;A[7 ]=zzzz_avr;A[8 ]=xzz_avr;A[9 ]=yzz_avr;A[10]=zzz_avr; A[11]=zz_avr;
+-			A[12]=xyy_avr ;A[13]=xzz_avr ;A[14]=xx_avr ;A[15]=xy_avr ;A[16]=xz_avr ; A[17]=x_avr ;
+-			A[18]=yyy_avr ;A[19]=yzz_avr ;A[20]=xy_avr ;A[21]=yy_avr ;A[22]=yz_avr ; A[23]=y_avr ;
+-			A[24]=yyz_avr ;A[25]=zzz_avr ;A[26]=xz_avr ;A[27]=yz_avr ;A[28]=zz_avr ; A[29]=z_avr ;
+-			A[30]=yy_avr  ;A[31]=zz_avr  ;A[32]=x_avr  ;A[33]=y_avr  ;A[34]=z_avr  ; A[35]=1     ;
+-			
+-			//非齐次列向量赋值
+-			B[0]=-xxyy_avr;
+-			B[1]=-xxzz_avr;
+-			B[2]=-xxx_avr ;
+-			B[3]=-xxy_avr ;
+-			B[4]=-xxz_avr ;
+-			B[5]=-xx_avr  ;
+- 
+-			//系数矩阵求逆
+-			mat_inverse_float(&A_matrix,&A_inv_matrix);
+-			
+-			//解方程组得出拟合参数
+-			mat_mult_float(&A_inv_matrix,&B_matrix,&Par_matrix);
+-			
+-			//计算椭球参数
+-			mx_offset=(-Par[2]/2.0f);             //拟合出的x轴中心坐标
+-			my_offset=(-Par[3]/(2.0f*Par[0]));    //拟合出的y轴中心坐标
+-			mz_offset=(-Par[4]/(2.0f*Par[1]));    //拟合出的z轴中心坐标
+-			mx_k= sqrt(mx_offset*mx_offset + Par[0]*my_offset*my_offset + Par[1]*mz_offset*mz_offset - Par[5]);   //拟合出的x方向上的轴半径
+-			my_k= mx_k/sqrt(Par[0]);                                                                              //拟合出的y方向上的轴半径
+-			mz_k= mx_k/sqrt(Par[1]);                                                                              //拟合出的z方向上的轴半径
+-			mx_k_ratio = 1.0f/1.0f;
+-			my_k_ratio = 1.0f/(my_k/mx_k);
+-			mz_k_ratio = 1.0f/(mz_k/mx_k);
+-//       HAL_Delay(20); 
+-			BEBUG_LOG(" x0=%f\r\n y0=%f\r\n z0=%f\r\n A=%f\r\n B=%f\r\n C=%f\r\n AK=%f\r\n BK=%f\r\n CK=%f\r\n\r\n",mx_offset,my_offset,mz_offset,mx_k,my_k,mz_k,mx_k_ratio,my_k_ratio,mz_k_ratio);
+-//			 HAL_Delay(20); 
+-       Mag_Clf = 0;
+-			break;
+-		}
+-		default :break;
+-	}
+-}
+-
+-void get_calibrat_mag_data(float *mag_data)
+-{
+-  
+-#if XY_AXIS_INTERCHANGE
+-    axis_interchange(mag_data);
+-#endif 
+-  
+-  mag_data[0] = (mag_data[0]-mx_offset)*mx_k_ratio;
+-  mag_data[1] = (mag_data[1]-my_offset)*my_k_ratio;
+-  mag_data[2] = (mag_data[2]-mz_offset)*mz_k_ratio;
+-}
+-
+-float get_angle(float *mag_data)
+-{
+-  float yaw = 0.0f;
+-  yaw = atan2(mag_data[1],mag_data[0])* 180.0/PI;
+-  return yaw;
+-}
+diff --git a/software/application/bt_watch_call/src/launcher/test/pre_test_view.c b/software/application/bt_watch_call/src/launcher/test/pre_test_view.c
+index 0a3715e..f0b5726 100644
+--- a/software/application/bt_watch_call/src/launcher/test/pre_test_view.c
++++ b/software/application/bt_watch_call/src/launcher/test/pre_test_view.c
+@@ -79,7 +79,13 @@ static int _pre_test_view_preload(view_data_t *view_data)
+ 
+ static lv_timer_t *timer;
+ 
++#include <stdio.h>
++#include <fs_manager.h>
++#include <fs/fs.h>
++#include <fs/fs.h>
++#include <fs/fs_sys.h>
+ static uint8_t chip_id;
++static struct fs_file_t zfp;
+ static void timer_ing_update(lv_timer_t *timer)
+ {
+ 	extern uint8_t spl06_init(void);
+@@ -116,7 +122,7 @@ static void timer_ing_update(lv_timer_t *timer)
+ //     	printf("pa = %f\n",pa);
+ 	*/
+ //	lsm6dsl_read_data_polling(acc_mg, ang_mdps);
+-	lsm6dsv16x_read_data_polling(acc_mg, ang_mdps);
++//	lsm6dsv16x_read_data_polling(acc_mg, ang_mdps);
+ 	temp = mts4b_read_temp();
+ 	mts4b_start();
+ //	pa = ReadSPL06_Pressure(&t_SPL06_calibPara);
+@@ -124,13 +130,16 @@ static void timer_ing_update(lv_timer_t *timer)
+ 	float deg_c = 0.0;
+ 	if (chip_id == LPS22DF_ID)
+ 	{
++		/*
+ 		extern void lps22df_read_data_polling(float *hpa, float *deg_c);
+ 
+ 		lps22df_read_data_polling(&pa, &deg_c);
+ 	 	hight = Caculate_Altitude(pa * 100);
++		*/
+ 	}
+ 	else
+ 	{
++		/*
+ 		printf("%p\n", &t_SPL06_calibPara);
+ 		spl07_003_get_raw_temp();
+         	spl07_003_get_raw_pressure();
+@@ -139,9 +148,12 @@ static void timer_ing_update(lv_timer_t *timer)
+ 		pa = pa / 100.0;
+ 		hight = Caculate_Altitude(pa * 100);
+ 		printf("spl003 tmp: %.2f\n", spl07_003_get_temperature());
++		*/
+ 	}
+ 	
+-	 printf("pa:%.2f   gao:%.2fm, deg: %.2f, temp: %.2f\n",pa,hight, deg_c, temp);
++	printf("pa:%.2f   gao:%.2fm, deg: %.2f, temp: %.2f\n",pa,hight, deg_c, temp);
++
++	
+ 
+ 	src = lv_disp_get_scr_act(view_data->display);
+ 	if (src == NULL)
+@@ -153,32 +165,67 @@ extern int get_mag_data(struct mag_data_t *data, float *acc_mg);
+ 	get_mag_data(&mag_data, acc_mg);
+ 	int charge_status = power_manager_get_charge_status();
+ 	printf("charge_status: %d(%d)\n", charge_status, BAT_STATUS_CHARGING);
++	extern void oo_get_(float out[3]);
++	oo_get_(ang_mdps);
++	printf("%s: %4.2f %4.2f %4.2f\n", __func__, ang_mdps[0]/ 0.0174532925 , ang_mdps[1]/ 0.0174532925 , ang_mdps[2])/ 0.0174532925 ;
++
++	if (mag_data.flag == 2)
++	{
++	int str_ret = 0;
++	char str_data[128] = { 0 };
++	str_ret = snprintf(str_data, 128, "%.3f %.3f %.3f\n", mag_data.mag_data[0], mag_data.mag_data[1], mag_data.mag_data[2]);
++	fs_write(&zfp, str_data, str_ret);
++	printf("sensor_data:%s", str_data);
++	}
++
+ 	if (BAT_STATUS_CHARGING == charge_status)
+ 	{
+-	snprintf(text, 220, "\ntmp: %.2f\npre: %.2f\nheight: %.2f\ncalbrating: %d\nmag: %.3f\npower: %d%% charging\nmg: %4.2f %4.2f %4.2f\nmdps: %4.2f %4.2f %4.2f", temp, pa, hight,
++	snprintf(text, 220, "\ntmp: %.2f\npre: %.2f\nheight: %.2f\ncalbrating: %d\nmag: %.3f\npower: %4.2f %4.2f %4.2f \nmg: %4.2f %4.2f %4.2f\nmdps: %4.2f %4.2f %4.2f", 
++			temp, pa, hight,
+ 			mag_data.flag,
+ 			mag_data.angle_yaw,
+-			power_manager_get_battery_capacity(),
+-			acc_mg[0],
+-			acc_mg[1],
+-			acc_mg[2],
+-			ang_mdps[0],
+-			ang_mdps[1],
++			/*power_manager_get_battery_capacity(),*/
++			mag_data.mag_data[0],
++			mag_data.mag_data[1],
++			mag_data.mag_data[2],
++			-acc_mg[0],
++			-acc_mg[1],
++			-acc_mg[2],
++			
++			ang_mdps[0]/ 0.0174532925 ,
++			ang_mdps[1]/ 0.0174532925 ,
++			ang_mdps[2]/ 0.0174532925 
++			
++			/*
++			ang_mdps[0] ,
++			ang_mdps[1] ,
+ 			ang_mdps[2]
++			*/
+ 			);
+ 	}
+ 	else
+ 	{
+-	snprintf(text, 220, "\ntmp: %.2f\npre: %.2f\nheight: %.2f\ncalbrating: %d\nmag: %.3f\npower: %d%%\nmg: %4.2f %4.2f %4.2f\nmdps: %4.2f %4.2f %4.2f", temp, pa, hight,
++	snprintf(text, 220, "\ntmp: %.2f\npre: %.2f\nheight: %.2f\ncalbrating: %d\nmag: %.3f\npower: %4.2f %4.2f %4.2f\nmg: %4.2f %4.2f %4.2f\nmdps: %4.2f %4.2f %4.2f", 
++			temp, pa, hight,
+ 			mag_data.flag,
+ 			mag_data.angle_yaw,
+-			power_manager_get_battery_capacity(),
+-			acc_mg[0],
+-			acc_mg[1],
+-			acc_mg[2],
+-			ang_mdps[0],
+-			ang_mdps[1],
+-			ang_mdps[2]
++			/*power_manager_get_battery_capacity(),*/
++			mag_data.mag_data[0],
++			mag_data.mag_data[1],
++			mag_data.mag_data[2],
++			-acc_mg[0],
++			-acc_mg[1],
++			-acc_mg[2],
++			
++			ang_mdps[0]/ 0.0174532925 ,
++			ang_mdps[1]/ 0.0174532925 ,
++			ang_mdps[2]/ 0.0174532925 
++			
++			/*
++			ang_mdps[0] ,
++			ang_mdps[1] ,
++			ang_mdps[2] 
++			*/
+ 			);
+ 	}
+ 
+@@ -211,6 +258,7 @@ static int create_view(view_data_t *view_data)
+ 	extern void pressure_lps22df_id_get(uint8_t *chip_id);
+ 	pressure_lps22df_id_get(&chip_id);
+ 	printf("%s: pressure chip id: %x, %x\n", __func__, chip_id, LPS22DF_ID);
++	/*
+ 	if (chip_id == LPS22DF_ID)
+ 	{
+ 		lps22df_init();
+@@ -220,20 +268,29 @@ static int create_view(view_data_t *view_data)
+ 		spl07_003_init();
+ 		spl07_003_start_continuous(CONTINUOUS_P_AND_T);
+ 	}
++	*/
+ 	/*
+ 	if(spl06_init()){
+ 		SYS_LOG_INF("spl06_init err\r\n");
+ 	}
+ 	*/
+ 	//lsm6dsl_init();
+-	lsm6dsv16x_init();
++	//lsm6dsv16x_init();
+ //	SPL06_Init(&t_SPL06_calibPara);
+ 	printf("%p\n", &t_SPL06_calibPara);
+ 	timer = lv_timer_create(timer_ing_update, 1000, view_data);
+ 	//spl07_003_init();
+ 	//spl07_003_start_continuous(CONTINUOUS_P_AND_T);
++	extern int shell_aa_test(const struct shell *shell, size_t argc, char **argv);
++	shell_aa_test(NULL, 0, NULL);
+ 	if (timer)
+ 		lv_timer_ready(timer);
++
++	memset(&zfp, 0, sizeof(zfp));
++	if (fs_open(&zfp, "/NAND:/sensor.dat", FA_WRITE | FS_O_CREATE))
++	{
++		printf("open sensor.dat failed\n");
++	}
+ 	return 0;
+ }
+ 
+@@ -282,7 +339,10 @@ static int _pre_test_view_delete(view_data_t *view_data)
+ 
+ 	if (timer) 
+ 	{
++		extern int shell_aa_test_exit(void);
++		shell_aa_test_exit();
+ 		lv_timer_del(timer);
++		fs_close(&zfp);
+ 		timer = NULL;
+ 	}
+ 	lvgl_res_unload_scene_compact(SCENE_PRE_TEST_VIEW);
+diff --git a/software/application/bt_watch_call/src/launcher/test/sensor_test_view.c b/software/application/bt_watch_call/src/launcher/test/sensor_test_view.c
+index 567f0bf..373e48e 100644
+--- a/software/application/bt_watch_call/src/launcher/test/sensor_test_view.c
++++ b/software/application/bt_watch_call/src/launcher/test/sensor_test_view.c
+@@ -772,17 +772,69 @@ int get_mag_data(struct mag_data_t *data, float *acc_mg)
+ 			data->mag_data[2],
+ 			data->angle_yaw
+ 			);
+-	printf("%.3f %.3f\n", cosf(atanf(acc_mg[0] / acc_mg[2])), cosf(atanf(acc_mg[1] / acc_mg[2])));
+-	printf("%.3f %.3f\n", sinf(atanf(acc_mg[0] / acc_mg[2])), sinf(atanf(acc_mg[1] / acc_mg[2])));
+ 
++	float oo[3] = { 0.0, 0.0, 0.0 };
++	extern void oo_get_(float out[3]);
+ 	float new_mag[3];
++	float new_mag2[3];
+ 	float angle;
+-	new_mag[0] = data->mag_raw_data[0] * cosf(atanf(acc_mg[0] / acc_mg[2])) + data->mag_raw_data[2] * sinf(atanf(acc_mg[0] / acc_mg[2]));
+-	new_mag[1] = data->mag_raw_data[0] * sinf(atanf(acc_mg[1] / acc_mg[2])) * sinf(atanf(acc_mg[0] / acc_mg[2])) 
+-		+ data->mag_raw_data[1] * cosf(atanf(acc_mg[1] / acc_mg[2])) 
+-		- data->mag_raw_data[2] * sinf(atanf(acc_mg[1] / acc_mg[2])) * cosf(atanf(acc_mg[0] / acc_mg[2]));
+-	printf("mx: %.3f my: %.3f\n", new_mag[0], new_mag[1]);
+-        get_calibrat_mag_data(new_mag); //输入原始磁数据，得到补偿后的磁数据
++	oo_get_(oo);
++	/*
++		    #define M_PI        3.14159265358979323846
++	oo[0] *= M_PI / 180;
++	oo[1] *= M_PI / 180;
++	oo[2] *= M_PI / 180;
++	*/
++	printf("%s: %.3f %.3f\n", __func__, oo[0], oo[1]);
++
++	float A[9];
++	float inv_A[9];
++	static int mm_count = 0;
++
++	A[0] = 1; 
++	A[1] = 0; 
++	A[2] = 0;
++	A[3] = 0; 
++	A[4] = cos(oo[1]); 
++	A[5] = sin(oo[1]);
++	A[6] = 0; 
++	A[7] = -sin(oo[1]); 
++	A[8] = cos(oo[1]);
++
++	inv_A[0] = cos(oo[0]);
++	inv_A[1] = 0;
++	inv_A[2] = -sin(oo[0]);
++	inv_A[3] = 0;
++	inv_A[4] = 1;
++	inv_A[5] = 0;
++	inv_A[6] = sin(oo[0]);
++	inv_A[7] = 0;
++	inv_A[8] = cos(oo[0]);
++
++	
++#if 0
++	new_mag[0] = A[0] * data->mag_data[0] + A[1] * data->mag_data[1] + A[2] * data->mag_data[2];
++	new_mag[1] = A[3] * data->mag_data[0] + A[4] * data->mag_data[1] + A[5] * data->mag_data[2];
++	new_mag[2] = A[6] * data->mag_data[0] + A[7] * data->mag_data[1] + A[8] * data->mag_data[2];
++
++	new_mag2[0] = inv_A[0] * new_mag[0] + inv_A[1] * new_mag[1] + inv_A[2] * new_mag[2];
++	new_mag2[1] = inv_A[3] * new_mag[0] + inv_A[4] * new_mag[1] + inv_A[5] * new_mag[2];
++	new_mag2[2] = inv_A[6] * new_mag[0] + inv_A[7] * new_mag[1] + inv_A[8] * new_mag[2];
++#else
++	new_mag[0] = inv_A[0] * data->mag_data[0] + inv_A[1] * data->mag_data[1] + inv_A[2] * data->mag_data[2];
++	new_mag[1] = inv_A[3] * data->mag_data[0] + inv_A[4] * data->mag_data[1] + inv_A[5] * data->mag_data[2];
++	new_mag[2] = inv_A[6] * data->mag_data[0] + inv_A[7] * data->mag_data[1] + inv_A[8] * data->mag_data[2];
++
++	new_mag2[0] = A[0] * new_mag[0] + A[1] * new_mag[1] + A[2] * new_mag[2];
++	new_mag2[1] = A[3] * new_mag[0] + A[4] * new_mag[1] + A[5] * new_mag[2];
++	new_mag2[2] = A[6] * new_mag[0] + A[7] * new_mag[1] + A[8] * new_mag[2];
++#endif
++	new_mag[0] = new_mag2[0];
++	new_mag[1] = new_mag2[1];
++	new_mag[2] = new_mag2[2];
++
++
++       // get_calibrat_mag_data(new_mag); //输入原始磁数据，得到补偿后的磁数据
+ 	angle = get_angle(new_mag);
+ 
+             if(angle<=0)
+@@ -811,7 +863,8 @@ int get_mag_data(struct mag_data_t *data, float *acc_mg)
+ 			angle= 360.0 - angle; 				
+ 		}
+ 
+-	printf("mx: %.3f my: %.3f mz: %.3f angle: %.3f\n", new_mag[0], new_mag[1], new_mag[2], angle);
++	printf("new angle: %.3f, org nagle: %.3f\n", angle, data->angle_yaw);
++	data->angle_yaw = angle;
+ 
+ 	k_mutex_unlock(&my_mutex);
+ 
+@@ -1038,6 +1091,12 @@ void com_test_btn_event_handler(lv_event_t * e)
+ 	view_stack_push_view(PRE_TEST_VIEW, NULL);
+ }
+ 
++void hello_my(void)
++{
++	extern void gps_test_btn_event_handler(lv_event_t * e);
++//	gps_test_btn_event_handler(NULL);
++	com_test_btn_event_handler(NULL);
++}
+ 
+ 
+ static int sensor_test_view_layout(view_data_t *view_data)
+diff --git a/software/application/bt_watch_call/src/launcher/test/test_mode.c b/software/application/bt_watch_call/src/launcher/test/test_mode.c
+index 73ec463..6df5a17 100644
+--- a/software/application/bt_watch_call/src/launcher/test/test_mode.c
++++ b/software/application/bt_watch_call/src/launcher/test/test_mode.c
+@@ -105,7 +105,7 @@ static void usb_test_btn_event_handler(lv_event_t * e)
+ }
+ 
+ 
+-static void gps_test_btn_event_handler(lv_event_t * e)
++void gps_test_btn_event_handler(lv_event_t * e)
+ {
+ 	SYS_LOG_INF("%s: event\n", __func__);
+ 	view_stack_push_view(GPS_BT_TEST_VIEW, NULL);
+diff --git a/software/application/bt_watch_call/src/main/system_app_main.c b/software/application/bt_watch_call/src/main/system_app_main.c
+index c9fe27a..8abbcbe 100755
+--- a/software/application/bt_watch_call/src/main/system_app_main.c
++++ b/software/application/bt_watch_call/src/main/system_app_main.c
+@@ -258,6 +258,7 @@ void main_msg_proc(void *parama1, void *parama2, void *parama3)
+ 			#endif
+ 
+ {
++	golf_config_get(&Golf_Info);
+ 	if (Golf_Info.bt_switch_flag == 1)
+ 	{
+ 		bt_manager_ble_adv_start();
+@@ -492,9 +493,7 @@ int main(void)
+ 
+ 	struct k_thread thread_data;
+ 
+-	printf("new version for test 2222\n");
+ 
+-	golf_config_get(&Golf_Info);
+ 	//backup_entry();
+ 
+ uart_tid = 	k_thread_create(&thread_data,stack_area,
+@@ -503,7 +502,9 @@ uart_tid = 	k_thread_create(&thread_data,stack_area,
+ 								PRIORITY,0,K_NO_WAIT);
+ 	k_thread_name_set(uart_tid , "gps_uart");
+ 	k_msleep(120);
+-//	k_thread_suspend(uart_tid);
++	k_thread_suspend(uart_tid);
++
++	
+ 
+ 	while (1) {
+ 		main_msg_proc(NULL, NULL, NULL);
+diff --git a/software/framework/system/sys_shell.c b/software/framework/system/sys_shell.c
+index 4be1023..5a34a7b 100755
+--- a/software/framework/system/sys_shell.c
++++ b/software/framework/system/sys_shell.c
+@@ -121,6 +121,367 @@ static int shell_wake_lock(const struct shell *shell, size_t argc, char **argv)
+ }
+ #endif
+ 
++static int shell_gps_test(const struct shell *shell, size_t argc, char **argv)
++{
++extern void hello_my(void);
++	hello_my();
++	return 0;
++}
++
++static int shell_mm_test(const struct shell *shell, size_t argc, char **argv)
++{
++	/*
++extern void mm_init(void);
++	mm_init();
++	*/
++	return 0;
++}
++
++#include "math.h"
++
++typedef struct
++{
++  uint16_t numRows;     /**< number of rows of the matrix.     */
++  uint16_t numCols;     /**< number of columns of the matrix.  */
++  float    *pData;      /**< points to the data of the matrix. */
++} matrix_instance_f32;
++#if 1
++float	x_ = 1, x_2 = 0, x_tmp = 0, x_tmp2 = 0;
++float	t_pa = 0, gyr = 0, acc= 0;
++float oo[3] = { 0.0 };
++                             
++void accgyr(float gx, float gy, float gz, float ax, float ay, float az)
++{
++//	printf("%s: %f %f %f, %f %f %f\n", __func__, gx, gy, gz, ax, ay, az);
++
++  float x_temp,x_2temp,x_tmptemp,x_tmp2temp;
++  float qztemp; 
++  float vx, vy, vz;
++  float ex, ey, ez;
++              
++	static int mm_count = 0;
++
++
++  float tmp1 = x_*x_;
++  float tmp2 = x_*x_2;
++  float tmp3 = x_*x_tmp;
++  float tmp4 = x_2*x_2;
++  float tmp5 = x_2*x_tmp2;
++  float tmp6 = x_tmp*x_tmp;
++  float tmp7 = x_tmp*x_tmp2;
++  float tmp8 = x_tmp2*x_tmp2;
++  if(ax*ay*az==0)
++        return;
++  qztemp = sqrt(ax*ax + ay*ay + az*az);
++  ax = ax /qztemp;
++  ay = ay / qztemp;
++  az = az / qztemp;
++
++  vx = 2*(tmp5 - tmp3);
++  vy = 2*(tmp2 + tmp7);
++  vz = tmp1 - tmp4 - tmp6 + tmp8 ;
++
++  ex = (ay*vz - az*vy) ;
++  ey = (az*vx - ax*vz) ;
++  ez = (ax*vy - ay*vx) ;
++
++  t_pa = t_pa + ex * 0.008;
++  gyr = gyr + ey * 0.008;
++  acc = acc + ez * 0.008;
++
++  gx = gx + 10.0*ex + t_pa;
++  gy = gy + 10.0*ey + gyr;
++  gz = gz + 10.0*ez + acc;
++			  
++  x_temp=x_;
++  x_2temp=x_2;
++  x_tmptemp=x_tmp;
++  x_tmp2temp=x_tmp2;
++
++  x_ = x_temp + (-x_2temp*gx - x_tmptemp*gy -x_tmp2temp*gz)*0.001;
++  x_2 = x_2temp + (x_temp*gx + x_tmptemp*gz -x_tmp2temp*gy)*0.001;
++  x_tmp = x_tmptemp + (x_temp*gy - x_2temp*gz +x_tmp2temp*gx)*0.001;
++  x_tmp2 = x_tmp2temp + (x_temp*gz + x_2temp*gy -x_tmptemp*gx)*0.001;
++
++  qztemp = sqrt(x_*x_ + x_2*x_2 + x_tmp*x_tmp + x_tmp2*x_tmp2);
++  x_ = x_ / qztemp;
++  x_2 = x_2 / qztemp;
++  x_tmp = x_tmp / qztemp;
++  x_tmp2 = x_tmp2 / qztemp;
++
++
++		    #define M_PI        3.14159265358979323846
++                    oo[0] = atan2(2 * (x_ * x_2 + x_tmp * x_tmp2), 1 - 2 * (x_2 * x_2 + x_tmp * x_tmp));
++		    if (oo[0] < 0) oo[0] += M_PI;
++		    else if (oo[0] > 0) oo[0] -= M_PI;
++                    oo[1] = -asin(2 * (x_ * x_tmp - x_tmp2 * x_2));
++                    oo[2] = atan2(2 * (x_ * x_tmp2 + x_2 * x_tmp),  1 - 2 * (x_tmp * x_tmp + x_tmp2 * x_tmp2));
++
++                    // 
++		    /*
++                    oo[0] *= (float)((float)180.0 / (float)M_PI);
++                    oo[1] *= (float)((float)180.0 / (float)M_PI);
++                    oo[2] *= (float)((float)180.0 / (float)M_PI);
++		    */
++	mm_count++; 
++
++	if (mm_count % 500 == 0)
++  printf("angle: %f %f %f\n", oo[0] * 180 / M_PI, oo[1] * 180 / M_PI, oo[2] * 180 / M_PI);
++
++										    
++}
++
++//float oo[3] = { 0.0, 0.0, 0.0 };
++                             
++void my_test(float gx, float gy, float gz, float ax, float ay, float az)
++{
++	static int mm_count = 0;
++
++	float qztemp = 0.0;
++
++	qztemp = sqrtf(ax*ax+ay*ay+az*az);
++
++	ax = ax / qztemp;
++	ay = ay / qztemp;
++	az = az / qztemp;
++
++	/*
++	oo[0] += 0.001 * gx;
++	oo[1] += 0.001 * gy;
++	oo[2] += 0.001 * gz;
++	*/
++
++//	printf("bbb: %d %f %f %f\n", mm_count, gx, gy, gz);
++
++	mm_count++;
++	if (mm_count % 1000 == 0)
++	{
++		mm_count = 0;
++	//	printf("%s: %f %f %f\n", __func__, oo[0], oo[1], oo[2]);
++		printf("%s: %f %f \n", __func__, atan(ay/az) / 0.0174532925 , asin(-ax) / 0.0174532925 );
++	}
++	oo[0] = atan(ay/az) ;
++	oo[1] = asin(-ax) ;
++	oo[2] = 0;
++
++#if 0
++	float A[9];
++	float inv_A[9];
++	matrix_instance_f32 A_matrix;
++	matrix_instance_f32 inv_A_matrix;
++
++	A_matrix.numRows = 3;   
++	A_matrix.numCols = 3;   
++	A_matrix.pData  = A;   
++
++	inv_A_matrix.numRows = 3;
++	inv_A_matrix.numCols = 3;     
++	inv_A_matrix.pData  = inv_A;
++										    
++
++	A[0] = cos(oo[1]); A[1] = 0; A[2] = -sin(oo[1]);
++	A[3] = sin(oo[0]) * sin(oo[1]); A[4] = cos(oo[0]); A[5] = sin(oo[0]) * cos(oo[1]);
++	A[6] = cos(oo[0]) * sin(oo[1]); A[7] = -sin(oo[0]); A[8] = cos(oo[0]) * cos(oo[1]);
++
++if (mm_count % 1000 == 0)
++{
++	printf("cos(oo[0]): %.4f\n", cos(oo[0]));
++	printf("cos(oo[1]): %.4f\n", cos(oo[1]));
++	printf("sin(oo[0]): %.4f\n", sin(oo[0]));
++	printf("sin(oo[1]): %.4f\n", sin(oo[1]));
++	for (int i = 0; i < 3; i++)
++	{
++		for (int j = 0; j < 3; j++)
++		{
++			printf("%.4f ", A[i * 3 + j]);
++		}
++		printf("\n");
++	}
++}
++
++extern void mat_inverse_float(matrix_instance_f32 * pSrc,matrix_instance_f32 * pDst); 
++	mat_inverse_float(&A_matrix,&inv_A_matrix);
++
++if (mm_count % 1000 == 0)
++{
++	printf("\n");
++	for (int i = 0; i < 3; i++)
++	{
++		for (int j = 0; j < 3; j++)
++		{
++			printf("%.4f ", inv_A[i * 3 + j]);
++		}
++		printf("\n");
++	}
++}
++#endif
++
++}
++
++void oo_get_(float out[3])
++{
++	out[0] = oo[0];
++	out[1] = oo[1];
++	out[2] = oo[2];
++}
++
++#endif
++
++static int quit_flag = 0;
++static void aa_calibration_thread(void *p1,void *p2,void *p3)
++{
++	float acc[3] = { 0, 0 , 0 };
++	float ang[3] = { 0, 0, 0 };
++//	float aa[3];
++//	aa_t cc;
++//	float a1= 0.0;
++//	float a2= 0.0;
++//	float a3= 0.0;
++    	float mag_data[3]={0};//存储磁数据
++	extern void lsm6dsv16x_read_data_polling(float *acc, float *ang);
++	extern void lsm6dsv16x_init(void);
++
++	lsm6dsv16x_init();
++	k_msleep(1000 * 2);
++	float axs = 0;
++	float ays = 0;
++	float azs = 0;
++	float gxs = 0;
++	float gys = 0;
++	float gzs = 0;
++	float axx = 0;
++	float ayy = 0;
++	float azz = 0;
++	float gxx = 0;
++	float gyy = 0;
++	float gzz = 0;
++	
++#if 1
++	for (int i = 0; i < 200; i++)
++	{
++		k_msleep(5);
++		lsm6dsv16x_read_data_polling(acc, ang);
++		axs = axs + acc[0] / 1000;
++		ays = ays + acc[1] / 1000;
++		azs = azs + (acc[2] - 1000) / 1000;
++		gxs = gxs + ang[0] / 1000;
++		gys = gys + ang[1] / 1000;
++		gzs = gzs + ang[2] / 1000;
++		printf(": %f %f %f, %f %f %f\n", axs, ays, azs, gxs, gys, gzs);
++	}
++
++	axx = axs / 200;
++	ayy = ays / 200;
++	azz = azs / 200;
++
++	gxx = gxs / 200;
++	gyy = gys / 200;
++	gzz = gzs / 200;
++	
++
++		printf(": %f %f %f, %f %f %f\n", axx, ayy, azz, gxx, gyy, gzz);
++
++		printf("%s: quit_flag: %d\n", __func__, quit_flag);
++#endif
++
++		static int mm_count = 0;
++
++	while (quit_flag != 1)
++	{
++		k_msleep(1);
++		lsm6dsv16x_read_data_polling(acc, ang);
++#if 1
++		
++#if 1
++		accgyr(
++				(ang[0] / 1000  -gxx) * 0.0174532925/*  */, 
++				(ang[1] / 1000  -gyy) * 0.0174532925/*  */, 
++				(ang[2] / 1000  -gzz) * 0.0174532925/*  */,
++				acc[0] / 1000 -axx , 
++				acc[1] / 1000 -ayy, 
++				acc[2] / 1000 -azz 
++				);
++#else
++		accgyr(
++				(ang[0] / 1000) * 0.0174532925/*  */, 
++				(ang[1] / 1000) * 0.0174532925/*  */, 
++				(ang[2] / 1000) * 0.0174532925/*  */,
++				acc[0] / 1000, 
++				acc[1] / 1000, 
++				acc[2] / 1000 
++				);
++#if 0
++		my_test(
++				(ang[0] / 1000)/*  */, 
++				(ang[1] / 1000)/*  */, 
++				(ang[2] / 1000)/*  */,
++				acc[0] / 1000, 
++				acc[1] / 1000, 
++				acc[2] / 1000
++				); 
++#endif
++#endif
++#else
++		my_test(
++				(ang[0] / 1000), 
++				(ang[1] / 1000), 
++				(ang[2] / 1000),
++				acc[0] / 1000, 
++				acc[1] / 1000, 
++				acc[2] / 1000
++				); 
++#endif
++
++		/*
++		mm_count++;
++		if (mm_count % 1000 == 0)
++		{
++			printf("a1: %f, a2: %f, a3: %f\n", acc[0], acc[1], acc[2]);
++		}
++		*/
++
++	}
++}
++
++static k_tid_t m_tid = NULL;
++K_THREAD_STACK_DEFINE(aa_stack_area, 2048);
++static struct k_thread thread_data;
++void aa_thread_init(void)
++{
++	if (m_tid == NULL)
++	{
++		//extern void lsm6dsv16x_init(void);
++		//lsm6dsv16x_init();
++		m_tid = k_thread_create(&thread_data, aa_stack_area,
++				K_THREAD_STACK_SIZEOF(aa_stack_area),
++				aa_calibration_thread, NULL, NULL, NULL,
++				15, 0, K_NO_WAIT);
++		k_thread_name_set(m_tid, "aa_thread");
++	}
++	else
++	{
++		SYS_LOG_INF("%s: already started", __func__);
++	}
++}
++
++int shell_aa_test_exit(void)
++{
++	quit_flag = 1;
++	return 0;
++}
++
++int shell_aa_test_quit(const struct shell *shell, size_t argc, char **argv)
++{
++	return shell_aa_test_exit();
++}
++
++int shell_aa_test(const struct shell *shell, size_t argc, char **argv)
++{
++	quit_flag = 0;
++	m_tid = NULL;
++	aa_thread_init();
++	return 0;
++}
+ 
+ SHELL_STATIC_SUBCMD_SET_CREATE(sub_system,
+ 	SHELL_CMD(dumpmem, NULL, "dump mem info.", shell_dump_meminfo),
+@@ -132,6 +493,10 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_system,
+ #ifdef CONFIG_SYS_WAKELOCK
+ 	SHELL_CMD(wlock, NULL, "wlock lock[unlock] ", shell_wake_lock),
+ #endif
++	SHELL_CMD(gps_test, NULL, "wlock lock[unlock] ", shell_gps_test),
++	SHELL_CMD(mm_test, NULL, "wlock lock[unlock] ", shell_mm_test),
++	SHELL_CMD(aa_test, NULL, "wlock lock[unlock] ", shell_aa_test),
++	SHELL_CMD(aa_test_q, NULL, "wlock lock[unlock] ", shell_aa_test_quit),
+ 	SHELL_SUBCMD_SET_END /* Array terminated. */
+ );
+ 
