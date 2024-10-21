@@ -1,4 +1,7 @@
 
+tinyusb
+git@github.com:hathach/tinyusb.git
+
 git@github.com:aklomp/base64.git
 git@github.com:zhicheng/base64.git
 
