@@ -1,4 +1,7 @@
 
+lz4
+https://github.com/zephyrproject-rtos/lz4
+
 tinyusb
 git@github.com:hathach/tinyusb.git
 
