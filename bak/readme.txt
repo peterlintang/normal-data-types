@@ -1,4 +1,7 @@
 
+usb xie yi
+https://blog.csdn.net/weixin_42109053/article/details/128899106
+
 lz4
 https://github.com/zephyrproject-rtos/lz4
 
