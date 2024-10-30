@@ -36,6 +36,21 @@ sar	//sysstat
 ps
 watch
 
+/***********************************************
+you xi
+
+lei dian
+chromium-bsu
+sudo apt-get install chromium-bsu
+
+2 d zuo mian tan qiu
+frozen-bubble
+sudo apt-get install frozen-bubble
+
+mo shou
+sudo apt-get install megaglest
+**********************************************/
+
 dijkstra
 iconv	// change code 
 iconv -f ISO-8859-1 -t  UTF-8  input.txt -o output.txt
