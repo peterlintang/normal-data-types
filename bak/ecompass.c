@@ -33,7 +33,7 @@ Int16 low_pass_filter(void)
 	Int32 tmpAngle; 	/* temporary angle*100 deg: range -36000 to 36000 */
 	static Int16 iLPPsi;	/* low pass filtered angle*100 deg: range -18000 to 18000 */
 	
-	/* ???? */
+	/* ???????? */
 	static UInt16 ANGLE_LPF; /* low pass filter: set to 32768 / N for N samples averaging */
 
 	/* implement a modulo arithmetic exponential low pass filter on the yaw angle */
