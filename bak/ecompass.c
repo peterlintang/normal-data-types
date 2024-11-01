@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 
 	iecompass(Bpx, Bpy, Bpz, Gpx, Gpy, Gpz);
 
-	printf("roll: %d, pitch: %d, yaw: %d\n", iPhi, iThe, iPsi > 0 ? iPsi : 360 * 100 + iPsi);
+	printf("roll: %d, pitch: %d, yaw: %d\n", iPhi, iThe, (int32_t)iPsi > 0 ? (int32_t)iPsi : 360 * 100 + (int32_t)iPsi);
 
 	return 0;
 }
