@@ -85,6 +85,9 @@ gpu-chk
 power stress and shaping tool
 psst
 
+xing neng fen xi
+uftrace
+
 
 
 
