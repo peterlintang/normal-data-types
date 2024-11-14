@@ -43,7 +43,44 @@ shading flat | faceted | interp
 surfl
 
 hui zhi zhu mian
-cylinder
+[x,y,z] = cylinder(r, n)
 hui zhi qiu mian
-sphere
+[x,y,z] = sphere(n)
+
+zhi fang tu
+bar
+bar3
+barh
+bar3h
+
+mian ji tu
+area
+
+bing tu
+pie
+
+zhu zhuang tu
+histogram
+
+tuo pu tu
+gplot
+
+huo chai gan tu
+stem
+
+jie ti tu
+stairs
+
+fu shu xiang liang ping mian biao da
+compass
+feather
+
+er san wei xiang liang chang de biao xian
+quiver
+quiver3
+
+wu cha bang tu
+errorbar
+
+
 
