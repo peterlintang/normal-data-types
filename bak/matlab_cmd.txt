@@ -1,0 +1,49 @@
+
+figure
+figure(n)
+get(n)	
+set(n)
+a = subplot(m,n,1);
+
+er wei hua tu
+plot
+fplot
+ezplot
+loglog
+semilogx
+semilogy
+plotyy
+
+huo qu shu biao xuan dian de zuo biao
+ginput
+
+zoom on | off | out | reset | xon | yon | (factor) | (fig, option)
+
+san wei hui tu
+plot3(x, y, z)
+plot3(x, y, z, s)
+mesh(x, y, z)
+surf
+
+hua chu deng gao xian
+meshc
+surfc
+
+meshz
+
+pcolor
+surfl surfi ?
+waterfall
+
+view(az, el) az: fang wei jiao, el: fu shi jiao
+
+hidden on | off
+shading flat | faceted | interp
+
+surfl
+
+hui zhi zhu mian
+cylinder
+hui zhi qiu mian
+sphere
+
