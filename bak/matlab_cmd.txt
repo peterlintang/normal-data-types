@@ -84,3 +84,16 @@ errorbar
 
 
 
+
+Inspiron 3576可以通过BIOS设置关闭功耗墙。‌
+
+要关闭Inspiron 3576的功耗墙，可以按照以下步骤操作：
+
+‌进入BIOS设置‌：在开机时按下相应的按键（通常是F2、F10或Delete键）进入BIOS设置‌1。
+‌找到相关选项‌：在BIOS设置中，找到“Advanced”（高级）选项，然后找到“CPU Configuration”（CPU配置）选项‌1。
+‌禁用CPU电源管理‌：在“CPU Configuration”选项中，找到“CPU Power Management”（CPU电源管理）选项，然后将“CPU C States”（CPU C状态）设置为“Disabled”（禁用）‌1。
+‌保存并退出‌：保存设置并退出BIOS，这样功耗墙就被关闭了‌1。
+‌关闭功耗墙的影响‌：关闭功耗墙可能会导致电脑过度使用电力，增加硬件损坏的风险。因此，在关闭功耗墙之前，请确保电脑的电源和散热系统足够强大，以避免过度使用电力而导致硬件损坏‌1。
+
+
+
