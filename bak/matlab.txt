@@ -31,3 +31,9 @@ password for rar: www.jb51.net
 在已经工作的 Matlab 的更新/更改期间，无需执行步骤 3
 可能需要重复第 6 步（如果在更新/更改 Matlab 文件“libmwlmgrimpl.so”期间被覆盖）
 如果在更新/更改后您在 Matlab 启动过程中遇到错误，请先尝试重做第 6 步
+
+
+
+
+addons
+https://blog.csdn.net/ccsss22/article/details/135417664
