@@ -1,0 +1,22 @@
+
+huo qu g de lei xing
+class(g);
+
+liang du bian huan
+f: input img, 
+g: output img,
+low_in high_in ->remap to-> low_out high_out
+gamma: < 1, = 1, > 1
+g = imadjust(f, [low_in high_in], [low_out high_out], gamma);
+
+g = imcomplement(f);
+
+mat2gray(A, [AMin AMax]);
+
+im2uint8(I);
+
+
+zhi fang tu
+h = imhist(f, b)
+
+
