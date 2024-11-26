@@ -82,6 +82,10 @@ quiver3
 wu cha bang tu
 errorbar
 
+xian shi scope de cai dan lan
+set(0,'showHiddenHandles', 'On');
+set(gcf,'menubar','figure');
+
 
 
 
