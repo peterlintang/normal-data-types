@@ -106,6 +106,8 @@ matlab2024b
 https://www.cnblogs.com/zhongji/p/18522682
 
 
+resource
+https://fscae.com/page/2/?s=matlab+for+engineer&type=post
 
 
 
