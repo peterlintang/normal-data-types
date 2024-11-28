@@ -102,6 +102,25 @@ a2.Name='a2';
 a.Elements=[a1,a2];
 ********************************************/
 
+/*******************************************
+
+chuang jian shi jian xu lie bian lian 
+yong yu from workspace dao ru
+1>
+ts=timeseries(sin([0:0.1:10]),[0:0.1:10]);
+
+2>
+matrx = zeros(size(repmat([0:0.1:10]',[1 3])));
+matrx
+matrx(:,1)=0:0.1:10';
+matrx(:,2)=cos([0:0.1:10])';
+matrx(:,3)=sin([0:0.1:10])';
+
+3>
+struct=struct('time',[0:0.1:10]','signals',struct('values',sin([0:0.1:10]'),'dimension',length([0:0.1:10])))
+
+*******************************************/
+
 
 
 Inspiron 3576可以通过BIOS设置关闭功耗墙。‌
