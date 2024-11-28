@@ -87,6 +87,21 @@ set(0,'showHiddenHandles', 'On');
 set(gcf,'menubar','figure');
 
 
+/*******************************************
+simulink zhong 
+she zhi wei ert.tlc
+ctrl + B sheng cheng dai ma
+
+s2dot2_115_bus_creator.slx
+a=Simulink.Bus
+a.DataScope='Exported';
+a1=Simulink.BusElement;
+a2=Simulink.BusElement;
+a1.Name='a1'
+a2.Name='a2';
+a.Elements=[a1,a2];
+********************************************/
+
 
 
 Inspiron 3576可以通过BIOS设置关闭功耗墙。‌
