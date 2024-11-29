@@ -131,6 +131,10 @@ xian xing hua qu dian
 linspace(x1,x2,n)
 
 
+zhi fang zheng, bu bian yi, sheng cheng c dai ma shi
+eml.extrinsic('plot','bar');
+
+
 
 
 
