@@ -121,6 +121,14 @@ struct=struct('time',[0:0.1:10]','signals',struct('values',sin([0:0.1:10]'),'dim
 
 *******************************************/
 
+bao cun gong zuo bian lian dao wen jian
+save matrx.mat matrx
+jia zai wen jian bian lian dao gong zuo kong jian
+load matrx.mat
+
+
+
+
 
 
 Inspiron 3576可以通过BIOS设置关闭功耗墙。‌
