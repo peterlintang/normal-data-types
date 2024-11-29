@@ -92,4 +92,5 @@ uftrace
 pdftf
 
 
+7z x -p密码 文件名.zip
 
