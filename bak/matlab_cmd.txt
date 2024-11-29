@@ -127,6 +127,9 @@ jia zai wen jian bian lian dao gong zuo kong jian
 load matrx.mat
 
 
+xian xing hua qu dian
+linspace(x1,x2,n)
+
 
 
 
