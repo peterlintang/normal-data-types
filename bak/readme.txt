@@ -109,6 +109,8 @@ https://www.cnblogs.com/zhongji/p/18522682
 resource
 https://fscae.com/page/2/?s=matlab+for+engineer&type=post
 
+chip select and os
+https://m.lunwendata.com/show.php?id=16422
 
 
 
