@@ -5,6 +5,7 @@ get(n)
 set(n)
 a = subplot(m,n,1);
 
+
 er wei hua tu
 plot
 fplot
@@ -134,7 +135,12 @@ linspace(x1,x2,n)
 zhi fang zheng, bu bian yi, sheng cheng c dai ma shi
 eml.extrinsic('plot','bar');
 
+line_obj=find_system(gcs, 'findall', 'on', 'type', 'line')
+get(line_obj)
 
+
+chuang jian zi xi tong
+Ctrl + G
 
 
 
