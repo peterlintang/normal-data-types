@@ -142,6 +142,9 @@ get(line_obj)
 chuang jian zi xi tong
 Ctrl + G
 
+signals = getfield(yout, 'signals')
+values = getfield(signals, 'values')
+
 
 
 Inspiron 3576可以通过BIOS设置关闭功耗墙。‌
