@@ -1,3 +1,4 @@
+% codegen -config coder.config('lib') average_filter -args {x}
 % y = averaging_filter(x)
 % Take an input vector signal 'x' and produce an output vector signal 'y' with
 % same type and shape as 'x' but filtered.
