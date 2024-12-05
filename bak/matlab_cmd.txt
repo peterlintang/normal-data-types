@@ -148,6 +148,10 @@ values = getfield(signals, 'values')
 save model as piture
 saveas(get_param(gcs, 'handle'), 'simulink_pic', 'tiff');
 
+bian yi
+ctrl + B
+rtwbuild(gcs)
+
 
 
 Inspiron 3576可以通过BIOS设置关闭功耗墙。‌
