@@ -172,6 +172,11 @@ RTW.configSubsystemBuild(gcbh)
 da kai model explore
 sfexplr
 
+excel biao ge xiang guan
+xlsfinfo
+xlsread
+xlswrite
+
 
 
 Inspiron 3576可以通过BIOS设置关闭功耗墙。‌
