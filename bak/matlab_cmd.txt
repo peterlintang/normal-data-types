@@ -145,12 +145,32 @@ Ctrl + G
 signals = getfield(yout, 'signals')
 values = getfield(signals, 'values')
 
+chuang jian xin hao yu can shu
+A = Simulink.Signal
+B = Simulink.Parameter
+C = mpt.Signal
+D = mpt.Parameter
+Simulink.Bus
+Simulink.BusElement
+Simulink.AliasType		ding yi bie ming
+Simulink.NumericType
+
+ci dian shu ju
+page 174
+
+
 save model as piture
 saveas(get_param(gcs, 'handle'), 'simulink_pic', 'tiff');
 
 bian yi
 ctrl + B
 rtwbuild(gcs)
+
+she zhi zi xi tong jie kou han shu yuan xing, mo xing mu biao wen jian she zhi wei ert.tlc
+RTW.configSubsystemBuild(gcbh)
+
+da kai model explore
+sfexplr
 
 
 
