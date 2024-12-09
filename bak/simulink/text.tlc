@@ -1,0 +1,7 @@
+%warning Simulink user
+%assign Str="hello world"
+text | %<Str>
+%assign input1 = 5
+%assign input2 = 3
+%warning %<input1> + %<input2> = %<input1 + input2>
+%%error Simulink User

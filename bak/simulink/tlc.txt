@@ -1,0 +1,125 @@
+
+yu fa:
+%keyword [argument1, argument2, ...]
+
+keyword
+waring
+error
+
+%% dan hang zhu shi
+
+/% 	duo hang zhu shi
+... 
+... 
+... 
+%%
+
+%<>
+
+tiao jian fen zhi
+%if expression
+%elseif expression
+%else
+%endif
+
+kai guan fen zhi
+%switch expression
+%case expression
+%break
+%default
+%break
+%endswitch
+
+xun huan
+%foreach loopIdx = iterNum
+xxxxxxxxxx
+%endforeach
+
+%roll
+%endroll
+
+%for ident1 = const - exp1, const - exp2, ident2 = const - exp3
+ Code section1
+ % body
+ Code section2
+ % endbody
+ Code section3
+%endfor
+
+
+wen jian liu
+%openfile streamId="filename.ext" mode {open fro writing, mode: a or w}
+%selectfile {select an open file}
+%closefile {close an open file}
+
+
+record
+%createrecord NEW_RECORD {foo 1;SUB_RECORD{foo 2}}
+
+quan ju fang wen
+%createrecord::NEW_RECORD {foo 1;SUB_RECORD{foo 2}}
+
+%addtorecord OLD_RECORD NEW_FIELD_NAME NEW_FIELD_VALUE
+
+%mergerecord NEW_RECORD OLD_RECORD
+
+%copyrecord NEW_RECORD OLD_RECORD
+
+shan chu ji lv
+%undef var
+fan wei zhi ding
+%with NEW_RECORD
+%undef foo
+%endwith
+
+
+qing chu bian liang
+%undef var
+
+yu ju huan hang
+... or \
+
+
+lu jin kong zhi
+%include file	{ bao han wen jian }
+%addincludepath dir	{ tian jia sou suo lu jin }
+
+shu chu ge shi kong zhi
+%realformat
+
+zhi ding mo kuai sheng cheng yu yan zhong lei
+%language "C"
+%implements "Block-Type" "Language"
+%generatefile "Type" "blockwise.tlc"
+
+duan yan
+%assert expression
+
+han shu
+%function name(optional-arguments) void or Output
+...
+%endfunction
+
+nei jian han shu
+CAST("DataType", var)
+EXISTS(var)
+%ISFIELD(record, "fieldName")
+%GETFIELD(record, "fieldName")
+%SETFIELD(record, "fieldName", val)
+%REMOVEFIELD(record, "fieldName")
+ISEQUAL(expr1, expr2)
+ISEMPTY(var)
+TYPE(expr)
+WHITE_SPACE(expr)
+%matlab fun(args)
+%FEVAL(matlab-fun-name, rhs1, rhs2, ...)  { fan hui zhi }
+
+
+
+
+
+
+
+
+
+
