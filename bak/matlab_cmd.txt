@@ -177,6 +177,140 @@ xlsfinfo
 xlsread
 xlswrite
 
+she zhi lu jin
+pathtool
+
+zeros
+ones
+rand
+randn
+magic
+diag
+triu
+tril
+hankel
+hadamard
+pascal
+vander
+invhilb
+hilb
+company
+eye
+
+yuan bao
+{}
+cell
+cellstr
+celldisp
+cellplot
+cellfun
+iscell
+reshape
+
+jie gou ti
+struct(attr1,value1,attr2,value2, ...)
+
+det
+inv
+eig
+rank
+trace
+norm
+poly
+fliplr
+flipud
+flipdim
+resharp
+rot90
+diag
+tril
+triu
+
+exp
+log
+conv
+deconv
+
+format
+digits
+vpa
+
+char
+strcat
+strvcat
+strcmp
+strncmp
+strfind
+strrep
+strsplit
+strtok
+upper
+lower
+blanks
+deblank
+
+int2str
+mat2str
+num2str
+str2num
+base2dec
+bin2dec
+dec2base
+dec2bin
+struct2cell
+mat2cell
+cell2struct
+cell2mat
+num2hex
+hex2num
+hex2dec
+dec2hex
+
+helpdesk
+doc
+
+funhandle=@funname
+
+hua er wei tu
+X=x1:dx:x2;
+Y=fun(X);
+plot(X,Y);
+
+
+wang ge hui zhi
+x=x1:dx:x2;
+y=y1:dy:y2;
+[X,Y] = meshgrid(x,y);
+Z=fun(X,Y);
+mesh(X,Y,Z);
+
+qu mian
+surf(X,Y,Z);
+
+te su
+slice
+quiver3
+sphere
+plot3
+
+qiu han shu fun bian lian x qu yu x0 shi de zhi
+y=limit(fun, x, x0)
+eg: limit((sin(x)-sin(3*x))/sin(x),x,0)
+
+qiu han shu f zi bian lian x de n jie dao shu
+diff(f, x, n);
+eg:f = sym(exp(-2*x)*cos(3*x^(1/2)))
+or f = str2sym('exp(-2*x)*cos(3*x^(1/2))')
+
+shu zhi qiu dao
+x=linspace(0,2*pi,50);
+y=sin(x);
+dydx=diff(y)./diff(x);
+plot(x(1:49),dydx),grid
+
+qiu han shu f dui yu bian liang r de ji fen, ji fen qu jian wei [x0, x1]
+int(f,r,x0,x1)
+
 
 
 Inspiron 3576可以通过BIOS设置关闭功耗墙。‌
