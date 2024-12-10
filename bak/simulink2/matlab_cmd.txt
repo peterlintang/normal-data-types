@@ -1,0 +1,327 @@
+
+figure
+figure(n)
+get(n)	
+set(n)
+a = subplot(m,n,1);
+
+
+er wei hua tu
+plot
+fplot
+ezplot
+loglog
+semilogx
+semilogy
+plotyy
+
+huo qu shu biao xuan dian de zuo biao
+ginput
+
+zoom on | off | out | reset | xon | yon | (factor) | (fig, option)
+
+san wei hui tu
+plot3(x, y, z)
+plot3(x, y, z, s)
+mesh(x, y, z)
+surf
+
+hua chu deng gao xian
+meshc
+surfc
+
+meshz
+
+pcolor
+surfl surfi ?
+waterfall
+
+view(az, el) az: fang wei jiao, el: fu shi jiao
+
+hidden on | off
+shading flat | faceted | interp
+
+surfl
+
+hui zhi zhu mian
+[x,y,z] = cylinder(r, n)
+hui zhi qiu mian
+[x,y,z] = sphere(n)
+
+zhi fang tu
+bar
+bar3
+barh
+bar3h
+
+mian ji tu
+area
+
+bing tu
+pie
+
+zhu zhuang tu
+histogram
+
+tuo pu tu
+gplot
+
+huo chai gan tu
+stem
+
+jie ti tu
+stairs
+
+fu shu xiang liang ping mian biao da
+compass
+feather
+
+er san wei xiang liang chang de biao xian
+quiver
+quiver3
+
+wu cha bang tu
+errorbar
+
+xian shi scope de cai dan lan
+set(0,'showHiddenHandles', 'On');
+set(gcf,'menubar','figure');
+
+
+/*******************************************
+simulink zhong 
+she zhi wei ert.tlc
+ctrl + B sheng cheng dai ma
+
+s2dot2_115_bus_creator.slx
+a=Simulink.Bus
+a.DataScope='Exported';
+a1=Simulink.BusElement;
+a2=Simulink.BusElement;
+a1.Name='a1'
+a2.Name='a2';
+a.Elements=[a1,a2];
+********************************************/
+
+/*******************************************
+
+chuang jian shi jian xu lie bian lian 
+yong yu from workspace dao ru
+1>
+ts=timeseries(sin([0:0.1:10]),[0:0.1:10]);
+
+2>
+matrx = zeros(size(repmat([0:0.1:10]',[1 3])));
+matrx
+matrx(:,1)=0:0.1:10';
+matrx(:,2)=cos([0:0.1:10])';
+matrx(:,3)=sin([0:0.1:10])';
+
+3>
+struct=struct('time',[0:0.1:10]','signals',struct('values',sin([0:0.1:10]'),'dimension',length([0:0.1:10])))
+
+*******************************************/
+
+bao cun gong zuo bian lian dao wen jian
+save matrx.mat matrx
+jia zai wen jian bian lian dao gong zuo kong jian
+load matrx.mat
+
+
+xian xing hua qu dian
+linspace(x1,x2,n)
+
+
+zhi fang zheng, bu bian yi, sheng cheng c dai ma shi
+eml.extrinsic('plot','bar');
+
+line_obj=find_system(gcs, 'findall', 'on', 'type', 'line')
+get(line_obj)
+
+
+chuang jian zi xi tong
+Ctrl + G
+
+signals = getfield(yout, 'signals')
+values = getfield(signals, 'values')
+
+chuang jian xin hao yu can shu
+A = Simulink.Signal
+B = Simulink.Parameter
+C = mpt.Signal
+D = mpt.Parameter
+Simulink.Bus
+Simulink.BusElement
+Simulink.AliasType		ding yi bie ming
+Simulink.NumericType
+
+ci dian shu ju
+page 174
+
+
+save model as piture
+saveas(get_param(gcs, 'handle'), 'simulink_pic', 'tiff');
+
+bian yi
+ctrl + B
+rtwbuild(gcs)
+
+she zhi zi xi tong jie kou han shu yuan xing, mo xing mu biao wen jian she zhi wei ert.tlc
+RTW.configSubsystemBuild(gcbh)
+
+da kai model explore
+sfexplr
+
+excel biao ge xiang guan
+xlsfinfo
+xlsread
+xlswrite
+
+she zhi lu jin
+pathtool
+
+zeros
+ones
+rand
+randn
+magic
+diag
+triu
+tril
+hankel
+hadamard
+pascal
+vander
+invhilb
+hilb
+company
+eye
+
+yuan bao
+{}
+cell
+cellstr
+celldisp
+cellplot
+cellfun
+iscell
+reshape
+
+jie gou ti
+struct(attr1,value1,attr2,value2, ...)
+
+det
+inv
+eig
+rank
+trace
+norm
+poly
+fliplr
+flipud
+flipdim
+resharp
+rot90
+diag
+tril
+triu
+
+exp
+log
+conv
+deconv
+
+format
+digits
+vpa
+
+char
+strcat
+strvcat
+strcmp
+strncmp
+strfind
+strrep
+strsplit
+strtok
+upper
+lower
+blanks
+deblank
+
+int2str
+mat2str
+num2str
+str2num
+base2dec
+bin2dec
+dec2base
+dec2bin
+struct2cell
+mat2cell
+cell2struct
+cell2mat
+num2hex
+hex2num
+hex2dec
+dec2hex
+
+helpdesk
+doc
+
+funhandle=@funname
+
+hua er wei tu
+X=x1:dx:x2;
+Y=fun(X);
+plot(X,Y);
+
+
+wang ge hui zhi
+x=x1:dx:x2;
+y=y1:dy:y2;
+[X,Y] = meshgrid(x,y);
+Z=fun(X,Y);
+mesh(X,Y,Z);
+
+qu mian
+surf(X,Y,Z);
+
+te su
+slice
+quiver3
+sphere
+plot3
+
+qiu han shu fun bian lian x qu yu x0 shi de zhi
+y=limit(fun, x, x0)
+eg: limit((sin(x)-sin(3*x))/sin(x),x,0)
+
+qiu han shu f zi bian lian x de n jie dao shu
+diff(f, x, n);
+eg:f = sym(exp(-2*x)*cos(3*x^(1/2)))
+or f = str2sym('exp(-2*x)*cos(3*x^(1/2))')
+
+shu zhi qiu dao
+x=linspace(0,2*pi,50);
+y=sin(x);
+dydx=diff(y)./diff(x);
+plot(x(1:49),dydx),grid
+
+qiu han shu f dui yu bian liang r de ji fen, ji fen qu jian wei [x0, x1]
+int(f,r,x0,x1)
+
+
+
+Inspiron 3576可以通过BIOS设置关闭功耗墙。‌
+
+要关闭Inspiron 3576的功耗墙，可以按照以下步骤操作：
+
+‌进入BIOS设置‌：在开机时按下相应的按键（通常是F2、F10或Delete键）进入BIOS设置‌1。
+‌找到相关选项‌：在BIOS设置中，找到“Advanced”（高级）选项，然后找到“CPU Configuration”（CPU配置）选项‌1。
+‌禁用CPU电源管理‌：在“CPU Configuration”选项中，找到“CPU Power Management”（CPU电源管理）选项，然后将“CPU C States”（CPU C状态）设置为“Disabled”（禁用）‌1。
+‌保存并退出‌：保存设置并退出BIOS，这样功耗墙就被关闭了‌1。
+‌关闭功耗墙的影响‌：关闭功耗墙可能会导致电脑过度使用电力，增加硬件损坏的风险。因此，在关闭功耗墙之前，请确保电脑的电源和散热系统足够强大，以避免过度使用电力而导致硬件损坏‌1。
+
+
+
