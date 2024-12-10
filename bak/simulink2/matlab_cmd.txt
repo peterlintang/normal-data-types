@@ -293,6 +293,9 @@ quiver3
 sphere
 plot3
 
+options:
+optimset
+
 qiu han shu fun bian lian x qu yu x0 shi de zhi
 y=limit(fun, x, x0)
 eg: limit((sin(x)-sin(3*x))/sin(x),x,0)
@@ -310,6 +313,81 @@ plot(x(1:49),dydx),grid
 
 qiu han shu f dui yu bian liang r de ji fen, ji fen qu jian wei [x0, x1]
 int(f,r,x0,x1)
+
+chang yong qiu jie wei ji fen fang cheng shu zhi jie
+[t, x] = ode23('xprime', to, tf, x0, tol, trace)
+[t, x] = ode45('xprime', to, tf, x0, tol, trace)
+[t, x] = ode23('xprime', [to, tf], x0, tol, trace)
+[t, x] = ode45('xprime', [to, tf], x0, tol, trace)
+eg: page57
+qiu wei fen fang cheng
+z1' = z2;
+z2' = z3;
+z3' = x^(-1)*z3-3*x^(-2)*z2+2*x^(-3)*z1+9*x^3*sin(x)
+zai qu jian H=[0.1,60]shang man zuo: x = 0.1, z1 = 1, z2 = 1, z3 = 1 de te jie
+
+H=[0.1,60];
+z0=[1;1;1];
+[x,z]=ode15s('dzdx1',H,z0);
+plot(x,z(:,1),'g--',x,z(:,2),'b*--',x,z(:,3),'mp--');
+
+page 57
+long bei ge ji fen
+[q,s]=Roberg(x^2,-1,1)
+
+chang wei fen fang cheng fu hao jie
+syms y(t) a
+Dy=diff(y)
+dsolve(Dy==(a)^(1/2)*t,t)
+
+
+%page 65
+fei xian xing fang cheng zu qiu jie
+jiang fang cheng zu hua wei
+F(x) = 0 xing shi
+
+%x0: chu shi zhi
+%myfun: m wen jian ding yi de F(x)
+%options: can shu
+[x,fval] = fsolve(@myfun, x0, options);
+
+
+page66
+wu yue su zui hua hua wen ti
+
+qiu duo yuan han shu zui xiao zhi
+fminsearch
+eg:fminsearch('2*x(1)^3+x(1)*x(2)^4-10*x(1)*x(2)', [0,0])
+or
+function f=myfun(x)
+	f = 2*x(1)^3+x(1)*x(2)^4-10*x(1)*x(2);
+end
+fminsearch(@myfun, [0, 0]);
+
+page67
+xian xing gui hua
+linprog
+eg:
+f=[1 1 1];
+A=[1 -1 1;3 2 4;3 2 0]
+b=[20;42;30];
+lb=zeros(3,1)
+[x,fval,exitflag,output,lambda]=linprog(f,A,b,[],[],lb)
+
+page69
+er ci gui hua wen ti
+quadprog
+eg:
+%f(x) = (1/2)x'Hx + f'x
+H=[1 -1;-1 2]
+f=[-2;-6];
+A=[1 1; -1 2; 2 1];
+b=[2;2;3]
+lb=zeros(2,1)
+clc
+[x,fval,exitflag,output,lambda]=quadprog(H,f,A,b,[],[],lb);
+
+
 
 
 
