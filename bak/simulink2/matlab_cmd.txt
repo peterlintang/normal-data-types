@@ -388,6 +388,19 @@ clc
 [x,fval,exitflag,output,lambda]=quadprog(H,f,A,b,[],[],lb);
 
 
+ming ling hang chuang jian mo xing yi ji xiu gai can shu
+new_system('new_model', options) % options: Library or Model
+open_system('model')
+save_system('model', 'filename');
+add_block('source block name', 'dest model name', 'attribute1_name', attribute1_value, ...);
+add_line('block name', 'source block name/output port name', 'dest block name/input port name');
+add_line('block name', m);
+delete_block('block name');
+simget('model name');
+set_param('model or block name', 'attribute', value);
+[t,x,y] = sim('model', timespan, options, ut)
+[t,x,y1, y2, ...] = sim('model', timespan, options, ut)
+
 
 
 
