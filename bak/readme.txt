@@ -114,6 +114,7 @@ https://m.lunwendata.com/show.php?id=16422
 
 
 
+https://electronics.stackexchange.com/questions/140116/how-do-you-determine-how-much-flash-ram-you-need-for-a-microcontroller
 
 
 
