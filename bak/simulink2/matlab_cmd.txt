@@ -401,6 +401,21 @@ set_param('model or block name', 'attribute', value);
 [t,x,y] = sim('model', timespan, options, ut)
 [t,x,y1, y2, ...] = sim('model', timespan, options, ut)
 
+close_system
+bdclose
+find_system
+replace_block
+delete_line
+get_param
+gcb
+gcs
+gcbh
+simulink
+bdroot
+
+simulink3
+sfundemos
+edit sfuntmpl
 
 
 
