@@ -417,6 +417,15 @@ simulink3
 sfundemos
 edit sfuntmpl
 
+zhong zhi lv bo
+medfilt2(B)
+fspecial()
+filter2
+im2bw()
+rgb2hsv
+imrotate
+imresize
+
 
 
 Inspiron 3576可以通过BIOS设置关闭功耗墙。‌
