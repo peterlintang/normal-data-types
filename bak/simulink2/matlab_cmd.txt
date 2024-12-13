@@ -431,6 +431,13 @@ strel
 imopen
 imclose
 
+A=imread('pout.tif');
+B=imnoise(A, 'salt&pepper');
+B=imnoise(A, 'salt & pepper');
+SE=strel('disk', 2);
+C=imopen(B,SE);
+D=imclose(C,SE);
+
 
 
 Inspiron 3576可以通过BIOS设置关闭功耗墙。‌
