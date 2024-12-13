@@ -119,6 +119,8 @@ https://electronics.stackexchange.com/questions/140116/how-do-you-determine-how-
 
 https://www.digikey.com/en/products/filter/embedded/microcontrollers/685?s=N4IgjCBcprDMVQGMoDMCGAbAzgUwDQgD2UA2iABwAMVFFAbCALqEAOALlCAMrsBOASwB2AcxABfSUA
 
+cpu clock select
+https://stackoverflow.com/questions/66861363/how-to-determine-mcu-clock-speed-requirements
 
 
 

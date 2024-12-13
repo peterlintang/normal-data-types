@@ -425,6 +425,11 @@ im2bw()
 rgb2hsv
 imrotate
 imresize
+imdilate
+imerode
+strel
+imopen
+imclose
 
 
 
