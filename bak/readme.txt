@@ -122,6 +122,9 @@ https://www.digikey.com/en/products/filter/embedded/microcontrollers/685?s=N4Igj
 cpu clock select
 https://stackoverflow.com/questions/66861363/how-to-determine-mcu-clock-speed-requirements
 
+systemd
+https://www.cnblogs.com/yanjingge888/articles/18501514
+
 
 
 
