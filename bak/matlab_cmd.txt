@@ -311,6 +311,10 @@ plot(x(1:49),dydx),grid
 qiu han shu f dui yu bian liang r de ji fen, ji fen qu jian wei [x0, x1]
 int(f,r,x0,x1)
 
+guide
+mcc
+coder
+
 
 
 Inspiron 3576可以通过BIOS设置关闭功耗墙。‌

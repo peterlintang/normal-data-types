@@ -438,6 +438,15 @@ SE=strel('disk', 2);
 C=imopen(B,SE);
 D=imclose(C,SE);
 
+coder
+mcc
+guide
+
+qiu gen
+roots([3 2 1]);
+solve(3*x^2+2*x+1);
+bb = tf([3 2 1], 1) ??
+zero(bb)
 
 
 Inspiron 3576可以通过BIOS设置关闭功耗墙。‌
