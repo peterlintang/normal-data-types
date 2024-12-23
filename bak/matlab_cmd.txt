@@ -302,6 +302,33 @@ diff(f, x, n);
 eg:f = sym(exp(-2*x)*cos(3*x^(1/2)))
 or f = str2sym('exp(-2*x)*cos(3*x^(1/2))')
 
+pretty();
+simplify
+
+syms y(t)
+ode = diff(y)+4*y==exp(-t)
+cond = y(0) == 1;
+ySol(t)=dsolve(ode, cond)
+
+eqn = 2*diff(y,t,2)+diff(y,t)+11*y==exp(-t);
+D1y=diff(y,t);
+cond=[y(0) == 1, D1y(0) ==0];
+ySol = dsolve(eqn, cond)
+fplot(ySol, [1, 6])
+
+
+(s+1)/(s^2+5s+6) == 2/(s+3)+(-1)/(s+2)
+num = [1 1];
+den = [1 5 6];
+[r,p,k] = residue(num, den)
+
+laplace
+ilaplace
+taylor(sin(x), x, 'Order', 5);
+fourier(t*exp(-t^2), t, w);
+expand((x+1)*(x+2))
+factor(x^2+3*x+2)
+
 shu zhi qiu dao
 x=linspace(0,2*pi,50);
 y=sin(x);
