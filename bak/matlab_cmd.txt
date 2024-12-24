@@ -1,4 +1,7 @@
 
+y@(x) sin(x)
+y(pi/2) == 1
+
 figure
 figure(n)
 get(n)	
