@@ -1,6 +1,24 @@
 
-y@(x) sin(x)
+y=@(x) sin(x)
 y(pi/2) == 1
+
+qiu: f(x, y)dxdy where f (x, y) =
+f=@(x,y) 1./(sqrt(x+y).*(1+x+y).^2);
+ymax=@(x) 1-x;
+integral2(f,0,1,0,ymax);
+
+sum(x)
+mean(x)==sum(x)/length(x)
+var(x)
+std(x)==sqrt(var(x))
+factorial(n)
+gamma(n)
+nchoosek(n, k)
+rand(row,col)
+floor
+
+
+integral3(f,0,pi,0,1,-1,1);
 
 figure
 figure(n)
