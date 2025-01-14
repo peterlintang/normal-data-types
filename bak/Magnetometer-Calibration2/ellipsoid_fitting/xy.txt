@@ -1,0 +1,72 @@
+
+orig
+raw = importdata('sensor-x18-y26.dat');
+x_m = raw(:,1);
+y_m = raw(:,2);
+z_m = raw(:,3);
+figure
+scatter3(x_m, y_m, z_m, 'fill', 'MarkerFaceColor', 'blue'); hold on;
+xlabel('X-axis'); ylabel('Y-axis'); zlabel('Z-axis');
+plot_sphere([0,0,0]', 40);
+
+
+
+y
+A=[cos(-26 * pi/180) 0 -sin(-26 * pi/180); 0 1 0; sin(-26 * pi/180) 0 cos(-26 * pi/180)]
+raw = raw';
+raw = A*raw;
+raw = raw';
+x_m = raw(:,1);
+y_m = raw(:,2);
+z_m = raw(:,3);
+figure
+scatter3(x_m, y_m, z_m, 'fill', 'MarkerFaceColor', 'blue'); hold on;
+xlabel('X-axis'); ylabel('Y-axis'); zlabel('Z-axis');
+plot_sphere([0,0,0]', 40);
+
+x
+Ax = [1 0 0; 0 cos(-18 * pi / 180) sin(-18 * pi / 180); 0 -sin(-18 * pi / 180) cos(-18 * pi / 180)];
+raw = raw';
+raw = Ax*raw;
+raw = raw';
+x_m = raw(:,1);
+y_m = raw(:,2);
+z_m = raw(:,3);
+figure
+scatter3(x_m, y_m, z_m, 'fill', 'MarkerFaceColor', 'red'); hold on;
+xlabel('X-axis'); ylabel('Y-axis'); zlabel('Z-axis');
+plot_sphere([0,0,0]', 40);
+
+
+
+raw = importdata('sensor-x18-y26.dat');
+x_m = raw(:,1);
+y_m = raw(:,2);
+z_m = raw(:,3);
+figure
+scatter3(x_m, y_m, z_m, 'fill', 'MarkerFaceColor', 'blue'); hold on;
+xlabel('X-axis'); ylabel('Y-axis'); zlabel('Z-axis');
+plot_sphere([0,0,0]', 40);
+A=[cos(-26 * pi/180) 0 -sin(-26 * pi/180); 0 1 0; sin(-26 * pi/180) 0 cos(-26 * pi/180)]
+raw = raw';
+raw = A*raw;
+raw = raw';
+x_m = raw(:,1);
+y_m = raw(:,2);
+z_m = raw(:,3);
+figure
+scatter3(x_m, y_m, z_m, 'fill', 'MarkerFaceColor', 'blue'); hold on;
+xlabel('X-axis'); ylabel('Y-axis'); zlabel('Z-axis');
+plot_sphere([0,0,0]', 40);
+Ax = [1 0 0; 0 cos(-18 * pi / 180) sin(-18 * pi / 180); 0 -sin(-18 * pi / 180) cos(-18 * pi / 180)];
+raw = raw';
+raw = Ax*raw;
+raw = raw';
+x_m = raw(:,1);
+y_m = raw(:,2);
+z_m = raw(:,3);
+figure
+scatter3(x_m, y_m, z_m, 'fill', 'MarkerFaceColor', 'red'); hold on;
+xlabel('X-axis'); ylabel('Y-axis'); zlabel('Z-axis');
+plot_sphere([0,0,0]', 40);
+

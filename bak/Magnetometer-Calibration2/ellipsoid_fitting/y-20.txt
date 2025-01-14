@@ -1,0 +1,33 @@
+
+>> raw=importdata('sensor2.dat');
+x_m = raw(:,1);
+y_m = raw(:,2);
+z_m = raw(:,3);
+figure
+>> scatter3(x_m, y_m, z_m, 'fill', 'MarkerFaceColor', 'red'); hold on;
+>> xlabel('X-axis'); ylabel('Y-axis'); zlabel('Z-axis');
+plot_sphere([0,0,0]', 40);
+
+
+A=[cos(-20 * pi/180) 0 -sin(-20 * pi/180); 0 1 0; sin(-20 * pi/180) 0 cos(-20 * pi/180)]
+
+A =
+
+    0.9397         0    0.3420
+         0    1.0000         0
+   -0.3420         0    0.9397
+
+>> raw=importdata('sensor2.dat');
+>> raw = raw';
+raw = A*raw;
+raw = raw';
+x_m = raw(:,1);
+y_m = raw(:,2);
+z_m = raw(:,3);
+figure
+scatter3(x_m, y_m, z_m, 'fill', 'MarkerFaceColor', 'blue'); hold on;
+xlabel('X-axis'); ylabel('Y-axis'); zlabel('Z-axis');
+plot_sphere([0,0,0]', 40);
+>> view(90,0)
+>> view(90,0)
+>> view(90,0)

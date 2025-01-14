@@ -1,0 +1,24 @@
+get(0, 'DiaryFile')
+
+ans =
+
+    'myDiaryFile'
+
+get(0, 'Diary')
+
+ans =
+
+    'on'
+
+a=1;
+b=sin(a);
+x=ones(4)
+
+x =
+
+     1     1     1     1
+     1     1     1     1
+     1     1     1     1
+     1     1     1     1
+
+diary off
