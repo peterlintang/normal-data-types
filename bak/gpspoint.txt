@@ -1,0 +1,149 @@
+
+1. 冷热温启动如何操作？ 之前我的操作是PAIR_GNSS_SUBSYS_POWER_OFF关掉gnss subsys，
+   然后再发送 PAIR_GNSS_SUBSYS_HOT_START  PAIR_GNSS_SUBSYS_WARM_START  PAIR_GNSS_SUBSYS_COLD_START
+   然后串口返回的是2 = Command sending failed.
+2. gps模块接串口上电后， 前面有几分钟时间gps的定位比较飘，
+
+gnss星座， 单模，可同时跟踪4个星座系统，对于对功耗有很强的需求的， 可以配置4个星座的一个子集；
+sbas增强定位系统，可提高定位精度，对测距有用；
+epo辅助定位，需下载epo文件并提供相对时间/相对位置；
+easy辅助定位， 可通过pair490指令开启或关闭；
+multi-tone aic，消除wifi 蓝牙 2g 3g 4g 5g网络的信号干扰；可通过pair074开启或关闭；
+geofencing 地理围栏？ geofence pin指示， 可通过pair890指令配置；
+可串口升级固件
+
+管脚
+vcc： 输入管脚， 电源3.6或1.8v 最好vcc管脚可由主控控制
+v_back: 输入管脚， 电源for backup，rtc 与ram供电，  should always be powered if warm hot start is needed 
+D_SEL: 输入管脚， 旋转接口下载（下载什么？固件？）  高： spi，低：uart
+geofence: 输出管脚， 指示geofence 状态， 
+1pps: 输出管脚，  one pluse per second， 上升沿；
+rf_in: 输入，模拟
+ant_on: 输出， 外部lna电源控制 或 active antenna in power saving mode， alp continuous 模式输出高电压， backup mode输出低电压
+reset_n: 输入， 复位模块
+vdd_rf: 输出管脚， vcc切断了vdd_rf也会跟着切断， 在continous模式下， vdd_rf供电external active antenna 或lna
+
+
+功耗：
+alp backup 模式功耗最佳， alp模式会降低精度， 估计用continous模式较好
+continuous 模式性能最佳
+	ab			pa		pb
+normal: 36mA(118.8mW)		33mW		27mW
+alp: 	42.9mW			18.15mW		13.5mW
+
+
+power on gnss subsys: $PAIR002*38
+power off gnss subsys: $PAIR003*39
+hot start: $PAIR004*3E
+warn start: $PAIR005*3F
+cold start: $PAIR006*3C
+full cold start: $PAIR007*3D
+只搜gps：$PAIR066,1,0,0,0,0,0*3B   $PAIR066,1,1,1,1,0,0*3A
+查询搜星状态：$PAIR067*3B
+使能glp: $PAIR680,1*29 $PAIR680,0*28
+查询glp使能状态： $PAIR681*35
+alp模式：$PAIR732,1*21   $PAIR732,0*20
+查询alp使能状态：$PAIR733*3D
+查询fix rate：$PAIR051*3E
+设置fix rate：$PAIR050,1000*12
+使能easy：$PAIR490,1*2A  $PAIR490,0*2B
+查询easy: $PAIR491*36
+设置导航模式：$PAIR080,1*2F  $PAIR080,0*2E  $PAIR080,5*2B  $PAIR080,7*29
+0 normal, 1 fitness, 5 drone modem, 7 swimming 
+查询导航模式：$PAIR081*33
+设置卫星最低snr：$PAIR058,15*1F
+查询最低snr： $PAIR059*36
+
+使能sbas：$PAIR410,1*22 $PAIR410,0*23
+查询sbas：$PAIR411*3E
+
+
+使能aic：$PAIR074,1*24 $PAIR074,0*25   wifi 2g 3g 4g 5g干扰消除
+查询aic：$PAIR075*38
+
+设置flp模式：$PAIR730,1*23  $PAIR730,0*22
+查询：$PAIR731*3F
+
+设置period模式：$PAIR690,1,21,39,48,72*28
+查询：$PAIR691*34
+
+10 260
+
+
+gnss星座， 单模，可同时跟踪4个星座系统，对于对功耗有很强的需求的， 可以配置4个星座的一个子集；
+sbas增强定位系统，可提高定位精度，对测距有用；
+epo辅助定位，需下载epo文件并提供相对时间/相对位置；
+easy辅助定位， 可通过pair490指令开启或关闭；
+multi-tone aic，消除wifi 蓝牙 2g 3g 4g 5g网络的信号干扰；可通过pair074开启或关闭；
+geofencing 地理围栏？ geofence pin指示， 可通过pair890指令配置；
+可串口升级固件
+
+管脚
+vcc： 输入管脚， 电源3.6或1.8v 最好vcc管脚可由主控控制
+v_back: 输入管脚， 电源for backup，rtc 与ram供电，  should always be powered if warm hot start is needed 
+D_SEL: 输入管脚， 旋转接口下载（下载什么？固件？）  高： spi，低：uart
+geofence: 输出管脚， 指示geofence 状态， 
+1pps: 输出管脚，  one pluse per second， 上升沿；
+rf_in: 输入，模拟
+ant_on: 输出， 外部lna电源控制 或 active antenna in power saving mode， alp continuous 模式输出高电压， backup mode输出低电压
+reset_n: 输入， 复位模块
+vdd_rf: 输出管脚， vcc切断了vdd_rf也会跟着切断， 在continous模式下， vdd_rf供电external active antenna 或lna
+
+
+功耗：
+alp backup 模式功耗最佳， alp模式会降低精度， 估计用continous模式较好
+continuous 模式性能最佳
+	ab			pa		pb
+normal: 36mA(118.8mW)		33mW		27mW
+alp: 	42.9mW			18.15mW		13.5mW
+
+
+power on gnss subsys: $PAIR002*38
+power off gnss subsys: $PAIR003*39
+hot start: $PAIR004*3E
+warn start: $PAIR005*3F
+cold start: $PAIR006*3C
+full cold start: $PAIR007*3D
+只搜gps：$PAIR066,1,0,0,0,0,0*3B   $PAIR066,1,1,1,1,0,0*3A
+查询搜星状态：$PAIR067*3B
+使能glp: $PAIR680,1*29 $PAIR680,0*28
+查询glp使能状态： $PAIR681*35
+alp模式：$PAIR732,1*21   $PAIR732,0*20
+查询alp使能状态：$PAIR733*3D
+查询fix rate：$PAIR051*3E
+设置fix rate：$PAIR050,1000*12
+使能easy：$PAIR490,1*2A  $PAIR490,0*2B
+查询easy: $PAIR491*36
+设置导航模式：$PAIR080,1*2F  $PAIR080,0*2E  $PAIR080,5*2B  $PAIR080,7*29
+0 normal, 1 fitness, 5 drone modem, 7 swimming 
+查询导航模式：$PAIR081*33
+设置卫星最低snr：$PAIR058,15*1F
+查询最低snr： $PAIR059*36
+
+使能sbas：$PAIR410,1*22 $PAIR410,0*23
+查询sbas：$PAIR411*3E
+
+
+使能aic：$PAIR074,1*24 $PAIR074,0*25   wifi 2g 3g 4g 5g干扰消除
+查询aic：$PAIR075*38
+
+设置flp模式：$PAIR730,1*23  $PAIR730,0*22
+查询：$PAIR731*3F
+
+设置period模式：$PAIR690,1,21,39,48,72*28
+查询：$PAIR691*34
+
+设置alp2模式
+$PAIR732,2*22
+
+查版本
+$PQTMVERNO*58
+
+
+芯片查询
+https://octopart.com/zh/electronic-parts/integrated-circuits-ics/embedded-processors-and-controllers/microcontrollers?interface=16+bit
+https://datasheet4u.com/
+https://www.alldatasheet.com/
+
+主控炬芯3089 gps洛达3335m 马达sih6164 陀螺仪lsm6dsv16x 地磁vcm1193l emmc BWCTARJ11X32G
+
