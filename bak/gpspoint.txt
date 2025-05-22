@@ -146,4 +146,6 @@ https://datasheet4u.com/
 https://www.alldatasheet.com/
 
 主控炬芯3089 gps洛达3335m 马达sih6164 陀螺仪lsm6dsv16x 地磁vcm1193l emmc BWCTARJ11X32G
+主控炬芯3089 gps洛达3335m 马达sih6164 陀螺仪lsm6dsv16x 地磁vcm1193l emmc BWCTARJ11X32G
+气压 LPS27HHTW lps22df气压计 马达lps22df气压计 光感W1160  心率GH3026_数据手册_V1.2 温度MTS4 MTS4B数字温度芯片-敏源
 
