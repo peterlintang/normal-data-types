@@ -130,6 +130,7 @@ https://www.cnblogs.com/yanjingge888/articles/18501514
 
 
 
+https://rtos.100ask.net/zh/FreeRTOS/simulator/chapter1.html#_1-9-%E4%BD%BF%E7%94%A8%E6%A8%A1%E6%8B%9F%E5%99%A8%E8%BF%90%E8%A1%8C%E7%AC%AC1%E4%B8%AA%E7%A8%8B%E5%BA%8F
 
 
 
