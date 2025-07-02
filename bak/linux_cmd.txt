@@ -1,0 +1,201 @@
+https://www.runoob.com/linux/linux-command-manual.html
+admin	// create and adminster sccs file (not found)
+alias	// ming li bie ming
+ar	// ku wen jian wei hu
+asa	// interpret carriage-control characters (not found)
+at	// dao shi zhi xing ming li
+awk	// ge shi sao miao yi ji chu li (important)
+basename // wen jian lu jin de ming zi
+batch	// equal at -q b -m now
+bc	// suan shu ji suan
+bg	// run jobs in background
+c99	// compile stand c programs
+cal	// print calendar
+cat	// con and print files
+cd	// change working dir
+cflow	// generate c flowgraph
+chgrp	// change file group ownership
+chmod	// change file mode
+chown 	// change file ownership
+cksum	// write file checksum and sizes
+cmp	// compare two files
+comm	// select or reject lines common to two files(ordered)		bi jiao liang ge wen jian bin fen bie 
+command	// execute a simple command
+compress	// compress data	(ncompress need to install)
+cp	// copy files
+crontab // shedule periodic background job
+csplit	// split files based on context
+ctags	// create a tag file
+cut 	// cut out selected fields of each line of a file
+cxref	// generate a c-language program cross-reference table
+date	// write the date and time
+dd	// conver and copy a file
+delta	// make a delta to an sccs file
+df 	// report free disk space
+diff	// compare two files
+dirname	// return the directory portion of a pathname
+du 	// estimate file space usage
+echo	// write arguments to standard output
+ed	// edit text	(important)
+env	// set the environment for command invocation
+ex	// text	edit 	(important)
+expand	// convert tabs to spaces
+expr	// evaluate arguments as an expression
+false	// return false value
+fc	// process the command history list
+fg 	// run jobs in the foreground
+file 	// determine file type
+find 	// find files
+fold 	// filter for folding lines
+fort77 	// fortran compiler
+fuser	// list process ids for all process that have one or more files open
+gencat 	// generate a formatted message catalog
+get	// get a version of an sccs file
+getconf	// get configuration values
+getopts	// parse utility options
+grep 	// search a file for pattern
+hash 	// remember or report utility locations
+head 	// copy the first part of files
+iconv 	// codeset conversion
+id	// return user identity
+ipcrm 	// remove an xsi message queue, semaphore set, or shared memory segment identifier
+ipcs 	// report xsi interprocess communication facilities status
+jobs 	// display status of jobs in the current session
+join 	// relational database operator
+kill 	// terminate or signal process
+lex 	// generate programs for lexical tasks
+link 	// call link function
+ln 	// link files
+locale 	// get locale-specific information
+localedef // define locale environment
+logger 	// log messages
+logname	// return the user's login name
+lp 	// send files to a printer
+ls 	// list directory contents
+m4 	// macro processor
+mailx 	// process messages
+make 	// maintain, update, and regenerate groups of programs
+man 	// display system documentation
+mesg 	// permit or deny messages
+mkdir 	// make directories
+mkfifo 	// make fifo special files
+more 	// display files on a page-by-page basis
+mv 	// move files
+newgrp 	// change to a new group
+nice 	// invoke a utility with an altered nice value
+nl 	// line numbering filter
+nm 	// write the name list of an object file
+nohup	// invoke a utility immune to hangups
+od 	// dump files in various formats
+paste 	// merge corresponding or subsequent lines of files
+patch 	// apply changes to files
+pathchk // check pathnames
+pax 	// portable archive interchange ()
+pr 	// print files
+printf 	// write formatted output
+prs 	// print an sccs file
+ps 	// report process status
+pwd 	// return working directory name
+qalter 	// alter batch job
+qdel 	// delete batch jobs
+qhold 	// hold batch jobs
+qmove 	// move batch jobs
+qmsg 	// send message to batch jobs
+qrerun  // return batch jobs
+qrls 	// release batch jobs
+qselect // select batch jobs
+qsig 	// signal batch jobs
+qstat 	// show status of batch jobs
+qsub 	// submit a script
+read 	// read a line from standard input
+renice 	// set nice values of running process
+rm 	// remove directory entries
+rmdel 	// remove a delta from an sccs file
+rmdir 	// remove directories
+sact 	// print current sccs file-editing activity
+sccs 	// front end for the sccs subsystem
+sed 	// stream editor (important)
+sh 	// shell, the standard command language interpreter
+sleep 	// suspend execution for an interval
+sort 	// sort, merge, or sequence check text files
+split 	// split files into pieces
+strings // find printable strings in files
+strip 	// remove unnecessary information from executable files
+stty 	// set the options for a terminal
+tabs	// set terminal tabs
+tail 	// copy the last part of a file
+talk 	// talk to another user
+tee 	// duplicate standard input
+test 	// evaluate expression
+time 	// time a simple command
+touch 	// change file access and modification times
+tput 	// change terminal characteristics
+tr 	// translate characters
+true 	// return true value
+tsort	// topological sort
+tty 	// return user's terminal name
+type 	// write a description of command type
+ulimit 	// set or report file size limit
+umask 	// get or set the file mode creation mask
+unalias // remove alias definitions
+uname 	// return system name
+uncompress 	// expand compressed data
+unexpand   	// convert spaces to tabs
+unget 	// undo a previous get of an sccs file
+uniq	// report or filter out repeated lines in a file
+unlink 	// call the unlink function
+uucp	// system to system copy
+uudecode 	// decode a binary file
+uuencode 	// encode a binary file
+uustat 	// uucp status inquiry and job control
+uux	// remote command execution
+val 	// validate sccs files
+vi 	// screen oriented display editor (important)
+wait 	// await process completion
+wc 	// word, line, and byte or character count
+what 	// identify sccs files
+who 	// display who is on the system
+write 	// write to another user
+xargs 	// construct argument lists and invoke utility
+yacc 	// yet another compiler compiler
+zcat 	// expand and concatenate data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
