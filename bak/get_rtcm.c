@@ -34,6 +34,14 @@ static void get_rtcm_packet(unsigned char *data, int len)
 		}
 		else
 		{
+                        if (rtcm_data_cur >= RTCM_DATA_MAX)
+                        {
+                                printf("rtcm over room %02x %02x %02x, reset\n", rtcm_data[0], rtcm_data[1], rtcm_data[2]);
+                                rtcm_data_len = -1;
+                                rtcm_data_cur = 0;
+                                continue;
+                        }
+			
 			rtcm_data[rtcm_data_cur++] = data[i];
 			if (rtcm_data_cur == 3)
 			{
