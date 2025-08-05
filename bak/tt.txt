@@ -1,1 +1,7 @@
 inkscape t2.svg --export-png=output2.png --export-dpi=300
+https://www.thorvg.org/about
+
+
+
+
+
