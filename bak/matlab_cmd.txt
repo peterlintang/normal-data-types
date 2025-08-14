@@ -1,4 +1,6 @@
-
+https://matlab.mathworks.com/
+jiexiaolinhj@163.com
+Xiaojie0427
 
 tf: construct or convert transfer function
 tf(num, den);
