@@ -1,4 +1,7 @@
 
+一些算法相关
+https://ahrs.readthedocs.io/en/latest/filters.html
+
 master slave see
 git@github.com:Prry/drivers-for-mcu.git
 
