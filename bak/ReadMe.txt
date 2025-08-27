@@ -1,4 +1,7 @@
 
+地磁拟合matlab
+https://www.cnblogs.com/lsgxeva/p/16061562.html
+
 一些算法相关
 https://ahrs.readthedocs.io/en/latest/filters.html
 
