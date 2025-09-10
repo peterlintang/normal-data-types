@@ -5,3 +5,49 @@ https://www.thorvg.org/about
 
 
 
+https://www.mathworks.com/matlabcentral/fileexchange/24693-ellipsoid-fit
+https://pdfs.semanticscholar.org/7e32/c4d82d9d1e995e560cd700ee0a0acf5f384c.pdf
+http://www.st.com/content/ccc/resource/technical/document/design_tip/group0/a2/98/f5/d4/9c/48/4a/d1/DM00286302/files/DM00286302.pdf/jcr:content/translations/en.DM00286302.pdf
+
+
+主控炬芯3089 gps洛达3335m 马达sih6164 陀螺仪lsm6dsv16x 地磁vcm1193l emmc BWCTARJ11X32G
+
+微传vcm1193地磁传感器
+芯存 4Gb xcsp4aapk
+歌尔spl06-001 003气压计
+lps22df气压计
+cw6307 cw6305电源管理芯片
+mts4 温度计
+st lsm6dsv16x 六轴传感器
+鹰芒 display
+
+i2c read I2CMT_0 0x5c 0x0f 0x10	气压
+i2c read I2C_0 0x0c 0x0c 0x10		地磁
+i2c read I2C_1 0x15 0x0 0x10 		tp
+i2c read I2C_1 0x48 0x00 0x10		光感
+i2c read I2C_1 0x6b 0x00 0x10		马达
+
+
+芯片查询
+https://octopart.com/zh/electronic-parts/integrated-circuits-ics/embedded-processors-and-controllers/microcontrollers?interface=16+bit
+https://datasheet4u.com/
+https://www.alldatasheet.com/
+
+主控炬芯3089 
+gps洛达3335m 
+马达sih6164 (聚芯微电子)
+ 陀螺仪lsm6dsv16x（意法半导体stm）
+ 地磁 vcm1193l（微传智能） 
+emmc BWCTARJ11X32G
+气压 LPS27HHTW（意法半导体） 
+lps22df（意法半导体）  
+气压计 马达  lps22df气压计 
+光感W1160  
+心率GH3026（汇顶科技）_数据手册_V1.2 
+温度MTS4 MTS4B数字温度芯片-敏源传感
+深圳市芯存科技有限公司 nand
+tma525b 触摸屏控制器（譜瑞科技）
+电池管理cw6305/7 cellwise 赛微微
+
+
+curl https://api.github.com/users/???/repos?per_page=100 > repos.json
