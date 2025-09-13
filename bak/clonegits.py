@@ -1,4 +1,4 @@
-# first run cmd: curl https://api.github.com/users/peterlintang/repos?per_page=100 > repos.json
+# first run cmd: curl https://api.github.com/users/peterlintang/repos?per_page=100&page=1 > repos.json
 import json
 import subprocess
 
