@@ -1,3 +1,5 @@
+https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml
+磁偏角查询
 
 地磁拟合matlab
 https://www.cnblogs.com/lsgxeva/p/16061562.html
