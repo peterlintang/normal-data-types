@@ -1,3 +1,5 @@
+https://www.olliw.eu/2013/imu-data-fusing/
+
 https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml
 磁偏角查询
 
