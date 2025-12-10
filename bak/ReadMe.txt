@@ -61,7 +61,8 @@ https://home.cs.colorado.edu/~main/cs1300/doc/gnu/ld_toc.html
 
 https://graphviz.cpp.org.cn/
 
-
+https://wine.htmlvalidator.com/install-wine-on-ubuntu-22.04.html
+22.04安装wine 
 
 
 
