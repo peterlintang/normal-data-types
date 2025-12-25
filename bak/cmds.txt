@@ -103,3 +103,7 @@ inkscape
 
 发送邮件
 mutt
+
+线性规划
+glpsol
+
