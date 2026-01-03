@@ -388,6 +388,24 @@ guide
 mcc
 coder
 
+__________________________________________________________________________________
+
+<matlab for engineering applications.pdf>
+
+chapter 11
+syms x y
+syms x(t)
+x(t) = t^2;
+x(3);
+syms f(x,y);
+f(x,y)=x+4*y;
+f(2,3);
+a=sym('a', 'real');
+pi=sym(pi);
+fra=sym(1/3);
+
+
+__________________________________________________________________________________
 
 
 Inspiron 3576可以通过BIOS设置关闭功耗墙。‌
