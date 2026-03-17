@@ -95,6 +95,7 @@ pdftf
 // cha kan cpu deng chuan gan qi xin xi
 sensors
 
+perf stat -e dTLB-load-misses,dTLB-loads,context-switches -p <你的进程PID> sleep 5
 
 7z x -p密码 文件名.zip
 
