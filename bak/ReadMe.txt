@@ -1,4 +1,6 @@
 
+https://www.altium.com/cn/documentation/altium-designer/tutorial/component-placement-routing-board#e6c998f83a539b627c6484af119972cb
+
 rust
 https://kaisery.github.io/trpl-zh-cn/ch05-01-defining-structs.html
 
