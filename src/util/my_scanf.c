@@ -9,9 +9,10 @@ static inline int minmea_isfield(char c) {
 
 /*
  * parse @sentence as described in @format
+ * example  05F67469|Faleata Golf Course|Vaitele|WS||Vaitele|-13.847516|-171.807358|1|1.2|032
  * ok	return 1;
  * fail return 0;
- * @sentence:	sentence to parse
+ * @sentence:	sentence to parse 
  * @format:	the format describe here
  * ...
  */
