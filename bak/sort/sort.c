@@ -4,6 +4,8 @@
 #include <string.h>
 #include <math.h>
 
+int minmea_scan(const char *sentence, const char *format, ...);
+
 /*
  * 35AF4C09|Miramar Memorial G.C.|U.S. Marine Corps|US|CA|San Diego|32.884857|-117.141106|1|3.8|007
  */
@@ -35,6 +37,20 @@ struct course_info {
 
 int parse_line(char *line, struct course_info *info)
 {
+	minmea_scan(line, "sssssssssss", 
+			info->id, 
+			info->name,
+			info->address,
+			info->country,
+			info->state,
+			info->city,
+			info->latitude,
+			info->longtitude,
+			info->published,
+			info->version,
+			info->folderIndex
+			); 
+	/*
 	char *p = NULL;
 	char *start = NULL;
 
@@ -81,15 +97,31 @@ int parse_line(char *line, struct course_info *info)
 	start = p + 1;
 //	p = strchr(start, '|');
 	strncpy(info->folderIndex, start, FOLDERINDEX_LEN);
+	*/
 
 	return 0;
 }
 
 static void print_course(struct course_info *info)
 {
+	fprintf(stdout, "%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n", 
+			info->id, 
+			info->name,
+			info->address,
+			info->country, 
+			info->state,
+			info->city,
+			info->latitude, 
+			info->longtitude,
+			info->published,
+			info->version,
+			info->folderIndex
+			);
+	/*
 	fprintf(stdout, "%s %s %s %s %s", 
 			info->country, info->latitude, info->longtitude,
 			info->id, info->folderIndex);
+			*/
 	/*
 	fprintf(stdout, "%s %s %s %s %s %s %s %s %s %s %s",
 		info->id,
@@ -181,7 +213,7 @@ static int compare2(const void *arg1, const void *arg2)
 #include <fcntl.h>
 int main(int argc, char *argv[])
 {
-#if 1
+#if 0
 	        int ret = 0;
         int total = 0;
         int left = 0;
@@ -238,7 +270,7 @@ again:
         return 0;
 
 #else
-#define COURSES_NUM	40000
+#define COURSES_NUM	40794
 	FILE *fp = NULL;
 	char line[1024];
 	char *pline = line;
