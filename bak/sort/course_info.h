@@ -23,6 +23,11 @@
 #define ITEM_ALT	"alt"
 #define ITEM_PT		"pt"
 #define ITEM_N		"n"
+#define ITEM_NM		"nm"
+#define ITEM_RT		"rt"
+#define ITEM_SL		"sl"
+#define ITEM_WRT	"wrt"
+#define ITEM_WSL	"wsl"
 
 struct gps_point {
 	double x;
@@ -64,6 +69,12 @@ int course_get_hole_tPtsNum_by_index(char *file_name, int index, int *value);
 int course_get_pl_n_by_index(char *file_name, int hole_index, int pl_index, char *n, int *n_len);
 int course_get_pl_pt_by_index(char *file_name, int hole_index, int pl_index, struct gps_point *pt);
 int course_get_pl_alt_by_index(char *file_name, int hole_index, int pl_index, float *alt);
+
+int course_get_teebox_nm_by_index(char *file_name, int index, char *nm, int *nm_len);
+int course_get_teebox_rt_by_index(char *file_name, int index, double *value);
+int course_get_teebox_sl_by_index(char *file_name, int index, double *value);
+int course_get_teebox_wrt_by_index(char *file_name, int index, double *value);
+int course_get_teebox_wsl_by_index(char *file_name, int index, double *value);
 
 int course_get_tPts_arrayItemNum_by_index(
 		char *file_name, 

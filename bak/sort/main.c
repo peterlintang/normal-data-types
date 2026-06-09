@@ -107,6 +107,22 @@ int main(int argc, char *argv[])
 		free(pts);
 	}
 
+	for (int i = 0; i < teebox_num; i++)
+	{
+		char nm[10] = { 0 };
+		int nm_len = 9;
+		double rt_value = 0.0;
+		double sl_value = 0.0;
+		double wrt_value = 0.0;
+		double wsl_value = 0.0;
+		course_get_teebox_nm_by_index(argv[1], i, nm, &nm_len);
+		course_get_teebox_rt_by_index(argv[1], i, &rt_value);
+		course_get_teebox_sl_by_index(argv[1], i, &sl_value);
+		course_get_teebox_wrt_by_index(argv[1], i, &wrt_value);
+		course_get_teebox_wsl_by_index(argv[1], i, &wsl_value);
+		printf("nm: %s, rt: %f, sl: %f, wrt: %f, wsl: %f\n", 
+				nm, rt_value, sl_value, wrt_value, wsl_value);
+	}
 
 	return 0;
 }
