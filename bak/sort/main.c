@@ -57,12 +57,13 @@ int main(int argc, char *argv[])
 
 
 	float alt = 0.0;
-	char n[4] = { 0 };
+	char n[5] = { 0 };
 	int n_len = 4;
 	struct gps_point pt = { 0.0, 0.0 };
 	struct gps_point center = { 0.0, 0.0 };
 	for (int i = 0; i < pl_num; i++)
 	{
+		memset(n, 0, 5);
 		n_len = 4;
 		course_get_pl_alt_by_index(argv[1], HOLE_NUM, i, &alt);
 		course_get_pl_n_by_index(argv[1], HOLE_NUM, i, n, &n_len);
