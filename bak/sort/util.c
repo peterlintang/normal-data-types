@@ -95,9 +95,9 @@ static int intersectionPoint2LinesSegments(struct gps_point *A, struct gps_point
  *	@current:	(in)user current gps info
  *	@center:	(in)center of green
  *	@f:		(out)front point
- *	@b:		(out)tear point
+ *	@b:		(out)rear point
  *	@f_distance:	(out)front distance
- *	@b_distance:	(out)tear distance
+ *	@b_distance:	(out)rear distance
  */
 static int s_green_fcb(struct gps_point *green, int pts_num, 
 		struct gps_point *current, 
@@ -166,7 +166,7 @@ static int s_green_fcb(struct gps_point *green, int pts_num,
  *	@center:	(in)center of green
  *	@f:		(out)front distance
  *	@c:		(out)center distance
- *	@b:		(out)tear distance
+ *	@b:		(out)rear distance
  *	return value:	0 sucess, -1 fail;
  */
 int green_fcb(struct gps_point *green, int pts_num, 

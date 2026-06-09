@@ -112,7 +112,7 @@ double calc_2gpspoints_distance(struct gps_point *A, struct gps_point *B);
  *	@center:	(in)center of green
  *	@f:		(out)front distance
  *	@c:		(out)center distance
- *	@b:		(out)tear distance
+ *	@b:		(out)rear distance
  *	return value:	0 sucess, -1 fail;
  */
 int green_fcb(struct gps_point *green, int pts_num, 
