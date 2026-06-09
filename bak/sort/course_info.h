@@ -43,7 +43,7 @@ static inline char *get_file(char *file_name)
 	fp = fopen(file_name, "r");
 	fseek(fp, 0, SEEK_END);
 	length = ftell(fp);
-	info = (unsigned char *)calloc(1, length);
+	info = (unsigned char *)calloc(1, length+1);
 	fseek(fp, 0, SEEK_SET);
 	fread(info, 1, length, fp);
 	fclose(fp);
