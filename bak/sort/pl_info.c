@@ -80,7 +80,6 @@ int course_get_pl_pt_by_index(char *file_name, int hole_index, int pl_index, str
 			pt->x = (double)item->valuedouble;
 			item = cJSON_GetArrayItem(pt_item, 1);
 			pt->y = (double)item->valuedouble;
-			//*alt = (float)alt_item->valuedouble;
 		}
 		else
 		{
@@ -98,7 +97,7 @@ int course_get_pl_pt_by_index(char *file_name, int hole_index, int pl_index, str
 	return ret;
 }
 
-int course_get_pl_alt_by_index(char *file_name, int hole_index, int pl_index, float *alt)
+int course_get_pl_alt_by_index(char *file_name, int hole_index, int pl_index, double *alt)
 {
 	unsigned char *buff = NULL;
 	cJSON *root = NULL;

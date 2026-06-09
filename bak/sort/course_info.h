@@ -61,14 +61,14 @@ int course_get_hole_hl_by_index(char *file_name, int index, int *value);
 int course_get_hole_p_by_index(char *file_name, int index, int *value);
 int course_get_hole_h_by_index(char *file_name, int index, int *value);
 int course_get_hole_gw_by_index(char *file_name, int index, int *value);
-int course_get_hole_ha_by_index(char *file_name, int index, float *value);
+int course_get_hole_ha_by_index(char *file_name, int index, double *value);
 int course_get_hole_plNum_by_index(char *file_name, int index, int *value);
 int course_get_hole_gPtsNum_by_index(char *file_name, int index, int *value);
 int course_get_hole_tPtsNum_by_index(char *file_name, int index, int *value);
 
 int course_get_pl_n_by_index(char *file_name, int hole_index, int pl_index, char *n, int *n_len);
 int course_get_pl_pt_by_index(char *file_name, int hole_index, int pl_index, struct gps_point *pt);
-int course_get_pl_alt_by_index(char *file_name, int hole_index, int pl_index, float *alt);
+int course_get_pl_alt_by_index(char *file_name, int hole_index, int pl_index, double *alt);
 
 int course_get_teebox_nm_by_index(char *file_name, int index, char *nm, int *nm_len);
 int course_get_teebox_rt_by_index(char *file_name, int index, double *value);

@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 	printf("teebox_num: %d\n", teebox_num);
 
 	int hl = 0;
-	float ha = 0.0;
+	double ha = 0.0;
 	int gw = 0;
 	int h = 0;
 	int p = 0;
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 	printf("pl_num: %d, tpts_num: %d, gpts_num: %d\n", pl_num, tpts_num, gpts_num);
 
 
-	float alt = 0.0;
+	double alt = 0.0;
 	char n[5] = { 0 };
 	int n_len = 4;
 	struct gps_point pt = { 0.0, 0.0 };

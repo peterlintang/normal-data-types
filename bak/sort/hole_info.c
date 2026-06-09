@@ -121,7 +121,7 @@ int course_get_hole_gw_by_index(char *file_name, int index, int *value)
 	return ret;
 }
 
-int course_get_hole_ha_by_index(char *file_name, int index, float *value)
+int course_get_hole_ha_by_index(char *file_name, int index, double *value)
 {
 	unsigned char *buff = NULL;
 	cJSON *root = NULL;
@@ -139,7 +139,7 @@ int course_get_hole_ha_by_index(char *file_name, int index, float *value)
 	{
 		item = cJSON_GetArrayItem(hls, index);
 		cJSON *item2 = cJSON_GetObjectItem(item, ITEM_HA);
-		*value = (float)item2->valuedouble;
+		*value = (double)item2->valuedouble;
 	}
 	else
 	{
