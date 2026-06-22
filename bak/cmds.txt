@@ -1,4 +1,5 @@
 
+tasket		// set cpu to run cmd
 stress 		// test cpu strength
 mpstat 		// show info about cpus overload
 pidstat 	// pid stat info
@@ -102,6 +103,18 @@ perf stat -e dTLB-load-misses,dTLB-loads,context-switches -p <你的进程PID> s
 # svg zhuan tu pian
 inkscape
 
+
+zhuan huan tu xiang fen bian lv
+convert -resize 600×600 src.jpg dst.jpg
+hdparm
+        hdparm -Tt /dev/sda
+fio
+        fio --name=read --ioengine=libaio --iodepth=64 --rw=read --bs=4k --direct=1 --size=1G --numjobs=1 --runtime=60 --time_based
+        fio --name=randread --ioengine=libaio --iodepth=32 --rw=randread --bs=4k --numjobs=1 --size=256M --runtime=60 --time_based --group_reporting
+dd
+
+查看命令用法
+/usr/local/bin/tldr
 
 
 
