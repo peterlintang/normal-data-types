@@ -93,16 +93,8 @@ static int to_y(double y)
 	return MY_HEIGHT - (y - (ref_min.y )) / ref * MY_HEIGHT;
 }
 
-static void draw_pl(char *course, int h_id, int pl_id)
+static void lvgl_draw_pl(char *pl_type, struct gps_point *point)
 {
-    char pl_type[8] = { 0 };
-    int pl_type_len = 8;
-    struct gps_point point = { 0.0, 0.0 };
-
-    course_get_pl_n_by_index(course, h_id, pl_id, pl_type, &pl_type_len);
-    course_get_pl_pt_by_index(course, h_id, pl_id, &point);
-    printf("type: %s, %.8f %.8f (%d %d)\n", pl_type, point.x, point.y, to_x(point.x), to_y(point.y));
-
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
 
@@ -117,8 +109,8 @@ static void draw_pl(char *course, int h_id, int pl_id)
     else
     	dsc.color = lv_palette_main(LV_PALETTE_YELLOW);
     dsc.width = 1;
-    dsc.center.x = to_x(point.x);
-    dsc.center.y = to_y(point.y);
+    dsc.center.x = to_x(point->x);
+    dsc.center.y = to_y(point->y);
     dsc.width = 1;
     dsc.radius = 2;
     dsc.start_angle = 0;
@@ -127,7 +119,19 @@ static void draw_pl(char *course, int h_id, int pl_id)
     lv_draw_arc(&layer, &dsc);
 
     lv_canvas_finish_layer(canvas, &layer);
+}
 
+static void draw_pl(char *course, int h_id, int pl_id)
+{
+    char pl_type[8] = { 0 };
+    int pl_type_len = 8;
+    struct gps_point point = { 0.0, 0.0 };
+
+    course_get_pl_n_by_index(course, h_id, pl_id, pl_type, &pl_type_len);
+    course_get_pl_pt_by_index(course, h_id, pl_id, &point);
+    printf("type: %s, %.8f %.8f (%d %d)\n", pl_type, point.x, point.y, to_x(point.x), to_y(point.y));
+
+    lvgl_draw_pl(pl_type, &point);
 }
 
 static void draw_pls(char *course, int h_id)
@@ -141,16 +145,8 @@ static void draw_pls(char *course, int h_id)
     }
 }
 
-static void draw_green(char *course, int h_id, int g_id)
+static void lvgl_draw_green(struct gps_point *points, int points_num)
 {
-    int points_num = 0;
-    struct gps_point *points = NULL;
-
-    course_get_gPts_arrayItemNum_by_index(course, h_id, g_id, &points_num);
-
-    points = (struct gps_point *)calloc(points_num, sizeof(struct gps_point));
-
-    course_get_gPts_arrayItemInfo_by_index(course, h_id, g_id, points, points_num); 
     for (int i = 0; i < points_num; i++)
     {
 	    lv_layer_t layer;
@@ -171,6 +167,20 @@ static void draw_green(char *course, int h_id, int g_id)
 	    lv_canvas_finish_layer(canvas, &layer);
 
     }
+}
+
+static void draw_green(char *course, int h_id, int g_id)
+{
+    int points_num = 0;
+    struct gps_point *points = NULL;
+
+    course_get_gPts_arrayItemNum_by_index(course, h_id, g_id, &points_num);
+
+    points = (struct gps_point *)calloc(points_num, sizeof(struct gps_point));
+
+    course_get_gPts_arrayItemInfo_by_index(course, h_id, g_id, points, points_num); 
+
+    lvgl_draw_green(points, points_num);
 
     free(points);
 }
@@ -186,12 +196,8 @@ static void draw_greens(char *course, int h_id)
 	}
 }
 
-static void draw_teebox(char *course, int h_id, int t_id)
+static void lvgl_draw_teebox(struct gps_point pts[2])
 {
-	struct gps_point pts[2] = { 0.0, 0.0 };
-
-	course_get_tPts_arrayItemInfo_by_index(course, h_id, t_id, pts);
-
 	lv_layer_t layer;
 	lv_canvas_init_layer(canvas, &layer);
 
@@ -212,7 +218,15 @@ static void draw_teebox(char *course, int h_id, int t_id)
 	lv_draw_rect(&layer, &dsc, &coords);
 
 	lv_canvas_finish_layer(canvas, &layer);
+}
 
+static void draw_teebox(char *course, int h_id, int t_id)
+{
+	struct gps_point pts[2] = { 0.0, 0.0 };
+
+	course_get_tPts_arrayItemInfo_by_index(course, h_id, t_id, pts);
+
+	lvgl_draw_teebox(pts);
 }
 
 static void draw_teeboxes(char *course, int h_id)
