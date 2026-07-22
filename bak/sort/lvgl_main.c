@@ -347,6 +347,7 @@ static void init_canvas(void)
     lv_canvas_set_draw_buf(canvas, &draw_buf);
     lv_obj_center(canvas);
     lv_canvas_fill_bg(canvas, lv_palette_main(LV_PALETTE_NONE), LV_OPA_COVER);
+//    lv_canvas_fill_bg(canvas, lv_color_white(), LV_OPA_COVER);
 }
 
 static void set_ref(char *course, int h_id)
