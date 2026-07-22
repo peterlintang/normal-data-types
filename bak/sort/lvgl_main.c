@@ -84,12 +84,14 @@ static lv_obj_t *canvas = NULL;
 static int to_x(double x)
 {
 	double ref = ref_max.x - ref_min.x > ref_max.y - ref_min.y ? ref_max.x - ref_min.x : ref_max.y - ref_min.y;
+//	double ref = ref_max.x - ref_min.x;
 	return (x - (ref_min.x )) / ref * MY_WIDTH;
 }
 
 static int to_y(double y)
 {
 	double ref = ref_max.x - ref_min.x > ref_max.y - ref_min.y ? ref_max.x - ref_min.x : ref_max.y - ref_min.y;
+//	double ref = ref_max.y - ref_min.y;
 	return MY_HEIGHT - (y - (ref_min.y )) / ref * MY_HEIGHT;
 }
 
@@ -267,7 +269,7 @@ static void find_min_max_points(char *course, int h_id)
 
     int pls_num = 0;
     course_get_hole_plNum_by_index(course, h_id, &pls_num);
-    printf("pls_num: %d\n", pls_num);
+    //printf("pls_num: %d\n", pls_num);
 
     for (int i = 0; i < pls_num; i++)
     {
@@ -310,13 +312,7 @@ static void find_min_max_points(char *course, int h_id)
 	free(points);
     }
 
-    printf("ref_min: %.8f, %.8f\n", ref_min.x, ref_min.y);
-    printf("ref_max: %.8f, %.8f\n", ref_max.x, ref_max.y);
     
-    ref_min.x -= 0.0001;
-    ref_min.y -= 0.0001;
-    ref_max.x += 0.0001;
-    ref_max.y += 0.0001;
     
 }
 
@@ -365,6 +361,14 @@ static void set_ref(char *course, int h_id)
     }
     else
     	find_min_max_points(course, h_id);
+
+    ref_min.x -= 0.0001;
+    ref_min.y -= 0.0001;
+    ref_max.x += 0.0001;
+    ref_max.y += 0.0001;
+
+    printf("ref_min: %.8f, %.8f, %.8f\n", ref_min.x, ref_max.x, ref_max.x - ref_min.x);
+    printf("ref_max: %.8f, %.8f, %.8f\n", ref_min.y, ref_max.y, ref_max.y - ref_min.y);
 }
 
 int main(int argc, char **argv)
