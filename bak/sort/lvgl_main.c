@@ -83,20 +83,61 @@ static lv_obj_t *canvas = NULL;
 
 static int to_x(double x)
 {
+#if 0
 	double ref = ref_max.x - ref_min.x > ref_max.y - ref_min.y ? ref_max.x - ref_min.x : ref_max.y - ref_min.y;
 //	double ref = ref_max.x - ref_min.x;
+	 int a = (x - (ref_min.x )) / ref * MY_WIDTH;
+	 if (a <= 0 || a >= MY_WIDTH)
+	 {
+		 printf("\n\nERROR: x: %.8f, ref_min.x: %.8f, ref: %.8f, a: %d, width: %d\n\n", 
+				 x, ref_min.x, ref, a, MY_WIDTH);
+	 }
 	return (x - (ref_min.x )) / ref * MY_WIDTH;
+#else
+	double ref = ref_max.x - ref_min.x > ref_max.y - ref_min.y ? ref_max.x - ref_min.x : ref_max.y - ref_min.y;
+
+	double x_min = 0;
+	double x_max = (ref_max.x - ref_min.x) / ref * MY_WIDTH;
+
+	int aa = (int)(((x - ref_min.x) / ref * MY_WIDTH) - ((x_min + x_max) / 2 - MY_WIDTH / 2));
+	if (aa <= 0 || aa >= MY_WIDTH)
+	{
+		printf("X VERY ERROR\n\n");
+	}
+	return ((x - ref_min.x) / ref * MY_WIDTH) - ((x_min + x_max) / 2 - MY_WIDTH / 2);
+#endif
 }
 
 static int to_y(double y)
 {
+#if 0
 	double ref = ref_max.x - ref_min.x > ref_max.y - ref_min.y ? ref_max.x - ref_min.x : ref_max.y - ref_min.y;
 //	double ref = ref_max.y - ref_min.y;
+	int a = MY_HEIGHT - (y - (ref_min.y )) / ref * MY_HEIGHT;
+	 if (a <= 0 || a >= MY_HEIGHT)
+	 {
+		 printf("\n\nERROR: y: %.8f, ref_min.y: %.8f, ref: %.8f, a: %d, width: %d\n\n", 
+				 y, ref_min.y, ref, a, MY_HEIGHT);
+	 }
 	return MY_HEIGHT - (y - (ref_min.y )) / ref * MY_HEIGHT;
+#else
+	double ref = ref_max.x - ref_min.x > ref_max.y - ref_min.y ? ref_max.x - ref_min.x : ref_max.y - ref_min.y;
+
+	double y_min = 0;
+	double y_max = (ref_max.y - ref_min.y) / ref * MY_HEIGHT;
+
+	int aa= (int)(((y - ref_min.y) / ref * MY_HEIGHT) - ((y_min + y_max) / 2 - MY_HEIGHT / 2));
+	if (aa <= 0 || aa >= MY_HEIGHT)
+	{
+		printf("Y VERY ERROR\n\n");
+	}
+	return ((y - ref_min.y) / ref * MY_HEIGHT) - ((y_min + y_max) / 2 - MY_HEIGHT / 2);
+#endif
 }
 
 static void lvgl_draw_pl(char *pl_type, struct gps_point *point)
 {
+//	printf("%s: begin\n", __func__);
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
 
@@ -114,13 +155,15 @@ static void lvgl_draw_pl(char *pl_type, struct gps_point *point)
     dsc.center.x = to_x(point->x);
     dsc.center.y = to_y(point->y);
     dsc.width = 1;
-    dsc.radius = 2;
+    dsc.radius = 1;
     dsc.start_angle = 0;
     dsc.end_angle = 360;
+//    printf("%s: x: %d, y: %d\n", __func__, to_x(point->x), to_y(point->y));
 
     lv_draw_arc(&layer, &dsc);
 
     lv_canvas_finish_layer(canvas, &layer);
+//	printf("%s: done\n", __func__);
 }
 
 static void draw_pl(char *course, int h_id, int pl_id)
@@ -131,7 +174,7 @@ static void draw_pl(char *course, int h_id, int pl_id)
 
     course_get_pl_n_by_index(course, h_id, pl_id, pl_type, &pl_type_len);
     course_get_pl_pt_by_index(course, h_id, pl_id, &point);
-    printf("type: %s, %.8f %.8f (%d %d)\n", pl_type, point.x, point.y, to_x(point.x), to_y(point.y));
+    printf("type: %s, %.8f %.8f (%d %d)\n", pl_type, point.y, point.x, to_y(point.y), to_x(point.x));
 
     lvgl_draw_pl(pl_type, &point);
 }
@@ -149,6 +192,7 @@ static void draw_pls(char *course, int h_id)
 
 static void lvgl_draw_green(struct gps_point *points, int points_num)
 {
+//	printf("%s: begin\n", __func__);
     for (int i = 0; i < points_num; i++)
     {
 	    lv_layer_t layer;
@@ -165,10 +209,12 @@ static void lvgl_draw_green(struct gps_point *points, int points_num)
 	    dsc.p2.x = to_x(points[(i + 1) % points_num].x);
 	    dsc.p2.y = to_y(points[(i + 1) % points_num].y);
 	    lv_draw_line(&layer, &dsc);
+	    //printf("%s: x: %f y: %f, x: %f y: %f\n", __func__, dsc.p1.x, dsc.p1.y, dsc.p2.x, dsc.p2.y);
 
 	    lv_canvas_finish_layer(canvas, &layer);
 
     }
+//	printf("%s: done\n", __func__);
 }
 
 static void draw_green(char *course, int h_id, int g_id)
@@ -200,6 +246,8 @@ static void draw_greens(char *course, int h_id)
 
 static void lvgl_draw_teebox(struct gps_point pts[2])
 {
+#if 0
+//	printf("%s: begin\n", __func__);
 	lv_layer_t layer;
 	lv_canvas_init_layer(canvas, &layer);
 
@@ -209,6 +257,12 @@ static void lvgl_draw_teebox(struct gps_point pts[2])
 	dsc.border_color = lv_palette_main(LV_PALETTE_GREEN);
 	dsc.border_width = 1;
 	dsc.outline_color = lv_palette_main(LV_PALETTE_GREEN);
+        dsc.outline_width = 1;
+        dsc.outline_pad = 1;
+        dsc.outline_opa = LV_OPA_50;
+    	dsc.radius = 1;
+    	dsc.border_width = 1;
+
 
 
 	int x_min = to_x(pts[0].x) > to_x(pts[1].x) ? to_x(pts[1].x) : to_x(pts[0].x);
@@ -216,10 +270,42 @@ static void lvgl_draw_teebox(struct gps_point pts[2])
 	int y_min = to_y(pts[0].y) > to_y(pts[1].y) ? to_y(pts[1].y) : to_y(pts[0].y);
 	int y_max = to_y(pts[0].y) > to_y(pts[1].y) ? to_y(pts[0].y) : to_y(pts[1].y);
 	lv_area_t coords = {x_min, y_min, x_max, y_max};
+	//printf("%s: x_min: %d, x_max: %d, y_min: %d, y_max: %d\n", __func__, x_min, x_max, y_min, y_max);
 
 	lv_draw_rect(&layer, &dsc, &coords);
 
 	lv_canvas_finish_layer(canvas, &layer);
+//	printf("%s: done\n", __func__);
+#else
+//	printf("%s: begin\n", __func__);
+	int x_min = to_x(pts[0].x) > to_x(pts[1].x) ? to_x(pts[1].x) : to_x(pts[0].x);
+	int x_max = to_x(pts[0].x) > to_x(pts[1].x) ? to_x(pts[0].x) : to_x(pts[1].x);
+	int y_min = to_y(pts[0].y) > to_y(pts[1].y) ? to_y(pts[1].y) : to_y(pts[0].y);
+	int y_max = to_y(pts[0].y) > to_y(pts[1].y) ? to_y(pts[0].y) : to_y(pts[1].y);
+
+	int x[4] = { x_min, x_max, x_max, x_min };
+	int y[4] = { y_min, y_min, y_max, y_max };
+
+	for (int i = 0; i < 4; i++)
+	{
+	    lv_layer_t layer;
+	    lv_canvas_init_layer(canvas, &layer);
+
+	    lv_draw_line_dsc_t dsc;
+	    lv_draw_line_dsc_init(&dsc);
+	    dsc.color = lv_palette_main(LV_PALETTE_GREEN);
+	    dsc.width = 1;
+	    dsc.round_end = 1;
+	    dsc.round_start = 1;
+	    dsc.p1.x = x[i];
+	    dsc.p1.y = y[i];
+	    dsc.p2.x = x[(i + 1) % 4];
+	    dsc.p2.y = y[(i + 1) % 4];
+	    lv_draw_line(&layer, &dsc);
+	    lv_canvas_finish_layer(canvas, &layer);
+	}
+//	printf("%s: done\n", __func__);
+#endif
 }
 
 static void draw_teebox(char *course, int h_id, int t_id)
@@ -363,13 +449,15 @@ static void set_ref(char *course, int h_id)
     else
     	find_min_max_points(course, h_id);
 
+    
     ref_min.x -= 0.0001;
     ref_min.y -= 0.0001;
     ref_max.x += 0.0001;
     ref_max.y += 0.0001;
+    
 
-    printf("ref_min: %.8f, %.8f, %.8f\n", ref_min.x, ref_max.x, ref_max.x - ref_min.x);
-    printf("ref_max: %.8f, %.8f, %.8f\n", ref_min.y, ref_max.y, ref_max.y - ref_min.y);
+    printf("ref x: %.8f, %.8f, %.8f\n", ref_min.x, ref_max.x, ref_max.x - ref_min.x);
+    printf("ref y: %.8f, %.8f, %.8f\n", ref_min.y, ref_max.y, ref_max.y - ref_min.y);
 }
 
 int main(int argc, char **argv)
@@ -391,10 +479,19 @@ int main(int argc, char **argv)
   /*Initialize the HAL (display, input devices, tick) for LVGL*/
   hal_init(MY_WIDTH, MY_HEIGHT);
 
+//lv_example_canvas_8();
+
   init_canvas();
+  
   set_ref(course, -1);
   draw_course(course);
-  //draw_hole(course, hole_id);
+  
+  
+  /*
+  set_ref(course, hole_id);
+  draw_hole(course, hole_id);
+  */
+  
   #if LV_USE_OS == LV_OS_NONE
 
   /* Run the default demo */
