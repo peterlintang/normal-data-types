@@ -132,7 +132,7 @@ void buffer_data_print_info(T b)
 
 #undef T
 
-#if 1
+#if 0
 #define T buffer_data_t
 
 #define ELEMENT_NUM	100000
