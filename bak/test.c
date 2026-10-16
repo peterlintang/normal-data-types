@@ -1363,6 +1363,9 @@ MemoryPool* init_memory_pool(int max_nodes)
     mp->pool_buffer = (RB_Node)malloc(sizeof(*node) * max_nodes);
     mp->free_list = (RB_Node *)malloc(sizeof(node) * max_nodes);
 
+    memset(mp->pool_buffer, 0, sizeof(*node) * max_nodes);
+    memset(mp->free_list, 0, sizeof(node) * max_nodes);
+
     if (!mp->pool_buffer || !mp->free_list) {
         if (mp->pool_buffer) free(mp->pool_buffer);
         if (mp->free_list) free(mp->free_list);
@@ -1420,6 +1423,10 @@ static void test_rb(void)
 
 	tree = MODULE_FUN_NAME(RB_Tree, new)(rb_cmp);
 
+	struct timeval time1;
+	struct timeval time2;
+	gettimeofday(&time1, NULL);
+
 	for (int i = 0; i < RB_ITEM_LEN; i++)
 	{
 #if YY
@@ -1427,7 +1434,11 @@ static void test_rb(void)
 #else
 		node = pool_alloc_node(mp);
 #endif
+#if YY
 		node->priv = (void *)((random()) % RB_ITEM_LEN + 1);
+#else
+		node->priv = (void *)((i + 1) % RB_ITEM_LEN + 1);
+#endif
 		MODULE_FUN_NAME(RB_Tree, insert)(tree, node);
 		/*
 		if (is_valid_rbtree(tree->root) == 0)
@@ -1446,7 +1457,11 @@ static void test_rb(void)
 	for (int i = 0; i < RB_ITEM_LEN; i++)
 	{
 		//node = MODULE_FUN_NAME(RB_Tree, search)(tree, (void *)(random() % RB_ITEM_LEN + 1));
+#if YY
 		node = MODULE_FUN_NAME(RB_Tree, iterative_search)(tree, (void *)(random() % RB_ITEM_LEN + 1));
+#else
+		node = MODULE_FUN_NAME(RB_Tree, iterative_search)(tree, (void *)((i + 1) % RB_ITEM_LEN + 1));
+#endif
 		if (node)
 		{
 //		fprintf(stdout, "delete i: %d, value: %d\n", i, (int)(node->priv));
@@ -1469,6 +1484,11 @@ static void test_rb(void)
 	}
 //	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
 
+	gettimeofday(&time2, NULL);
+	fprintf(stdout, "testing : %s, elapse: %ld seconds, %ld useconds\n", 
+				"inside",
+				time2.tv_sec - time1.tv_sec,
+				time2.tv_usec - time1.tv_usec);
 #if YY
 	MODULE_FUN_NAME(RB_Tree, free)(&tree);
 #else
