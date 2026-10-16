@@ -31,27 +31,51 @@ static NODE tree_search(T tree,
 		return tree_search(tree, x->right, key);
 }
 
+static NODE tree_search2(T tree, NODE x, void *key)
+{
+	int result = 0;
+	while ((x != NULL) && (x != tree->nil) && ((result = tree->cmp(x->priv, key)) != 0))
+	{
+		if (result > 0)
+			x = x->left;
+		else
+			x = x->right;
+	}
+
+	if (x == tree->nil)
+		return NULL;
+	return x;
+}
+
 NODE MODULE_FUN_NAME(RB_Tree, search)(T tree, void *key)
 {
 	assert(tree && key);
 
+#define USE_METHOD 0
+#if USE_METHOD
 	return tree_search(tree, tree->root, key);
+#else
+	return tree_search2(tree, tree->root, key);
+#endif
 }
 
 NODE MODULE_FUN_NAME(RB_Tree, iterative_search)(T tree, void *key)
 {
 	assert(tree && key);
 
+	int result = 0;
 	NODE x = tree->root;
 
-	while ((x != tree->nil) && tree->cmp(x->priv, key) != 0)
+	while ((x != tree->nil) && ((result = tree->cmp(x->priv, key)) != 0))
 	{
-		if (tree->cmp(x->priv, key) > 0)
+//		if (tree->cmp(x->priv, key) > 0)
+		if (result > 0)
 			x = x->left;
 		else
 			x = x->right;
 	}
 
+	if (x == tree->nil) x = NULL;
 	return x;
 }
 
@@ -73,7 +97,7 @@ static NODE tree_minimum(T tree, NODE x)
 	if (minimax < count)
 	{
 		minimax = count;
-		fprintf(stdout, "minimum: %d\n", count);
+//		fprintf(stdout, "minimum: %d\n", count);
 	}
 
 	return x;
