@@ -1,4 +1,7 @@
 
+sudo perf record -g ./my_program
+sudo perf report -k perf.data
+
 valgrind --tool=callgrind ./a.out
 kcachegrind callgrind.out.131248 
 
