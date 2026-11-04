@@ -144,7 +144,7 @@ static void test_queue_array(void)
 	int i;
 	int *p = NULL;
 
-	q = MODULE_FUN_NAME(QueueA, new)(QUEUEA_ITEM_LEN + 1, sizeof(struct aa));
+	q = MODULE_FUN_NAME(QueueA, new)(QUEUEA_ITEM_LEN, sizeof(struct aa));
 	if (NULL == q)
 		return ;
 
@@ -1734,7 +1734,7 @@ static void test_queue(void)
 	int ret = 0;
 	int *value = NULL;
 
-	q = MODULE_FUN_NAME(Queue, new)(QUEUE_ITEM_LEN + 1);
+	q = MODULE_FUN_NAME(Queue, new)(QUEUE_ITEM_LEN);
 
 	for (int i = 0; i <	QUEUE_ITEM_LEN; i++)
 	{
