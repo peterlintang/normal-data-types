@@ -41,7 +41,7 @@ T MODULE_FUN_NAME(QueueA, new)(int length, int size)
 	T q = (T)calloc(1, sizeof(*q));
 	if (q)
 	{
-		q->head = MODULE_FUN_NAME(Array, new)(length, size);
+		q->head = MODULE_FUN_NAME(Array, new)(length + 1, size); //多的一个作哨兵
 		if (NULL == q->head)
 		{
 			free(q);
