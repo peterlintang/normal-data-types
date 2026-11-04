@@ -32,7 +32,7 @@ T MODULE_FUN_NAME(Queue, new)(int size)
 	q = (T)calloc(1, sizeof(*q));
 	if (q)
 	{
-		q->array = (void **)calloc(1, size * sizeof(void *));
+		q->array = (void **)calloc(1, (size + 1) * sizeof(void *)); //有一个作标兵
 		if (q->array == NULL)
 		{
 			free(q);
@@ -40,7 +40,7 @@ T MODULE_FUN_NAME(Queue, new)(int size)
 		}
 		else
 		{
-			q->size = size;
+			q->size = size + 1;
 		}
 	}
 
@@ -106,10 +106,10 @@ int MODULE_FUN_NAME(Queue, en)(T q, void *x)
 	}
 
 	q->array[q->tail] = x;
+	q->tail++;
 	if (q->tail == q->size)
-		q->tail = (q->tail + 1) % q->size;
-	else
-		q->tail = q->tail + 1;
+		q->tail = 0;
+	//printf("en head: %d, tail: %d\n", q->head, q->tail);
 
 	return 0;
 }
@@ -130,10 +130,10 @@ int MODULE_FUN_NAME(Queue, de)(T q, void **p)
 	}
 
 	*p = q->array[q->head];
+	q->head++;
 	if (q->head == q->size)
-		q->head = (q->head + 1) % q->size;
-	else
-		q->head = q->head + 1;
+		q->head = 0;
+	//printf("de head: %d, tail: %d\n", q->head, q->tail);
 
 	return 0;
 }
