@@ -133,7 +133,7 @@ static void test_stack_link(void)
 #include "queue_array.h"
 static void test_queue_array(void)
 {
-#define QUEUEA_ITEM_LEN	10240000
+#define QUEUEA_ITEM_LEN	1024
 	struct aa {
 		int a;
 		char b[11];
@@ -154,7 +154,7 @@ static void test_queue_array(void)
 		struct aa tmp; 
 		tmp.a = i;
 		strcpy(tmp.b, "hello");
-		fprintf(stdout, "i: %d, \n", i);
+		//fprintf(stdout, "i: %d, \n", i);
 		MODULE_FUN_NAME(QueueA, put)(q, (void *)&tmp);
 	}
 
@@ -163,9 +163,13 @@ static void test_queue_array(void)
 	{
 		struct aa *tmp = NULL;
 		MODULE_FUN_NAME(QueueA, get)(q, (void **)&tmp);
-		fprintf(stdout, "i: %d, \n", i);
-		if (tmp != NULL)
-			fprintf(stdout, "first get: value: %d, %s\n", tmp->a, tmp->b);
+		if (tmp->a != i)
+		{
+			fprintf(stdout, "i: %d, \n", i);
+			if (tmp != NULL)
+				fprintf(stdout, "first get: value: %d, %s\n", tmp->a, tmp->b);
+		}
+			
 	}
 
 	fprintf(stdout, "puttiing 2\n");
@@ -174,18 +178,21 @@ static void test_queue_array(void)
 		struct aa tmp; 
 		tmp.a = i;
 		strcpy(tmp.b, "world");
-		fprintf(stdout, "i: %d, \n", i);
+		//fprintf(stdout, "i: %d, \n", i);
 		MODULE_FUN_NAME(QueueA, put)(q, (void *)&tmp);
 	}
 
 	fprintf(stdout, "gettiing \n");
+	int count = 0;
 	while (MODULE_FUN_NAME(QueueA, isEmpty)(q) == 0)
 	{
 		struct aa *tmp = NULL;
 		MODULE_FUN_NAME(QueueA, get)(q, (void **)&tmp);
 		if (tmp != NULL)
 		{
-			fprintf(stdout, "second get: value: %d, %s\n", tmp->a, tmp->b);
+			if (tmp->a != count)
+				fprintf(stdout, "second get: value: %d, %s\n", tmp->a, tmp->b);
+			count++;
 		}
 	}
 
@@ -1291,6 +1298,41 @@ static int rb_cmp(void *arg1, void *arg2)
 	}
 }
 
+int get_black_target(RB_Node root) {
+    int target = 0;
+    while (root != NULL) {
+        if (root->color == BLACK) target++;
+        root = root->left;
+    }
+    return target;
+}
+
+int verify_rbtree_helper(RB_Node node, int black_count, int target_black) {
+    if (node == NULL) {
+        return (black_count == target_black);
+    }
+
+    if (node->color == BLACK) {
+        black_count++;
+    } else {
+        if (node->left && node->left->color == RED) return 0;
+        if (node->right && node->right->color == RED) return 0;
+    }
+
+    return verify_rbtree_helper(node->left, black_count, target_black) &&
+           verify_rbtree_helper(node->right, black_count, target_black);
+}
+
+int is_valid_rbtree(RB_Node root) {
+    if (root == NULL) return 1;
+
+    if (root->color != BLACK) return 0;
+
+    int target_black = get_black_target(root);
+    return verify_rbtree_helper(root, 0, target_black);
+}
+
+
 int rb_print(void *priv, void *arg)
 {
 	RB_Node node = (RB_Node)priv;
@@ -1300,40 +1342,172 @@ int rb_print(void *priv, void *arg)
 	return 0;
 }
 
+// ==========================================
+// 2. 内存池结构体定义
+// ==========================================
+typedef struct MemoryPool {
+    RB_Node pool_buffer;    // 指向一次性申请的超大连续内存块
+    RB_Node *free_list;     // 回收站（空闲链表栈），用于存放被 free 的节点指针
+    int max_nodes;          // 内存池容量上限
+    int next_available;     // 大内存块中下一个未被使用的节点下标
+    int free_top;           // 回收站栈顶指针
+} MemoryPool;
+
+// ==========================================
+// 3. 内存池核心操作接口
+// ==========================================
+
+MemoryPool* init_memory_pool(int max_nodes)
+{
+    MemoryPool *mp = (MemoryPool *)malloc(sizeof(MemoryPool));
+    if (!mp) return NULL;
+
+    mp->max_nodes = max_nodes;
+    mp->next_available = 0;
+    mp->free_top = 0;
+
+    RB_Node node = NULL;
+    mp->pool_buffer = (RB_Node)malloc(sizeof(*node) * max_nodes);
+    mp->free_list = (RB_Node *)malloc(sizeof(node) * max_nodes);
+
+    memset(mp->pool_buffer, 0, sizeof(*node) * max_nodes);
+    memset(mp->free_list, 0, sizeof(node) * max_nodes);
+
+    if (!mp->pool_buffer || !mp->free_list) {
+        if (mp->pool_buffer) free(mp->pool_buffer);
+        if (mp->free_list) free(mp->free_list);
+        free(mp);
+        return NULL;
+    }
+    return mp;
+}
+
+static inline RB_Node pool_alloc_node(MemoryPool *mp) {
+    if (mp->free_top > 0) {
+        mp->free_top--;
+        return mp->free_list[mp->free_top];
+    }
+
+    if (mp->next_available < mp->max_nodes) {
+        RB_Node node = &mp->pool_buffer[mp->next_available];
+        mp->next_available++;
+        return node;
+    }
+
+    return NULL;
+}
+
+static inline void pool_free_node(MemoryPool *mp, RB_Node node) {
+    if (!node) return;
+
+    mp->free_list[mp->free_top] = node;
+    mp->free_top++;
+}
+
+void destroy_memory_pool(MemoryPool *mp) {
+    if (!mp) return;
+    free(mp->pool_buffer);
+    free(mp->free_list);
+    free(mp);
+}
+
+
+
 static void test_rb(void)
 {
-#define RB_ITEM_LEN	102400000
+#define YY	0
+#define RB_ITEM_LEN	10240000
 	RB_Tree tree = NULL;
 	RB_Node node = NULL;
 
+	MemoryPool *mp = NULL;
+	mp = init_memory_pool(10240000);
+	if (mp == NULL)
+	{
+		printf("%s: no mem\n", __func__);
+		return ;
+	}
+
 	tree = MODULE_FUN_NAME(RB_Tree, new)(rb_cmp);
+
+	struct timeval time1;
+	struct timeval time2;
+	gettimeofday(&time1, NULL);
 
 	for (int i = 0; i < RB_ITEM_LEN; i++)
 	{
+#if YY
 		node = (RB_Node)calloc(1, sizeof(*node));
+#else
+		node = pool_alloc_node(mp);
+#endif
+#if YY
 		node->priv = (void *)((random()) % RB_ITEM_LEN + 1);
+#else
+		node->priv = (void *)((i + 1) % RB_ITEM_LEN + 1);
+#endif
 		MODULE_FUN_NAME(RB_Tree, insert)(tree, node);
+		/*
+		if (is_valid_rbtree(tree->root) == 0)
+		{
+			fprintf(stdout, "TODO not a rb tree\n");
+		}
+		*/
 //		fprintf(stdout, "insert i: %d, %d...\n", i, (int)(node->priv));
 //		MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
 	}
 
-	fprintf(stdout, "after insert all\n");
-	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
+//	fprintf(stdout, "test is valid rbtree: %d\n", is_valid_rbtree(tree->root));
+
+//	fprintf(stdout, "after insert all\n");
+//	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
 	for (int i = 0; i < RB_ITEM_LEN; i++)
 	{
-		node = MODULE_FUN_NAME(RB_Tree, search)(tree, (void *)(random() % RB_ITEM_LEN + 1));
+		//node = MODULE_FUN_NAME(RB_Tree, search)(tree, (void *)(random() % RB_ITEM_LEN + 1));
+#if YY
+		node = MODULE_FUN_NAME(RB_Tree, iterative_search)(tree, (void *)(random() % RB_ITEM_LEN + 1));
+#else
+		node = MODULE_FUN_NAME(RB_Tree, iterative_search)(tree, (void *)((i + 1) % RB_ITEM_LEN + 1));
+#endif
 		if (node)
 		{
 //		fprintf(stdout, "delete i: %d, value: %d\n", i, (int)(node->priv));
 		MODULE_FUN_NAME(RB_Tree, delete)(tree, node);
-		MODULE_FUN_NAME(RB_Tree, minimum)(tree);
-		MODULE_FUN_NAME(RB_Tree, maximum)(tree);
+#if YY
+		free(node);
+#else
+		pool_free_node(mp, node);
+#endif
+//		MODULE_FUN_NAME(RB_Tree, minimum)(tree);
+//		MODULE_FUN_NAME(RB_Tree, maximum)(tree);
 		}
+		else
+		{
+#if YY == 0
+			fprintf(stdout, "not found node: %d\n", (i + 1) % RB_ITEM_LEN + 1);
+#endif
+		}
+		/*
+		if (is_valid_rbtree(tree->root) == 0)
+		{
+			fprintf(stdout, "TODO not a rb tree\n");
+		}
+		*/
 //	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
 	}
 //	MODULE_FUN_NAME(RB_Tree, inorder_walk)(tree, tree->root, rb_print, NULL);
 
-//	MODULE_FUN_NAME(RB_Tree, free)(&tree);
+	gettimeofday(&time2, NULL);
+	fprintf(stdout, "testing : %s, elapse: %ld seconds, %ld useconds\n", 
+				"inside",
+				time2.tv_sec - time1.tv_sec,
+				time2.tv_usec - time1.tv_usec);
+#if YY
+	MODULE_FUN_NAME(RB_Tree, free)(&tree);
+#else
+#endif
+	MODULE_FUN_NAME(RB_Tree, free)(&tree);
+	destroy_memory_pool(mp);
 }
 
 #include "fib-heap.h"
@@ -1360,7 +1534,7 @@ static int fib_cmp(void *arg1, void *arg2)
 
 static void test_fib(void)
 {
-#define FIB_ITEM_LEN	1024000
+#define FIB_ITEM_LEN	102400
 #define FIB_INFINITE	0
 	FibHeap_T h1 = NULL;
 	FibHeap_T h2 = NULL;
@@ -1385,7 +1559,7 @@ static void test_fib(void)
 	for (int i = 0; i < FIB_ITEM_LEN; i++)
 	{
 		node = MODULE_FUN_NAME(FibHeap, extractMin)(h1);
-		fprintf(stdout, "i: %d, value: %d\n", i, (int)(MODULE_FUN_NAME(FibHeap, NodePriv)(node)));
+		//fprintf(stdout, "i: %d, value: %d\n", i, (int)(MODULE_FUN_NAME(FibHeap, NodePriv)(node)));
 		MODULE_FUN_NAME(FibHeap, NodeFree)(&node);
 	}
 	
@@ -1407,7 +1581,7 @@ static void test_fib(void)
 	for (int i = 0; i < FIB_ITEM_LEN; i++)
 	{
 		node = MODULE_FUN_NAME(FibHeap, minmum)(h2);
-		fprintf(stdout, "i: %d, value: %d\n", i, (int)(MODULE_FUN_NAME(FibHeap, NodePriv)(node)));
+		//fprintf(stdout, "i: %d, value: %d\n", i, (int)(MODULE_FUN_NAME(FibHeap, NodePriv)(node)));
 		MODULE_FUN_NAME(FibHeap, delete)(h2, node);
 		MODULE_FUN_NAME(FibHeap, NodeFree)(&node);
 	}
@@ -1430,19 +1604,20 @@ static void test_fib(void)
 
 	h3 = MODULE_FUN_NAME(FibHeap, union)(&h1, &h2);
 	fprintf(stdout, "h3:\n");
-	MODULE_FUN_NAME(FibHeap, print)(h3);
+//	MODULE_FUN_NAME(FibHeap, print)(h3);
 	for (int i = 0; i < FIB_ITEM_LEN; i++)
 	{
 	//	node = MODULE_FUN_NAME(FibHeap, minmum)(h3);
 		node = MODULE_FUN_NAME(FibHeap, extractMin)(h3);
-		fprintf(stdout, "i: %d, value: %d\n", i, (int)(MODULE_FUN_NAME(FibHeap, NodePriv)(node)));
+		//fprintf(stdout, "i: %d, value: %d\n", i, (int)(MODULE_FUN_NAME(FibHeap, NodePriv)(node)));
 //	MODULE_FUN_NAME(FibHeap, print)(h3);
 //		MODULE_FUN_NAME(FibHeap, delete)(h3, node);
 		MODULE_FUN_NAME(FibHeap, NodeFree)(&node);
+		//MODULE_FUN_NAME(FibHeap, print)(h3);
 	}
 	MODULE_FUN_NAME(FibHeap, print)(h3);
 
-//	MODULE_FUN_NAME(FibHeap, free)(&h1);
+	MODULE_FUN_NAME(FibHeap, free)(&h3);
 
 }
 
@@ -1729,22 +1904,24 @@ static void test_list(void)
 
 static void test_queue(void)
 {
-#define QUEUE_ITEM_LEN	10240000
+#define QUEUE_ITEM_LEN	3
 	Queue_T q = NULL;
 	int ret = 0;
 	int *value = NULL;
+	int count = 0;
 
 	q = MODULE_FUN_NAME(Queue, new)(QUEUE_ITEM_LEN);
 
 	for (int i = 0; i <	QUEUE_ITEM_LEN; i++)
 	{
-		ret = MODULE_FUN_NAME(Queue, en)(q, (void *)i);
+		ret = MODULE_FUN_NAME(Queue, en)(q, (void *)count);
 		if (ret != 0)
 		{
 			fprintf(stdout, "put i: %d to queue failed\n", i);
 		}
+		count++;
 	}
-	for (int i = 0; i < QUEUE_ITEM_LEN; i++)
+	for (int i = 0; i < QUEUE_ITEM_LEN * 2; i++)
 	{
 		ret = MODULE_FUN_NAME(Queue, de)(q, (void **)&value);
 		if (ret != 0)
@@ -1754,6 +1931,17 @@ static void test_queue(void)
 		if ((int)value != i)
 		{
 			fprintf(stdout, "i: %d, value: %d\n", i, (int)value);
+		}
+		ret = MODULE_FUN_NAME(Queue, en)(q, (void *)count);
+		if (ret != 0)
+		{
+			fprintf(stdout, "put i: %d to queue failed\n", i);
+		}
+		count++;
+		ret = MODULE_FUN_NAME(Queue, en)(q, (void *)count);
+		if (ret != 0)
+		{
+			fprintf(stdout, "put i: %d to queue failed\n", i);
 		}
 	}
 
@@ -1769,7 +1957,7 @@ static void test_stack(void)
 	int ret = 0;
 	int *value = NULL;
 
-	s = MODULE_FUN_NAME(Stack, new)(STACK_ITEM_LEN + 1);
+	s = MODULE_FUN_NAME(Stack, new)(STACK_ITEM_LEN);
 
 	for (int i = 0; i < STACK_ITEM_LEN; i++)
 	{
@@ -1885,7 +2073,7 @@ static void test_gve(void)
 	{
 		e = (Edge_T)MODULE_FUN_NAME(Graph, EdgeGet)(g, i);
 		if (e == NULL) continue;
-		fprintf(stdout, "edge: %d %p \n", (int)MODULE_FUN_NAME(Graph, EdgeGetPriv)(e), e);
+		//fprintf(stdout, "edge: %d %p \n", (int)MODULE_FUN_NAME(Graph, EdgeGetPriv)(e), e);
 		MODULE_FUN_NAME(Graph, EdgeRemove)(g, e);
 		MODULE_FUN_NAME(Graph, EdgeFree)(&e);
 	}
@@ -1896,7 +2084,7 @@ static void test_gve(void)
 	{
 		v = (VNode_T)MODULE_FUN_NAME(Graph, VnodeGet)(g, i);
 		if (v == NULL) continue;
-		fprintf(stdout, "vnode: %d %p \n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v), v);
+		//fprintf(stdout, "vnode: %d %p \n", (int)MODULE_FUN_NAME(Graph, VnodeGetPriv)(v), v);
 		MODULE_FUN_NAME(Graph, VnodeRemove)(g, v);
 		MODULE_FUN_NAME(Graph, VnodeFree)(&v);
 	}
@@ -2011,8 +2199,10 @@ static void test_gve_array(void)
 		edge_ext_p->value = i;
 		edge_ext_p->d = i;
 		edge_ext_p->f = i;
+		/*
 		fprintf(stdout, "i: %d, value: %d, d: %d, f: %d, v: %p, u: %p, edge: %p, ext: %p\n", 
 						i, edge_ext_p->value, edge_ext_p->d, edge_ext_p->f, node_v, node_u, edge, edge_ext_p);
+						*/
 	}
 
 	fprintf(stdout, "edges: third\n");
@@ -2021,8 +2211,10 @@ static void test_gve_array(void)
 		edge = (EdgeA_T)MODULE_FUN_NAME(GraphA, EdgeGet)(g, i);
 		edge_ext_p = MODULE_FUN_NAME(GraphA, EdgeGetPriv)(edge);
 		MODULE_FUN_NAME(GraphA, EdgeGetVnodes)(edge, (void **)&node_v, (void **)&node_u);
+		/*
 		fprintf(stdout, "i: %d, value: %d, d: %d, f: %d, v: %p, u: %p, edge: %p, ext: %p\n", 
 						i, edge_ext_p->value, edge_ext_p->d, edge_ext_p->f, node_v, node_u, edge, edge_ext_p);
+						*/
 	}
 
 	MODULE_FUN_NAME(GraphA, free)(&g);
@@ -2090,6 +2282,47 @@ static  void test_sential_list(void)
 	MODULE_FUN_NAME(SenDlink, destroy)(&senLink);
 }
 
+#include "thread_pool.h"
+#include "stdatomic.h"
+
+static void thread_pool_cb(void *p)
+{
+#if 0
+	static int a = 3;
+	static int b = 8;
+
+	printf("%d a+b: %d\n", (int)pthread_self(), a + b);
+	a++;
+	b++;
+#else
+	static atomic_int a = 0;
+	printf("%d: %d\n", (int)pthread_self(), a++);
+#endif
+	usleep(10);
+}
+
+static void test_thread_pool(void)
+{
+	ThreadPool_T pool = NULL;
+
+	pool = MODULE_FUN_NAME(ThreadPool, new)(8, 2048);
+	MODULE_FUN_NAME(ThreadPool, init)(pool);
+
+	for (int i = 0; i < 1024 * 4; i++)
+	{
+		MODULE_FUN_NAME(ThreadPool, post)(
+			pool, 
+			thread_pool_cb, 
+			NULL);
+	}
+
+	usleep(1000*100);
+
+	MODULE_FUN_NAME(ThreadPool, destroy)(pool);
+	MODULE_FUN_NAME(ThreadPool, free)(&pool);
+}
+
+
 struct test_routine {
 	void (*call_back)(void);
 	char *name;
@@ -2131,6 +2364,7 @@ struct test_routine my_test_routines[] =
 //		{test_binary_tree, "binary_tree"},		// ko
 //		{test_sbit, "sbit"},					// ko 其他地方验证过ok
 //		{test_ring_buf, "ring_buf"},			// ko 其他地方验证过ok
+//		{test_thread_pool, "thread_pool"},			//
 		{NULL,NULL},
 };
 
