@@ -80,22 +80,29 @@ static void test_queue_link(void)
 #define QUUEE_LINK_ITEM_LEN	10240000
 	QueueL_T q = NULL;
 	int i;
+	int count = 0;
 	int *p = NULL;
 
 	q = MODULE_FUN_NAME(QueueL, new)(10);
 	if (NULL == q)
 		return ;
 
+for (int k = 0; k < 10; k++)
+{
 	for (i = 0; i < QUUEE_LINK_ITEM_LEN; i++)
 	{
 		MODULE_FUN_NAME(QueueL, put)(q, (void *)i);
 	}
 
+	count = 0;
 	while (MODULE_FUN_NAME(QueueL, isEmpty)(q) == 0)
 	{
 		MODULE_FUN_NAME(QueueL, get)(q, (void **)&p);
-		fprintf(stdout, "value: %d\n", (int)p);
+		if ((int)p != count)
+			fprintf(stdout, "error value: %d\n", (int)p);
+		count++;
 	}
+}
 
 	MODULE_FUN_NAME(QueueL, free)(&q);
 }
@@ -133,7 +140,7 @@ static void test_stack_link(void)
 #include "queue_array.h"
 static void test_queue_array(void)
 {
-#define QUEUEA_ITEM_LEN	1024
+#define QUEUEA_ITEM_LEN	10240000
 	struct aa {
 		int a;
 		char b[11];
@@ -142,37 +149,51 @@ static void test_queue_array(void)
 
 	QueueA_T q = NULL;
 	int i;
+	int count = 0;
+	int ret = 0;
 	int *p = NULL;
 
 	q = MODULE_FUN_NAME(QueueA, new)(QUEUEA_ITEM_LEN, sizeof(struct aa));
 	if (NULL == q)
 		return ;
 
-	fprintf(stdout, "putiing \n");
+for (int k = 0; k < 10; k++)
+{
+	//fprintf(stdout, "putiing \n");
 	for (i = 0; i < QUEUEA_ITEM_LEN; i++)
 	{
 		struct aa tmp; 
 		tmp.a = i;
 		strcpy(tmp.b, "hello");
 		//fprintf(stdout, "i: %d, \n", i);
-		MODULE_FUN_NAME(QueueA, put)(q, (void *)&tmp);
+		ret = MODULE_FUN_NAME(QueueA, put)(q, (void *)&tmp);
+		if (ret != 0)
+		{
+			printf("put %d error\n", i);
+		}
 	}
 
-	fprintf(stdout, "gettiing \n");
+	count = 0;
+	//fprintf(stdout, "gettiing \n");
 	for (i = 0; i < QUEUEA_ITEM_LEN; i++)
 	{
 		struct aa *tmp = NULL;
-		MODULE_FUN_NAME(QueueA, get)(q, (void **)&tmp);
-		if (tmp->a != i)
+		ret = MODULE_FUN_NAME(QueueA, get)(q, (void **)&tmp);
+		if (ret != 0)
+		{
+			printf("get %d error\n", i);
+		}
+		if (tmp->a != count)
 		{
 			fprintf(stdout, "i: %d, \n", i);
 			if (tmp != NULL)
 				fprintf(stdout, "first get: value: %d, %s\n", tmp->a, tmp->b);
 		}
+		count++;
 			
 	}
 
-	fprintf(stdout, "puttiing 2\n");
+	//fprintf(stdout, "puttiing 2\n");
 	for (i = 0; i < QUEUEA_ITEM_LEN; i++)
 	{
 		struct aa tmp; 
@@ -182,8 +203,8 @@ static void test_queue_array(void)
 		MODULE_FUN_NAME(QueueA, put)(q, (void *)&tmp);
 	}
 
-	fprintf(stdout, "gettiing \n");
-	int count = 0;
+	//fprintf(stdout, "gettiing \n");
+	count = 0;
 	while (MODULE_FUN_NAME(QueueA, isEmpty)(q) == 0)
 	{
 		struct aa *tmp = NULL;
@@ -195,8 +216,9 @@ static void test_queue_array(void)
 			count++;
 		}
 	}
+}
 
-	fprintf(stdout, "freeing \n");
+	//fprintf(stdout, "freeing \n");
 	MODULE_FUN_NAME(QueueA, free)(&q);
 }
 #endif
@@ -1904,7 +1926,7 @@ static void test_list(void)
 
 static void test_queue(void)
 {
-#define QUEUE_ITEM_LEN	3
+#define QUEUE_ITEM_LEN	10240000
 	Queue_T q = NULL;
 	int ret = 0;
 	int *value = NULL;
@@ -1912,16 +1934,17 @@ static void test_queue(void)
 
 	q = MODULE_FUN_NAME(Queue, new)(QUEUE_ITEM_LEN);
 
+for (int k = 0; k < 10; k++)
+{
 	for (int i = 0; i <	QUEUE_ITEM_LEN; i++)
 	{
-		ret = MODULE_FUN_NAME(Queue, en)(q, (void *)count);
+		ret = MODULE_FUN_NAME(Queue, en)(q, (void *)i);
 		if (ret != 0)
 		{
 			fprintf(stdout, "put i: %d to queue failed\n", i);
 		}
-		count++;
 	}
-	for (int i = 0; i < QUEUE_ITEM_LEN * 2; i++)
+	for (int i = 0; i < QUEUE_ITEM_LEN; i++)
 	{
 		ret = MODULE_FUN_NAME(Queue, de)(q, (void **)&value);
 		if (ret != 0)
@@ -1932,18 +1955,8 @@ static void test_queue(void)
 		{
 			fprintf(stdout, "i: %d, value: %d\n", i, (int)value);
 		}
-		ret = MODULE_FUN_NAME(Queue, en)(q, (void *)count);
-		if (ret != 0)
-		{
-			fprintf(stdout, "put i: %d to queue failed\n", i);
-		}
-		count++;
-		ret = MODULE_FUN_NAME(Queue, en)(q, (void *)count);
-		if (ret != 0)
-		{
-			fprintf(stdout, "put i: %d to queue failed\n", i);
-		}
 	}
+}
 
 	MODULE_FUN_NAME(Queue, free)(&q);
 }
